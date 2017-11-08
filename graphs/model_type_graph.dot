@@ -1,0 +1,389 @@
+
+digraph G {
+    graph [sep=0.5, ranksep=2];
+    node [colorscheme="pastel18"];
+    rankdir="LR";
+
+    subgraph interface_like {
+        style=invis;
+        subgraph interface {
+            /*node [
+                style=filled,
+                fillcolor=1
+            ];*/
+        "*btsmodel.BTSProjectDBCollection" [color="#cc3d51"];
+        "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BtsmodelPackage" [color="#cc913d"];
+        "*btsmodel.BTSObservableObject" [color="#9bcc3d"];
+        "*btsmodel.BTSRelation" [color="#3d44cc"];
+        "*btsmodel.BTSIDReservationObject" [color="#7acc3d"];
+        "*btsmodel.BTSTimespan" [color="#3dcc3d"];
+        "*btsmodel.BTSUser" [color="#c7cc3d"];
+        "*btsmodel.BTSConfiguration" [color="#703dcc"];
+        "*btsmodel.BTSInterTextReference" [color="#733dcc"];
+        "*btsmodel.BTSPassportEditorConfig" [color="#a2cc3d"];
+        "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSConfig" [color="#cb3dcc"];
+        "*btsmodel.BTSUserGroup" [color="#513dcc"];
+        "*btsmodel.BTSTranslations" [color="#cc763d"];
+        "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.BTSWorkflowRuleItem" [color="#a9cc3d"];
+        "*btsmodel.BTSConfigItem" [color="#95cc3d"];
+        "*btsmodel.AdministrativDataObject" [color="#6c3dcc"];
+        "*btsmodel.BTSNamedTypedObject" [color="#3d4ecc"];
+        "*btsmodel.UserActionCounter" [color="#ccc43d"];
+        "*btsmodel.BTSProject" [color="#cc583d"];
+        "*btsmodel.BTSExternalReference" [color="#3dcc40"];
+        "*btsmodel.BTSRevision" [color="#3d6ccc"];
+        "*btsmodel.BTSDBConnection" [color="#73cc3d"];
+        "*btsmodel.BTSTranslation" [color="#3dcc76"];
+        "*btsmodel.BTSDate" [color="#3dcc95"];
+        "*btsmodel.BTSReferencableItem" [color="#3dcc80"];
+        "*btsmodel.BTSComment" [color="#843dcc"];
+        "*btsmodel.BTSWorkflowRule" [color="#3d9bcc"];
+        "*btsmodel.BTSDBCollectionRoleDesc" [color="#cc873d"];
+        "*btsmodel.DBLease" [color="#cc653d"];
+        "*btsmodel.BTSOperator" [color="#3dcc6c"];
+        }
+    }
+
+    subgraph class_like {
+        style=invis;
+        subgraph class {
+            node [
+                shape=box,
+                /*style=filled,
+                fillcolor=2*/
+            ];
+        "*btsmodel.impl.BTSExternalReferenceImpl" [color="#3d70cc"];
+        "*btsmodel.impl.BTSTimespanImpl" [color="#3d65cc"];
+        "*btsmodel.impl.BTSDBConnectionImpl" [color="#473dcc"];
+        "*btsmodel.impl.BTSDateImpl" [color="#3dcc73"];
+        "*btsmodel.impl.BTSTranslationImpl" [color="#cc5f3d"];
+        "*btsmodel.impl.BTSConfigurationImpl" [color="#3dcc58"];
+        "*btsmodel.impl.BTSRevisionImpl" [color="#98cc3d"];
+        "*btsmodel.impl.BTSDBCollectionRoleDescImpl" [color="#cc3d9b"];
+        "*btsmodel.impl.BTSIDReservationObjectImpl" [color="#a2cc3d"];
+        "*btsmodel.impl.BTSUserImpl" [color="#cc3d95"];
+        "*btsmodel.impl.BTSUserGroupImpl" [color="#3d95cc"];
+        "*btsmodel.impl.BTSOperatorImpl" [color="#7dcc3d"];
+        "*btsmodel.impl.BTSPassportEditorConfigImpl" [color="#ccb63d"];
+        "*btsmodel.impl.BTSInterTextReferenceImpl" [color="#3dcc76"];
+        "*btsmodel.impl.BTSTranslationsImpl" [color="#c43dcc"];
+        "*btsmodel.impl.BTSRelationImpl" [color="#cccb3d"];
+        "*btsmodel.impl.BTSConfigItemImpl" [color="#5fcc3d"];
+        "*btsmodel.impl.BTSProjectImpl" [color="#84cc3d"];
+        "*btsmodel.impl.BTSProjectDBCollectionImpl" [color="#cc3d3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" [color="#58cc3d"];
+        "*btsmodel.impl.BTSCommentImpl" [color="#3dcc6c"];
+        "*btsmodel.util.BtsmodelAdapterFactory" [color="#cc4e3d"];
+        "*btsmodel.impl.UserActionCounterImpl" [color="#cc3d95"];
+        "*btsmodel.impl.BTSWorkflowRuleImpl" [color="#69cc3d"];
+        "*btsmodel.impl.DBLeaseImpl" [color="#3dcc80"];
+        }
+
+        subgraph abstract_class {
+            node [
+                shape=box,
+                style=bold
+                /*style="bold,filled",
+                fillcolor=3*/
+            ];
+        "*btsmodel.impl.BTSNamedTypedObjectImpl" [color="#3dc7cc"];
+        "*btsmodel.impl.BTSReferencableItemImpl" [color="#a23dcc"];
+        "*btsmodel.impl.BTSConfigImpl" [color="#cc3d47"];
+        "*btsmodel.impl.BTSWorkflowRuleItemImpl" [color="#763dcc"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" [color="#4a3dcc"];
+        "*btsmodel.impl.BTSObjectImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSObservableObjectImpl" [color="#cc3dcb"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" [color="#cc3d5b"];
+        }
+
+        subgraph enum {
+            node [
+                style=dotted
+                /*style="dotted,filled",
+                fillcolor=4*/
+            ];
+
+        }
+    }
+
+    subgraph extends {
+        edge [weight=2.0];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.BTSUserImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSDBCollectionRoleDescImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.BTSReferencableItemImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSDBBaseObjectImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSPassportEditorConfigImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSRevisionImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.BTSProjectImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSDBConnectionImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.BTSUserGroupImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.impl.UserActionCounterImpl" [color="#4a3dcc"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#cc3d5b"];
+        "*btsmodel.impl.BTSConfigImpl" -> "*btsmodel.impl.BTSConfigurationImpl" [color="#cc3d47"];
+        "*btsmodel.impl.BTSObservableObjectImpl" -> "*btsmodel.impl.AdministrativDataObjectImpl" [color="#cc3dcb"];
+        "*btsmodel.impl.BTSObservableObjectImpl" -> "*btsmodel.impl.BTSWorkflowRuleItemImpl" [color="#cc3dcb"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSTranslationImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.BTSCommentImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSProjectDBCollectionImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSConfigImpl" -> "*btsmodel.impl.BTSConfigItemImpl" [color="#cc3d47"];
+        "*btsmodel.impl.BTSWorkflowRuleItemImpl" -> "*btsmodel.impl.BTSOperatorImpl" [color="#763dcc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSNamedTypedObjectImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.impl.DBLeaseImpl" [color="#4a3dcc"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.impl.BTSIDReservationObjectImpl" [color="#4a3dcc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSWorkflowRuleImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSExternalReferenceImpl" [color="#cc3d69"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.impl.BTSRelationImpl" [color="#cc3d69"];
+    }
+    
+    subgraph interface_extends {
+        edge [len=1.0, weight=5.0, dir=back];
+        "*btsmodel.BTSTranslation" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSRevision" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSExternalReference" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.AdministrativDataObject" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSDBConnection" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSIDReservationObject" -> "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.BTSReferencableItem" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSReferencableItem" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSDBCollectionRoleDesc" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSWorkflowRuleItem" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSNamedTypedObject" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSProject" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSNamedTypedObject" [color="#3d4ecc"];
+        "*btsmodel.BTSComment" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSWorkflowRule" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSProjectDBCollection" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.AdministrativDataObject" -> "*btsmodel.BTSObservableObject" [color="#9bcc3d"];
+        "*btsmodel.BTSUserGroup" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSPassportEditorConfig" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSRelation" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.BTSOperator" -> "*btsmodel.BTSWorkflowRuleItem" [color="#a9cc3d"];
+        "*btsmodel.BTSDBBaseObject" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.UserActionCounter" -> "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.BTSWorkflowRuleItem" -> "*btsmodel.BTSObservableObject" [color="#9bcc3d"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.DBLease" -> "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.BTSConfiguration" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSConfig" [color="#cb3dcc"];
+        "*btsmodel.BTSConfiguration" -> "*btsmodel.BTSConfig" [color="#cb3dcc"];
+        "*btsmodel.BTSObject" -> "*btsmodel.AdministrativDataObject" [color="#6c3dcc"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSObservableObject" [color="#9bcc3d"];
+        "*btsmodel.BTSUser" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+    }
+
+    subgraph implements {
+        edge [len=1.0, weight=5.0, dir=back];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#3d95cc"];
+        "*btsmodel.impl.BTSUserGroupImpl" -> "*btsmodel.BTSUserGroup" [color="#513dcc"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.impl.BTSOperatorImpl" -> "*btsmodel.BTSOperator" [color="#3dcc6c"];
+        "*btsmodel.impl.BTSWorkflowRuleItemImpl" -> "*btsmodel.BTSWorkflowRuleItem" [color="#a9cc3d"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.AdministrativDataObject" [color="#6c3dcc"];
+        "*btsmodel.impl.BTSRelationImpl" -> "*btsmodel.BTSRelation" [color="#3d44cc"];
+        "*btsmodel.impl.BTSProjectDBCollectionImpl" -> "*btsmodel.BTSProjectDBCollection" [color="#cc3d51"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSConfiguration" [color="#703dcc"];
+        "*btsmodel.impl.BTSDBCollectionRoleDescImpl" -> "*btsmodel.BTSDBCollectionRoleDesc" [color="#cc873d"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.BTSDBBaseObject" [color="#a6cc3d"];
+        "*btsmodel.impl.BTSIDReservationObjectImpl" -> "*btsmodel.BTSIDReservationObject" [color="#7acc3d"];
+        "*btsmodel.impl.BTSDBConnectionImpl" -> "*btsmodel.BTSDBConnection" [color="#73cc3d"];
+        "*btsmodel.impl.BTSTranslationImpl" -> "*btsmodel.BTSTranslation" [color="#3dcc76"];
+        "*btsmodel.impl.BTSDateImpl" -> "*btsmodel.BTSDate" [color="#3dcc95"];
+        "*btsmodel.impl.BTSReferencableItemImpl" -> "*btsmodel.BTSReferencableItem" [color="#3dcc80"];
+        "*btsmodel.impl.BTSExternalReferenceImpl" -> "*btsmodel.BTSExternalReference" [color="#3dcc40"];
+        "*btsmodel.impl.UserActionCounterImpl" -> "*btsmodel.UserActionCounter" [color="#ccc43d"];
+        "*btsmodel.impl.BTSPassportEditorConfigImpl" -> "*btsmodel.BTSPassportEditorConfig" [color="#a2cc3d"];
+        "*btsmodel.impl.BTSUserImpl" -> "*btsmodel.BTSUser" [color="#c7cc3d"];
+        "*btsmodel.impl.BTSObservableObjectImpl" -> "*btsmodel.BTSObservableObject" [color="#9bcc3d"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSConfigItem" [color="#95cc3d"];
+        "*btsmodel.impl.BTSTimespanImpl" -> "*btsmodel.BTSTimespan" [color="#3dcc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BtsmodelPackage" [color="#cc913d"];
+        "*btsmodel.impl.BTSNamedTypedObjectImpl" -> "*btsmodel.BTSNamedTypedObject" [color="#3d4ecc"];
+        "*btsmodel.impl.BTSInterTextReferenceImpl" -> "*btsmodel.BTSInterTextReference" [color="#733dcc"];
+        "*btsmodel.impl.BTSRevisionImpl" -> "*btsmodel.BTSRevision" [color="#3d6ccc"];
+        "*btsmodel.impl.BTSTranslationsImpl" -> "*btsmodel.BTSTranslations" [color="#cc763d"];
+        "*btsmodel.impl.BTSCommentImpl" -> "*btsmodel.BTSComment" [color="#843dcc"];
+        "*btsmodel.impl.DBLeaseImpl" -> "*btsmodel.DBLease" [color="#cc653d"];
+        "*btsmodel.impl.BTSProjectImpl" -> "*btsmodel.BTSProject" [color="#cc583d"];
+        "*btsmodel.impl.BTSWorkflowRuleImpl" -> "*btsmodel.BTSWorkflowRule" [color="#3d9bcc"];
+        "*btsmodel.impl.BTSConfigImpl" -> "*btsmodel.BTSConfig" [color="#cb3dcc"];
+    }
+
+    subgraph references {
+        edge [color=gray, weight=0];
+/*         "*btsmodel.impl.BTSWorkflowRuleItemImpl" -> "*btsmodel.BTSWorkflowRuleItem" [color="#763dcc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.impl.BtsmodelPackageImpl" [color="#58cc3d"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSExternalReference" [color="#3dbacc"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSConfiguration" [color="#3dcc58"];
+        "*btsmodel.BTSWorkflowRuleItem" -> "*btsmodel.BTSIdentifiableItem" [color="#a9cc3d"];
+        "*btsmodel.BTSWorkflowRuleItem" -> "*btsmodel.BTSObservableObject" [color="#a9cc3d"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.BTSDBBaseObject" [color="#cc3d5b"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSDBCollectionRoleDesc" [color="#58cc3d"];
+        "*btsmodel.impl.BTSInterTextReferenceImpl" -> "*btsmodel.BTSInterTextReference" [color="#3dcc76"];
+        "*btsmodel.impl.BTSTimespanImpl" -> "*btsmodel.BTSDate" [color="#3d65cc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSReferencableItem" [color="#58cc3d"];
+        "*btsmodel.impl.BTSWorkflowRuleImpl" -> "*btsmodel.BTSWorkflowRule" [color="#69cc3d"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.impl.AdministrativDataObjectImpl" [color="#3dbacc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSTimespan" [color="#58cc3d"];
+        "*btsmodel.BTSRevision" -> "*btsmodel.BTSIdentifiableItem" [color="#3d6ccc"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#5fcc3d"];
+        "*btsmodel.BTSReferencableItem" -> "*btsmodel.BTSIdentifiableItem" [color="#3dcc80"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSWorkflowRuleItem" [color="#95cc3d"];
+        "*btsmodel.impl.BTSTimespanImpl" -> "*btsmodel.BTSTimespan" [color="#3d65cc"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSDBBaseObject" [color="#3dbacc"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSObject" [color="#3dcc58"];
+        "*btsmodel.AdministrativDataObject" -> "*btsmodel.BTSIdentifiableItem" [color="#6c3dcc"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSObservableObject" [color="#5fcc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSConfiguration" [color="#58cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSOperator" [color="#58cc3d"];
+        "*btsmodel.impl.BTSProjectDBCollectionImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#cc3d3d"];
+        "*btsmodel.impl.BTSExternalReferenceImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#3d70cc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSRelation" [color="#58cc3d"];
+        "*btsmodel.impl.BTSProjectImpl" -> "*btsmodel.BTSProject" [color="#84cc3d"];
+        "*btsmodel.BTSUser" -> "*btsmodel.BTSObject" [color="#c7cc3d"];
+        "*btsmodel.impl.BTSOperatorImpl" -> "*btsmodel.BTSOperator" [color="#7dcc3d"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSNamedTypedObject" [color="#3dcc58"];
+        "*btsmodel.BTSDBCollectionRoleDesc" -> "*btsmodel.BTSIdentifiableItem" [color="#cc873d"];
+        "*btsmodel.impl.BTSProjectDBCollectionImpl" -> "*btsmodel.BTSProjectDBCollection" [color="#cc3d3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSProjectDBCollection" [color="#58cc3d"];
+        "*btsmodel.impl.BTSProjectImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#84cc3d"];
+        "*btsmodel.BTSOperator" -> "*btsmodel.BTSWorkflowRuleItem" [color="#3dcc6c"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSConfig" [color="#95cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSWorkflowRule" [color="#58cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSObject" [color="#58cc3d"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSTranslations" [color="#5fcc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSInterTextReference" [color="#58cc3d"];
+        "*btsmodel.impl.DBLeaseImpl" -> "*btsmodel.BTSDBBaseObject" [color="#3dcc80"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSRelation" [color="#3dcc58"];
+        "*btsmodel.impl.BTSConfigImpl" -> "*btsmodel.BTSConfig" [color="#cc3d47"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSExternalReference" [color="#58cc3d"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSRelation" [color="#3dbacc"];
+        "*btsmodel.BTSRelation" -> "*btsmodel.BTSInterTextReference" [color="#3d44cc"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSTranslations" [color="#95cc3d"];
+        "*btsmodel.BTSRelation" -> "*btsmodel.BTSIdentifiableItem" [color="#3d44cc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSConfig" [color="#58cc3d"];
+        "*btsmodel.impl.BTSDBConnectionImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#473dcc"];
+        "*btsmodel.BTSObject" -> "*btsmodel.AdministrativDataObject" [color="#3dbacc"];
+        "*btsmodel.impl.BTSIdentifiableItemImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#cc3d69"];
+        "*btsmodel.impl.BTSUserImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#cc3d95"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSDBBaseObject" [color="#58cc3d"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.BTSDBBaseObject" [color="#4a3dcc"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSDBBaseObject" [color="#3dbacc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSUser" [color="#58cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.UserActionCounter" [color="#58cc3d"];
+        "*btsmodel.impl.BTSUserImpl" -> "*btsmodel.BTSUser" [color="#cc3d95"];
+        "*btsmodel.BTSTranslations" -> "*btsmodel.BTSTranslation" [color="#cc763d"];
+        "*btsmodel.impl.BTSOperatorImpl" -> "*btsmodel.impl.BTSWorkflowRuleItemImpl" [color="#7dcc3d"];
+        "*btsmodel.impl.BTSProjectImpl" -> "*btsmodel.BTSDBConnection" [color="#84cc3d"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.BTSRevision" [color="#cc3d5b"];
+        "*btsmodel.BTSConfiguration" -> "*btsmodel.BTSConfig" [color="#703dcc"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSObservableObject" [color="#95cc3d"];
+        "*btsmodel.BTSTimespan" -> "*btsmodel.BTSDate" [color="#3dcc3d"];
+        "*btsmodel.impl.BTSDBBaseObjectImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#4a3dcc"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.impl.BTSObservableObjectImpl" [color="#cc3d5b"];
+        "*btsmodel.impl.BTSRevisionImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#98cc3d"];
+        "*btsmodel.impl.BTSUserGroupImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#3d95cc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSRevision" [color="#58cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSNamedTypedObject" [color="#58cc3d"];
+        "*btsmodel.BTSNamedTypedObject" -> "*btsmodel.BTSIdentifiableItem" [color="#3d4ecc"];
+        "*btsmodel.impl.BTSIDReservationObjectImpl" -> "*btsmodel.BTSIDReservationObject" [color="#a2cc3d"];
+        "*btsmodel.impl.BTSDateImpl" -> "*btsmodel.BTSDate" [color="#3dcc73"];
+        "*btsmodel.impl.BTSReferencableItemImpl" -> "*btsmodel.BTSReferencableItem" [color="#a23dcc"];
+        "*btsmodel.BTSProject" -> "*btsmodel.BTSDBConnection" [color="#cc583d"];
+        "*btsmodel.impl.UserActionCounterImpl" -> "*btsmodel.UserActionCounter" [color="#cc3d95"];
+        "*btsmodel.impl.BTSTranslationImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#cc5f3d"];
+        "*btsmodel.impl.BTSNamedTypedObjectImpl" -> "*btsmodel.BTSNamedTypedObject" [color="#3dc7cc"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSWorkflowRuleItem" [color="#5fcc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSIDReservationObject" [color="#58cc3d"];
+        "*btsmodel.impl.DBLeaseImpl" -> "*btsmodel.DBLease" [color="#3dcc80"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSWorkflowRuleItem" [color="#58cc3d"];
+        "*btsmodel.impl.BTSDBCollectionRoleDescImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#cc3d9b"];
+        "*btsmodel.impl.BTSWorkflowRuleImpl" -> "*btsmodel.BTSWorkflowRuleItem" [color="#69cc3d"];
+        "*btsmodel.impl.BTSPassportEditorConfigImpl" -> "*btsmodel.BTSPassportEditorConfig" [color="#ccb63d"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSDBBaseObject" [color="#3dcc58"];
+        "*btsmodel.BTSConfiguration" -> "*btsmodel.BTSObject" [color="#703dcc"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSRevision" [color="#3dcc58"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSObservableObject" [color="#3dcc58"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSExternalReference" [color="#3dbacc"];
+        "*btsmodel.impl.BTSTranslationImpl" -> "*btsmodel.BTSTranslation" [color="#cc5f3d"];
+        "*btsmodel.BTSWorkflowRule" -> "*btsmodel.BTSIdentifiableItem" [color="#3d9bcc"];
+        "*btsmodel.impl.BTSCommentImpl" -> "*btsmodel.BTSComment" [color="#3dcc6c"];
+        "*btsmodel.BTSTranslation" -> "*btsmodel.BTSIdentifiableItem" [color="#3dcc76"];
+        "*btsmodel.impl.BTSUserGroupImpl" -> "*btsmodel.BTSUserGroup" [color="#3d95cc"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSObject" [color="#3dbacc"];
+        "*btsmodel.BTSIDReservationObject" -> "*btsmodel.BTSDBBaseObject" [color="#7acc3d"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.AdministrativDataObject" [color="#cc3d5b"];
+        "*btsmodel.impl.BTSRelationImpl" -> "*btsmodel.BTSRelation" [color="#cccb3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSConfigItem" [color="#58cc3d"];
+        "*btsmodel.BTSComment" -> "*btsmodel.BTSObject" [color="#843dcc"];
+        "*btsmodel.UserActionCounter" -> "*btsmodel.BTSDBBaseObject" [color="#ccc43d"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSIdentifiableItem" [color="#95cc3d"];
+        "*btsmodel.impl.BTSCommentImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#3dcc6c"];
+        "*btsmodel.BTSProject" -> "*btsmodel.BTSProjectDBCollection" [color="#cc583d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BtsmodelPackage" [color="#58cc3d"];
+        "*btsmodel.impl.DBLeaseImpl" -> "*btsmodel.impl.BTSDBBaseObjectImpl" [color="#3dcc80"];
+        "*btsmodel.BTSExternalReference" -> "*btsmodel.BTSIdentifiableItem" [color="#3dcc40"];
+        "*btsmodel.BTSDBConnection" -> "*btsmodel.BTSIdentifiableItem" [color="#73cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSUserGroup" [color="#58cc3d"];
+        "*btsmodel.impl.BTSReferencableItemImpl" -> "*btsmodel.BTSObject" [color="#a23dcc"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSPassportEditorConfig" [color="#5fcc3d"];
+        "*btsmodel.BTSPassportEditorConfig" -> "*btsmodel.BTSIdentifiableItem" [color="#a2cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSPassportEditorConfig" [color="#58cc3d"];
+        "*btsmodel.impl.BTSIDReservationObjectImpl" -> "*btsmodel.impl.BTSDBBaseObjectImpl" [color="#a2cc3d"];
+        "*btsmodel.impl.BTSWorkflowRuleItemImpl" -> "*btsmodel.impl.BTSObservableObjectImpl" [color="#763dcc"];
+        "*btsmodel.impl.BTSRevisionImpl" -> "*btsmodel.BTSRevision" [color="#98cc3d"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.impl.BTSConfigImpl" [color="#5fcc3d"];
+        "*btsmodel.impl.BTSNamedTypedObjectImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#3dc7cc"];
+        "*btsmodel.impl.BTSProjectDBCollectionImpl" -> "*btsmodel.BTSDBCollectionRoleDesc" [color="#cc3d3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSComment" [color="#58cc3d"];
+        "*btsmodel.BTSProjectDBCollection" -> "*btsmodel.BTSIdentifiableItem" [color="#cc3d51"];
+        "*btsmodel.BTSUserGroup" -> "*btsmodel.BTSObject" [color="#513dcc"];
+        "*btsmodel.impl.BTSObservableObjectImpl" -> "*btsmodel.BTSObservableObject" [color="#cc3dcb"];
+        "*btsmodel.BTSConfigItem" -> "*btsmodel.BTSPassportEditorConfig" [color="#95cc3d"];
+        "*btsmodel.impl.BTSWorkflowRuleItemImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#763dcc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.DBLease" [color="#58cc3d"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSRelation" [color="#3dbacc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSProject" [color="#58cc3d"];
+        "*btsmodel.BTSReferencableItem" -> "*btsmodel.BTSObject" [color="#3dcc80"];
+        "*btsmodel.impl.BTSRelationImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#cccb3d"];
+        "*btsmodel.BTSObject" -> "*btsmodel.BTSNamedTypedObject" [color="#3dbacc"];
+        "*btsmodel.impl.BTSExternalReferenceImpl" -> "*btsmodel.BTSExternalReference" [color="#3d70cc"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#3dcc58"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSTranslations" [color="#58cc3d"];
+        "*btsmodel.BTSProjectDBCollection" -> "*btsmodel.BTSDBCollectionRoleDesc" [color="#cc3d51"];
+        "*btsmodel.impl.BTSObjectImpl" -> "*btsmodel.BTSNamedTypedObject" [color="#3dbacc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSDBConnection" [color="#58cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#58cc3d"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.AdministrativDataObject" [color="#3dcc58"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSTranslation" [color="#58cc3d"];
+        "*btsmodel.impl.BTSReferencableItemImpl" -> "*btsmodel.impl.BTSObjectImpl" [color="#a23dcc"];
+        "*btsmodel.BTSConfig" -> "*btsmodel.BTSConfig" [color="#cb3dcc"];
+        "*btsmodel.impl.BTSDBCollectionRoleDescImpl" -> "*btsmodel.BTSDBCollectionRoleDesc" [color="#cc3d9b"];
+        "*btsmodel.impl.BTSDBConnectionImpl" -> "*btsmodel.BTSDBConnection" [color="#473dcc"];
+        "*btsmodel.impl.BTSPassportEditorConfigImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#ccb63d"];
+        "*btsmodel.AdministrativDataObject" -> "*btsmodel.BTSObservableObject" [color="#6c3dcc"];
+        "*btsmodel.BtsmodelPackage" -> "*btsmodel.BtsmodelPackage" [color="#cc913d"];
+        "*btsmodel.impl.BTSTranslationsImpl" -> "*btsmodel.BTSTranslation" [color="#c43dcc"];
+        "*btsmodel.BTSWorkflowRule" -> "*btsmodel.BTSWorkflowRuleItem" [color="#3d9bcc"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.BTSExternalReference" [color="#3dcc58"];
+        "*btsmodel.impl.AdministrativDataObjectImpl" -> "*btsmodel.BTSIdentifiableItem" [color="#cc3d5b"];
+        "*btsmodel.impl.BTSTranslationsImpl" -> "*btsmodel.BTSTranslations" [color="#c43dcc"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSObservableObject" [color="#58cc3d"];
+        "*btsmodel.impl.UserActionCounterImpl" -> "*btsmodel.impl.BTSDBBaseObjectImpl" [color="#cc3d95"];
+        "*btsmodel.impl.BTSProjectImpl" -> "*btsmodel.BTSProjectDBCollection" [color="#84cc3d"];
+        "*btsmodel.impl.BTSWorkflowRuleImpl" -> "*btsmodel.impl.BTSIdentifiableItemImpl" [color="#69cc3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.BTSDate" [color="#58cc3d"];
+        "*btsmodel.BTSProject" -> "*btsmodel.BTSObject" [color="#cc583d"];
+        "*btsmodel.impl.BTSConfigurationImpl" -> "*btsmodel.impl.BTSConfigImpl" [color="#3dcc58"];
+        "*btsmodel.BTSDBBaseObject" -> "*btsmodel.BTSIdentifiableItem" [color="#a6cc3d"];
+        "*btsmodel.DBLease" -> "*btsmodel.BTSDBBaseObject" [color="#cc653d"];
+        "*btsmodel.impl.BTSConfigItemImpl" -> "*btsmodel.BTSConfigItem" [color="#5fcc3d"];
+        "*btsmodel.impl.BTSRelationImpl" -> "*btsmodel.BTSInterTextReference" [color="#cccb3d"];
+        "*btsmodel.impl.BtsmodelPackageImpl" -> "*btsmodel.AdministrativDataObject" [color="#58cc3d"];
+        "*btsmodel.AdministrativDataObject" -> "*btsmodel.BTSRevision" [color="#6c3dcc"]; */
+    }
+}
