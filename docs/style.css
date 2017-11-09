@@ -1,0 +1,64 @@
+.document {
+    margin: auto;
+    width: 60em;
+}
+
+h1,h2,h3,h4,h5,h6,table {
+    margin-top: 1.5em;
+    margin-bottom: 0.7em;
+}
+
+td > p {
+    margin-bottom: 0;
+}
+
+.literal {
+    font-family: monospace;
+    padding: .2rem .4rem;
+    font-size: 90%;
+    color: #bd4147;
+    background-color: #f7f7f9;
+    border-radius: .25rem;
+}
+
+table .literal {
+    background-color: transparent;
+}
+
+tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+
+th {
+    border-bottom: 2px #a0a0a0 solid;
+}
+
+.field-list > dt {
+    margin-top: 2em;
+}
+
+.field-list > dd {
+    margin-left: 4em;
+}
+
+.admonition {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.warning {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.attention {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+.admonition-title {
+    font-weight: 700;
+}

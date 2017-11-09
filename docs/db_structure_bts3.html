@@ -1,363 +1,11 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8"/>
 <meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
 <title>Datenbankstruktur des BTS Version 3</title>
-<style type="text/css">
-
-/*
-:Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7952 2016-07-26 18:15:59Z milde $
-:Copyright: This stylesheet has been placed in the public domain.
-
-Default cascading style sheet for the HTML output of Docutils.
-
-See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
-customize this style sheet.
-*/
-
-/* used to remove borders from tables and images */
-.borderless, table.borderless td, table.borderless th {
-  border: 0 }
-
-table.borderless td, table.borderless th {
-  /* Override padding for "table.docutils td" with "! important".
-     The right padding separates the table cells. */
-  padding: 0 0.5em 0 0 ! important }
-
-.first {
-  /* Override more specific margin styles with "! important". */
-  margin-top: 0 ! important }
-
-.last, .with-subtitle {
-  margin-bottom: 0 ! important }
-
-.hidden {
-  display: none }
-
-.subscript {
-  vertical-align: sub;
-  font-size: smaller }
-
-.superscript {
-  vertical-align: super;
-  font-size: smaller }
-
-a.toc-backref {
-  text-decoration: none ;
-  color: black }
-
-blockquote.epigraph {
-  margin: 2em 5em ; }
-
-dl.docutils dd {
-  margin-bottom: 0.5em }
-
-object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
-  overflow: hidden;
-}
-
-/* Uncomment (and remove this text!) to get bold-faced definition list terms
-dl.docutils dt {
-  font-weight: bold }
-*/
-
-div.abstract {
-  margin: 2em 5em }
-
-div.abstract p.topic-title {
-  font-weight: bold ;
-  text-align: center }
-
-div.admonition, div.attention, div.caution, div.danger, div.error,
-div.hint, div.important, div.note, div.tip, div.warning {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em }
-
-div.admonition p.admonition-title, div.hint p.admonition-title,
-div.important p.admonition-title, div.note p.admonition-title,
-div.tip p.admonition-title {
-  font-weight: bold ;
-  font-family: sans-serif }
-
-div.attention p.admonition-title, div.caution p.admonition-title,
-div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title, .code .error {
-  color: red ;
-  font-weight: bold ;
-  font-family: sans-serif }
-
-/* Uncomment (and remove this text!) to get reduced vertical space in
-   compound paragraphs.
-div.compound .compound-first, div.compound .compound-middle {
-  margin-bottom: 0.5em }
-
-div.compound .compound-last, div.compound .compound-middle {
-  margin-top: 0.5em }
-*/
-
-div.dedication {
-  margin: 2em 5em ;
-  text-align: center ;
-  font-style: italic }
-
-div.dedication p.topic-title {
-  font-weight: bold ;
-  font-style: normal }
-
-div.figure {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-div.footer, div.header {
-  clear: both;
-  font-size: smaller }
-
-div.line-block {
-  display: block ;
-  margin-top: 1em ;
-  margin-bottom: 1em }
-
-div.line-block div.line-block {
-  margin-top: 0 ;
-  margin-bottom: 0 ;
-  margin-left: 1.5em }
-
-div.sidebar {
-  margin: 0 0 0.5em 1em ;
-  border: medium outset ;
-  padding: 1em ;
-  background-color: #ffffee ;
-  width: 40% ;
-  float: right ;
-  clear: right }
-
-div.sidebar p.rubric {
-  font-family: sans-serif ;
-  font-size: medium }
-
-div.system-messages {
-  margin: 5em }
-
-div.system-messages h1 {
-  color: red }
-
-div.system-message {
-  border: medium outset ;
-  padding: 1em }
-
-div.system-message p.system-message-title {
-  color: red ;
-  font-weight: bold }
-
-div.topic {
-  margin: 2em }
-
-h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
-h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
-  margin-top: 0.4em }
-
-h1.title {
-  text-align: center }
-
-h2.subtitle {
-  text-align: center }
-
-hr.docutils {
-  width: 75% }
-
-img.align-left, .figure.align-left, object.align-left, table.align-left {
-  clear: left ;
-  float: left ;
-  margin-right: 1em }
-
-img.align-right, .figure.align-right, object.align-right, table.align-right {
-  clear: right ;
-  float: right ;
-  margin-left: 1em }
-
-img.align-center, .figure.align-center, object.align-center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-table.align-center {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.align-left {
-  text-align: left }
-
-.align-center {
-  clear: both ;
-  text-align: center }
-
-.align-right {
-  text-align: right }
-
-/* reset inner alignment in figures */
-div.align-right {
-  text-align: inherit }
-
-/* div.align-center * { */
-/*   text-align: left } */
-
-.align-top    {
-  vertical-align: top }
-
-.align-middle {
-  vertical-align: middle }
-
-.align-bottom {
-  vertical-align: bottom }
-
-ol.simple, ul.simple {
-  margin-bottom: 1em }
-
-ol.arabic {
-  list-style: decimal }
-
-ol.loweralpha {
-  list-style: lower-alpha }
-
-ol.upperalpha {
-  list-style: upper-alpha }
-
-ol.lowerroman {
-  list-style: lower-roman }
-
-ol.upperroman {
-  list-style: upper-roman }
-
-p.attribution {
-  text-align: right ;
-  margin-left: 50% }
-
-p.caption {
-  font-style: italic }
-
-p.credits {
-  font-style: italic ;
-  font-size: smaller }
-
-p.label {
-  white-space: nowrap }
-
-p.rubric {
-  font-weight: bold ;
-  font-size: larger ;
-  color: maroon ;
-  text-align: center }
-
-p.sidebar-title {
-  font-family: sans-serif ;
-  font-weight: bold ;
-  font-size: larger }
-
-p.sidebar-subtitle {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-p.topic-title {
-  font-weight: bold }
-
-pre.address {
-  margin-bottom: 0 ;
-  margin-top: 0 ;
-  font: inherit }
-
-pre.literal-block, pre.doctest-block, pre.math, pre.code {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-pre.code .ln { color: grey; } /* line numbers */
-pre.code, code { background-color: #eeeeee }
-pre.code .comment, code .comment { color: #5C6576 }
-pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
-pre.code .literal.string, code .literal.string { color: #0C5404 }
-pre.code .name.builtin, code .name.builtin { color: #352B84 }
-pre.code .deleted, code .deleted { background-color: #DEB0A1}
-pre.code .inserted, code .inserted { background-color: #A3D289}
-
-span.classifier {
-  font-family: sans-serif ;
-  font-style: oblique }
-
-span.classifier-delimiter {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-span.interpreted {
-  font-family: sans-serif }
-
-span.option {
-  white-space: nowrap }
-
-span.pre {
-  white-space: pre }
-
-span.problematic {
-  color: red }
-
-span.section-subtitle {
-  /* font-size relative to parent (h1..h6 element) */
-  font-size: 80% }
-
-table.citation {
-  border-left: solid 1px gray;
-  margin-left: 1px }
-
-table.docinfo {
-  margin: 2em 4em }
-
-table.docutils {
-  margin-top: 0.5em ;
-  margin-bottom: 0.5em }
-
-table.footnote {
-  border-left: solid 1px black;
-  margin-left: 1px }
-
-table.docutils td, table.docutils th,
-table.docinfo td, table.docinfo th {
-  padding-left: 0.5em ;
-  padding-right: 0.5em ;
-  vertical-align: top }
-
-table.docutils th.field-name, table.docinfo th.docinfo-name {
-  font-weight: bold ;
-  text-align: left ;
-  white-space: nowrap ;
-  padding-left: 0 }
-
-/* "booktabs" style (no vertical lines) */
-table.docutils.booktabs {
-  border: 0px;
-  border-top: 2px solid;
-  border-bottom: 2px solid;
-  border-collapse: collapse;
-}
-table.docutils.booktabs * {
-  border: 0px;
-}
-table.docutils.booktabs th {
-  border-bottom: thin solid;
-  text-align: left;
-}
-
-h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
-h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
-  font-size: 100% }
-
-ul.auto-toc {
-  list-style-type: none }
-
-</style>
+<link rel="stylesheet" href="bootstrap.css" type="text/css" />
+<link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
 <div class="document" id="datenbankstruktur-des-bts-version-3">
@@ -378,81 +26,899 @@ funktionieren oder nicht benutzt werden.</p>
 <div class="section" id="allgemeines-objektlayout-in-der-datenbank">
 <h1>Allgemeines Objektlayout in der Datenbank</h1>
 <p>Alle hier aufgelisteten Objekte bilden 1:1 auf Java-Klassen ab. All diese Klassen sind Teil des Eclipse eObject-Systems.
-Jedes Objekt enthält ein Attribut <tt class="docutils literal">eClass</tt>, das eine Pseudo-URL enthält, die den Typen dieses Objektes eindeutig
-identifiziert. Diese URL folgt immer dem Schema <tt class="docutils literal"><span class="pre">http://{&quot;btsmodel&quot;</span> oder <span class="pre">&quot;btsCorpusModel&quot;}/1.0#//{Name</span> der eClass}</tt>.
-Es gibt zwei Gruppen von eClass-Definitionen, oder <em>Modelle</em>: Das <tt class="docutils literal">btsmodel</tt> sowie das <tt class="docutils literal">btsCorpusModel</tt> (sic!).
+Jedes Objekt enthält ein Attribut <span class="docutils literal">eClass</span>, das eine Pseudo-URL enthält, die den Typen dieses Objektes eindeutig
+identifiziert. Diese URL folgt immer dem Schema <span class="docutils literal"><span class="pre">http://{&quot;btsmodel&quot;</span> oder <span class="pre">&quot;btsCorpusModel&quot;}/1.0#//{Name</span> der eClass}</span>.
+Es gibt zwei Gruppen von eClass-Definitionen, oder <em>Modelle</em>: Das <span class="docutils literal">btsmodel</span> sowie das <span class="docutils literal">btsCorpusModel</span> (sic!).
 Ersteres enthält hauptsächlich interne Verwaltungsklassen, letzteres die Klassen für die eigentlichen Nutzdaten. Im
-folgenden eine Auflistung aller definierten <tt class="docutils literal">eClass</tt>-Pseudo-URLs mit der Angabe, ob diese auch tatsächlich irgendwo in
+folgenden eine Auflistung aller definierten <span class="docutils literal">eClass</span>-Pseudo-URLs mit der Angabe, ob diese auch tatsächlich irgendwo in
 der Datenbank zu finden sind.</p>
 <div class="figure">
-<a class="reference external image-reference" href="graphs/model_interface_graph.pdf"><img alt="graphs/model_interface_graph.png" src="graphs/model_interface_graph.png" style="width: 50%;" /></a>
-<p class="caption">Graph aller Interfaces der Modelle.</p>
+<a class="reference external image-reference" href="graphs/basemodel_interface_graph.pdf"><img alt="graphs/basemodel_interface_graph.png" src="graphs/basemodel_interface_graph.png" style="width: 100%;" /></a>
+<p class="caption">Graph of all interfaces of the base model. For one including the impls, see <a class="reference external" href="graphs/basemodel_type_graph.pdf">basemodel_type_graph.pdf</a>.</p>
 </div>
-<p><a class="reference external" href="http://btsmodel/1.0#//AdministrativDataObject">http://btsmodel/1.0#//AdministrativDataObject</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSComment">http://btsmodel/1.0#//BTSComment</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSConfig">http://btsmodel/1.0#//BTSConfig</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSConfigItem">http://btsmodel/1.0#//BTSConfigItem</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSConfiguration">http://btsmodel/1.0#//BTSConfiguration</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSDBBaseObject">http://btsmodel/1.0#//BTSDBBaseObject</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSDBCollectionRoleDesc">http://btsmodel/1.0#//BTSDBCollectionRoleDesc</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSDBConnection">http://btsmodel/1.0#//BTSDBConnection</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSDate">http://btsmodel/1.0#//BTSDate</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSExternalReference">http://btsmodel/1.0#//BTSExternalReference</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSIDReservationObject">http://btsmodel/1.0#//BTSIDReservationObject</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSIdentifiableItem">http://btsmodel/1.0#//BTSIdentifiableItem</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSInterTextReference">http://btsmodel/1.0#//BTSInterTextReference</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSNamedTypedObject">http://btsmodel/1.0#//BTSNamedTypedObject</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSObject">http://btsmodel/1.0#//BTSObject</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSObservableObject">http://btsmodel/1.0#//BTSObservableObject</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSOperator">http://btsmodel/1.0#//BTSOperator</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSPassportEditorConfig">http://btsmodel/1.0#//BTSPassportEditorConfig</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSProject">http://btsmodel/1.0#//BTSProject</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSProjectDBCollection">http://btsmodel/1.0#//BTSProjectDBCollection</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSReferencableItem">http://btsmodel/1.0#//BTSReferencableItem</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSRelation">http://btsmodel/1.0#//BTSRelation</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSRevision">http://btsmodel/1.0#//BTSRevision</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSTimespan">http://btsmodel/1.0#//BTSTimespan</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSTranslation">http://btsmodel/1.0#//BTSTranslation</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSTranslations">http://btsmodel/1.0#//BTSTranslations</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSUser">http://btsmodel/1.0#//BTSUser</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSUserGroup">http://btsmodel/1.0#//BTSUserGroup</a> *
-<a class="reference external" href="http://btsmodel/1.0#//BTSWorkflowRule">http://btsmodel/1.0#//BTSWorkflowRule</a>
-<a class="reference external" href="http://btsmodel/1.0#//BTSWorkflowRuleItem">http://btsmodel/1.0#//BTSWorkflowRuleItem</a>
-<a class="reference external" href="http://btsmodel/1.0#//DBLease">http://btsmodel/1.0#//DBLease</a> *
-<a class="reference external" href="http://btsmodel/1.0#//StringToStringListMap">http://btsmodel/1.0#//StringToStringListMap</a>
-<a class="reference external" href="http://btsmodel/1.0#//StringToStringMap">http://btsmodel/1.0#//StringToStringMap</a>
-<a class="reference external" href="http://btsmodel/1.0#//UserActionCounter">http://btsmodel/1.0#//UserActionCounter</a></p>
-<p><a class="reference external" href="http://btsCorpusModel/1.0#//BTSAbstractParagraph">http://btsCorpusModel/1.0#//BTSAbstractParagraph</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSAbstractText">http://btsCorpusModel/1.0#//BTSAbstractText</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSAmbivalence">http://btsCorpusModel/1.0#//BTSAmbivalence</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSAmbivalenceItem">http://btsCorpusModel/1.0#//BTSAmbivalenceItem</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSAnnotation">http://btsCorpusModel/1.0#//BTSAnnotation</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSCorpusHeader">http://btsCorpusModel/1.0#//BTSCorpusHeader</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSCorpusObject">http://btsCorpusModel/1.0#//BTSCorpusObject</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSGraphic">http://btsCorpusModel/1.0#//BTSGraphic</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSImage">http://btsCorpusModel/1.0#//BTSImage</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSLemmaCase">http://btsCorpusModel/1.0#//BTSLemmaCase</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSLemmaEntry">http://btsCorpusModel/1.0#//BTSLemmaEntry</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSMarker">http://btsCorpusModel/1.0#//BTSMarker</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSPassport">http://btsCorpusModel/1.0#//BTSPassport</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSPassportEntry">http://btsCorpusModel/1.0#//BTSPassportEntry</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSPassportEntryGroup">http://btsCorpusModel/1.0#//BTSPassportEntryGroup</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSPassportEntryItem">http://btsCorpusModel/1.0#//BTSPassportEntryItem</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSSenctence">http://btsCorpusModel/1.0#//BTSSenctence</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSSentenceItem">http://btsCorpusModel/1.0#//BTSSentenceItem</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSTCObject">http://btsCorpusModel/1.0#//BTSTCObject</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSText">http://btsCorpusModel/1.0#//BTSText</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSTextContent">http://btsCorpusModel/1.0#//BTSTextContent</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSTextCorpus">http://btsCorpusModel/1.0#//BTSTextCorpus</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSTextItems">http://btsCorpusModel/1.0#//BTSTextItems</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSTextSentenceItem">http://btsCorpusModel/1.0#//BTSTextSentenceItem</a>
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSThsEntry">http://btsCorpusModel/1.0#//BTSThsEntry</a> *
-<a class="reference external" href="http://btsCorpusModel/1.0#//BTSWord">http://btsCorpusModel/1.0#//BTSWord</a> *</p>
-<p>In db but not in model:
-<a class="reference external" href="http://btsmodel/1.0#//BTSText">http://btsmodel/1.0#//BTSText</a> !!!</p>
+<div class="figure">
+<a class="reference external image-reference" href="graphs/corpusmodel_interface_graph.pdf"><img alt="graphs/corpusmodel_interface_graph.png" src="graphs/corpusmodel_interface_graph.png" style="width: 100%;" /></a>
+<p class="caption">Graph of all interfaces of the corpus model. For one including the impls, see <a class="reference external" href="graphs/corpusmodel_type_graph.pdf">corpusmodel_type_graph.pdf</a>.</p>
 </div>
-<div class="section" id="fundamentale-objekttypen">
-<h1>Fundamentale Objekttypen</h1>
+<div class="section" id="definierte-eclasses-des-basis-modells">
+<h2>Definierte eClasses des Basis-Modells</h2>
+<table>
+<colgroup>
+<col style="width: 63%" />
+<col style="width: 22%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>eClass</p></th>
+<th class="head"><p>In Datenbank <a class="footnote-reference brackets" href="#db" id="id1">1</a></p></th>
+<th class="head"><p>Anmerkungen</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//AdministrativDataObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSComment</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSConfig</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSConfigItem</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSConfiguration</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSDBBaseObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSDBCollectionRoleDesc</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSDBConnection</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSDate</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSExternalReference</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSIDReservationObject</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSIdentifiableItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSInterTextReference</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSNamedTypedObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSObservableObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSOperator</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSPassportEditorConfig</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSProject</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSProjectDBCollection</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSReferencableItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSRelation</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSRevision</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSTimespan</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSTranslation</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSTranslations</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSUser</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSUserGroup</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSWorkflowRule</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//BTSWorkflowRuleItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//DBLease</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//UserActionCounter</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//StringToStringListMap</span></span></p></td>
+<td><p>✘</p></td>
+<td><p><a class="footnote-reference brackets" href="#implonly" id="id2">2</a></p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//StringToStringMap</span></span></p></td>
+<td><p>✘</p></td>
+<td><p><a class="footnote-reference brackets" href="#implonly" id="id3">2</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="definierte-eclasses-des-corpus-modells">
+<h2>Definierte eClasses des Corpus-Modells</h2>
+<table>
+<colgroup>
+<col style="width: 63%" />
+<col style="width: 22%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>eClass</p></th>
+<th class="head"><p>In Datenbank <a class="footnote-reference brackets" href="#db" id="id4">1</a></p></th>
+<th class="head"><p>Anmerkungen</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSAbstractParagraph</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSAbstractText</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSAmbivalence</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSAmbivalenceItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSAnnotation</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSCorpusHeader</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSCorpusObject</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSGraphic</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSImage</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSLemmaCase</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSLemmaEntry</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSMarker</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSPassport</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSPassportEntry</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSPassportEntryGroup</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSPassportEntryItem</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSSenctence</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSSentenceItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSTCObject</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSText</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSTextContent</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSTextCorpus</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSTextItems</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSTextSentenceItem</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSThsEntry</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsCorpusModel/1.0#//BTSWord</span></span></p></td>
+<td><p>✔</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="db"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>)</span></dt>
+<dd><p>Ist die jeweilige eClass zwar im Modell vorhanden, aber nirgendwo in der Datenbank zu finden? Das ist z.B. bei
+rein abstrakten Basisklassen der Fall.</p>
+</dd>
+<dt class="label" id="implonly"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
+<dd><p>Es ist kein separates Interface vorhanden. Die zugehörige Impl-Klasse benutzt ein generisches
+Eclipse-Interface.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="objekttypen-des-basis-modells">
+<h1>Objekttypen des Basis-Modells</h1>
+<div class="section" id="administrativdataobject">
+<h2>AdministrativDataObject</h2>
+<p>AdministrativDataObject is a base class of BTSObject meant to bring in object versioning functionality. Its fields are
+the following.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">revisions</span></dt>
+<dd><p>A list of revisions of this object. In the database json, this is mapped to an array of strings. This usually looks
+like this:</p>
+<pre class="code literal-block"><code>[ &quot;0&#64;2015-06-26T16:13:16&#64;74cb6b70ab6b58566bfadc664b00282d&quot;,
+  &quot;1&#64;2015-06-26T16:18:09&#64;74cb6b70ab6b58566bfadc664b00282d&quot;,
+  &quot;2&#64;2015-08-06T10:56:12&#64;IHYWLODR3RDGHIAJRRNREH7MIQ&quot; ]</code></pre>
+<p>The first element is an incrementing revision number, the second one is a timestamp in some random timezone and the
+third one is the couchdb object id of the user to blame. As usual, don't expect these to <em>always</em> actually follow
+that format as <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BtsmodelFactoryImpl.java#L491">the parsing code in BtsmodelFactoryImpl.java</a> made to fail silently.</p>
+</dd>
+</dl>
+<dl class="field-list">
+<dt><span class="docutils literal">state</span></dt>
+<dd><p>This field is part of an improvised tombstone implementation. It may assume the values <span class="docutils literal">active</span> or <span class="docutils literal">terminated</span>.
+Absence of this field seems to be considered equivalent with its value being <span class="docutils literal">active</span>.</p>
+<p>The semantics of this are similar to a &quot;is_deleted&quot; field. To &quot;delete&quot; an object, you set its <span class="docutils literal">state</span> from
+<span class="docutils literal">active</span> to <span class="docutils literal">terminated</span>, but leave the object in the database. This means you never delete an object's history
+and an user can't mess up <em>too</em> bad.</p>
+<p>This field seems to be only ever checked in a smattering of UI classes, namely <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/corpus/src/org/bbaw/bts/ui/corpus/parts/CorpusNavigatorPart.java#L434">CorpusNavigatorPart.java</a>, <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/corpus/src/org/bbaw/bts/ui/corpus/parts/AnnotationsPart.java#L809">AnnotationsPart.java</a>, <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/egy/src/org/bbaw/bts/ui/egy/textSign/SignTextComposite.java#L1776">SignTextComposite.java</a> and <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/egy/src/org/bbaw/bts/ui/egy/parts/EgyTextEditorPart.java#L2135">EgyTextEditorPart.java</a>.</p>
+</dd>
+</dl>
+<dl class="field-list">
+<dt><span class="docutils literal">revisionState</span></dt>
+<dd><p>This field is also called <span class="docutils literal">reviewState</span>, it is an enum string.  The possible values of this field are enumerated
+under the <span class="docutils literal"><span class="pre">Revision-Status</span></span> meta model entry.  There is a convoluted system in place to restrict which states can
+be applied to which object types, however in practice luckily this remains mostly unused.</p>
+<p>The meaning of this field is something along the lines of &quot;has this object been reviewed for publication?&quot;</p>
+<p>This field is used in the code in a somewhat inconsistent manner. Most object types do not have any code referring
+to it even though all objects carry it. It seems the only place it <em>is</em> in fact used is with lemmata, and there <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-services-impl/src/org/bbaw/bts/core/services/corpus/impl/services/BTSLemmaEntryServiceImpl.java#L244">the
+code</a> looks like this:</p>
+<pre class="code literal-block"><code>entry.getRevisionState().contains(&quot;obsolete&quot;)</code></pre>
+</dd>
+</dl>
+<dl class="field-list">
+<dt><span class="docutils literal">visibility</span></dt>
+<dd><p>This field is supposed to provide basic read/list access control on objects. Its possible values seem to be supposed
+to be described in the <span class="docutils literal">Visibility</span> meta model entry, which contains <span class="docutils literal">group</span>, <span class="docutils literal">project</span>, <span class="docutils literal">public</span>,
+<span class="docutils literal">Reader</span> and <span class="docutils literal">all_authenticated</span>. The code however contains at least one reference to one additional value
+<span class="docutils literal">repository</span> in one of the obfuscated embedded design documents in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java#L98">CouchDBManager.java</a>.</p>
+<p>The code can't quite decide whether to check this at the database level (see the above reference) or <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-controller-impl/src/org/bbaw/bts/core/corpus/controller/impl/partController/CorpusNavigatorControllerImpl.java#L373">in the client</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="btscomment">
+<h2>BTSComment</h2>
+</div>
+<div class="section" id="btsconfig">
+<h2>BTSConfig</h2>
+</div>
+<div class="section" id="btsconfigitem">
+<h2>BTSConfigItem</h2>
+</div>
+<div class="section" id="btsconfiguration">
+<h2>BTSConfiguration</h2>
+</div>
+<div class="section" id="btsdbbaseobject">
+<h2>BTSDBBaseObject</h2>
+<p>BTSDBBaseObject is another of those base types of just about half of everything.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">_rev</span></dt>
+<dd><p>Current couchDB MVCC revision of this object. This is a string such as <span class="docutils literal"><span class="pre">1-37221aa74fd85dcb3286a87fadb9cee3</span></span>, with
+the digit upfront being an incrementing (but not necessarily unique) counter and the value behind it being a
+hex-encoded random value to distinguish concurrent revisions.</p>
+</dd>
+</dl>
+<div class="section" id="access-control-fields">
+<h3>Access control fields</h3>
+<p>These fields are part of a half-finished implementation of a limited form of <a class="reference external" href="https://en.wikipedia.org/wiki/Access_control_list">ACLs</a>. The idea is that on a per-object
+basis, a list of users or groups with read permission and a list of users or groups with update permission may be added.
+There does not seem to be any code to propagate permissions from parent to child objects and in the database most
+objects do not seem to contain sensible ACLs.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">updaters</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">readers</span></dt>
+<dd><p>Both of these properties are lists of strings. Each entry is either a user name (which is used as the user
+object's couchDB <span class="docutils literal">_id</span>) or a group name. Groups are simply implemented by their constituent users each having their
+name as part of a <span class="docutils literal">groupIds</span> array in their own user object. Access is only enforced client-side, if at all.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="fields-for-local-caching-of-values">
+<h3>Fields for local caching of values</h3>
+<dl class="field-list simple">
+<dt><span class="docutils literal">conflictingRevs</span></dt>
+<dd><p>This field is a pseudo-attribute that is not written to db. Under certain circumstances it is populated by
+<a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/dao-couch/src/org/bbaw/bts/dao/couchDB/CouchDBDao.java#L590">CouchDBDao.java</a> with the ids of conflicting revisions of the document containing the field as couchDB sees them.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt><span class="docutils literal">DBCollectionKey</span></dt>
+<dd><p>Not written to db. This field is populated in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/dao-couch/src/org/bbaw/bts/dao/couchDB/CouchDBDao.java">CouchDBDao.java</a> and caches the name of the local elasticsearch
+index that contains the object this field belongs to.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="mostly-unused-fields">
+<h3>(Mostly) unused fields</h3>
+<dl class="field-list simple">
+<dt><span class="docutils literal">locked</span></dt>
+<dd><p>This field is not written to db. This is a flag that seems to be only used to change the image that is displayed for
+a particular obejct.  Has no functional value.</p>
+</dd>
+<dt><span class="docutils literal">deleted</span></dt>
+<dd><p>Not written to db. Flag; does not seem to be used anywhere</p>
+</dd>
+<dt><span class="docutils literal">project</span></dt>
+<dd><p>Not written to db. Seems to be unused.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="btsdbcollectionroledesc">
+<h2>BTSDBCollectionRoleDesc</h2>
+</div>
+<div class="section" id="btsdbconnection">
+<h2>BTSDBConnection</h2>
+</div>
+<div class="section" id="btsdate">
+<h2>BTSDate</h2>
+</div>
+<div class="section" id="btsexternalreference">
+<h2>BTSExternalReference</h2>
+</div>
+<div class="section" id="btsidreservationobject">
+<h2>BTSIDReservationObject</h2>
+</div>
+<div class="section" id="btsidentifiableitem">
+<h2>BTSIdentifiableItem</h2>
+<p>BTSIdentifiableItem is a base interface of most everything in the database. Its purpose is to describe anything that
+holds an <span class="docutils literal">_id</span> attribute, which in couchdb is every top-level document (i.e. that is not embedded into some other
+document). Its sole field is:</p>
+<dl class="field-list">
+<dt><span class="docutils literal">_id</span></dt>
+<dd><p>The raw couchdb object ID. Do not make any assumptions about the contents of this field. Treat it as couchdb treats
+it: As an arbitrary string. Fun fact: There is both an object with the <span class="docutils literal">_id</span> <span class="docutils literal"><span class="pre">-1</span></span> and one with the <span class="docutils literal">_id</span>
+<span class="docutils literal"><span class="pre">-2</span></span>.</p>
+<p>Using the following code we can get some statistics about these ids.</p>
+<pre class="code literal-block"><code>set count (wc -l ids|cut -d' ' -f1); for re in '^&quot;[0-9]+&quot;$' '^&quot;[0-9a-f]{32}&quot;$' '^&quot;[a-zA-Z0-9]{27}&quot;$' '^&quot;[A-Z0-9]{26}&quot;$' '^&quot;dm[0-9]*&quot;$'; set num (egrep $re ids|wc -l); echo $re $num (echo $num/$count|bc -l); end</code></pre>
+<p>The total number of objects is slightly over 4.4 million.</p>
+<table>
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 19%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>regex</p></th>
+<th class="head"><p>count</p></th>
+<th class="head"><p>percentage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal"><span class="pre">[a-zA-Z0-9]{27}</span></span></p></td>
+<td><p>4282726</p></td>
+<td><p>96.86%</p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">[A-Z0-9]{26}</span></span></p></td>
+<td><p>70761</p></td>
+<td><p>1.60%</p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">[0-9]+</span></span></p></td>
+<td><p>52185</p></td>
+<td><p>1.18%</p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">dm[0-9]*</span></span></p></td>
+<td><p>7971</p></td>
+<td><p>0.18%</p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">[0-9a-f]{32}</span></span></p></td>
+<td><p>3</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>other</p></td>
+<td><p>7932</p></td>
+<td><p>0.18%</p></td>
+</tr>
+</tbody>
+</table>
+<p>For some database objects inherited from previous BTS versions, short numeric strings such as <span class="docutils literal">100120</span> are used.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="btsintertextreference">
+<h2>BTSInterTextReference</h2>
+</div>
+<div class="section" id="btsnamedtypedobject">
+<h2>BTSNamedTypedObject</h2>
+<p>BTSNamedTypedObject is an interface that through <span class="docutils literal">BTSObject</span> and other inheritance paths is implemented by a large
+number of types. It describes an object that may have a <span class="docutils literal">name</span>, a <span class="docutils literal">type</span>, a <span class="docutils literal">subtype</span> and a <span class="docutils literal">sortKey</span>. <span class="docutils literal">type</span>
+and <span class="docutils literal">subtype</span> are used somewhat inconsistently. For some object types, their range of values is described in the meta
+model entries under <span class="docutils literal">/objectTypes</span>. Not every object type uses <span class="docutils literal">type</span> as well as <span class="docutils literal">subtype</span> and not every <span class="docutils literal">type</span>
+also has one or more <span class="docutils literal">subtype</span>.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>This field generally describes a human-readable name of the object. The <span class="docutils literal">name</span> is generally used as a label when
+displaying objects (e.g. in the tree viewer, or in an input mask). Sample values for this are e.g. <span class="docutils literal">Hammamat <span class="pre">C-M</span> 265</span>
+and <span class="docutils literal">〈Wadi Allaqi 3〉</span> for some TCObjects or <span class="docutils literal">ḫnd (ḥr) (mw)</span> and <span class="docutils literal"><span class="pre">mꜣꜣ.t-Ḥr.w</span></span> for some lemmata.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>In case of lemmata the name often is a simple concatenation of transliterations of the lemma's constituent
+words, but <strong>this is no rule</strong>.</p>
+</div>
+</dd>
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>This field describes the logical type of the object. Its semantics vary by object type/eclass. Following are some
+example values found in the live database.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>List of possible of values in JSON</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal">Corpus:Text</span></p></td>
+<td><p><span class="docutils literal">&quot;Text&quot;, &quot;Subtext&quot;, &quot;subtext&quot;, &quot;undefined&quot;, &quot;&quot;, null</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:Senctence</span></p></td>
+<td><p><span class="docutils literal">&quot;HS&quot;, null</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Base:Comment</span></p></td>
+<td><p>No type, no subtype.</p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:LemmaEntry</span></p></td>
+<td><p><span class="docutils literal">null, &quot;undefined&quot;, &quot;numeral&quot;, &quot;particle&quot;, &quot;preposition&quot;, &quot;verb&quot;, ... ~15</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:Annotation</span></p></td>
+<td><p><span class="docutils literal">&quot;undefined&quot;, null, &quot;conceptual&quot; &quot;ConceptualGroup2&quot;, <span class="pre">&quot;Annotation-Leipzig&quot;,</span> ... ~10</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:TCObject</span></p></td>
+<td><p><span class="docutils literal">null, &quot;&quot;, &quot;undefined&quot;, &quot;Arrangement&quot;, &quot;TCSuperText&quot;, &quot;TCObject&quot;, &quot;Group&quot;, &quot;Scene&quot;, ... ~10</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:TextCorpus</span></p></td>
+<td><p><span class="docutils literal">null, &quot;undefined&quot;</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:ThsEntry</span></p></td>
+<td><p><span class="docutils literal">null, &quot;objectType&quot;, &quot;objecttype&quot;, &quot;actor&quot;, &quot;grouping&quot;, &quot;miniature&quot;, &quot;model&quot;, &quot;material&quot;, &quot;copy&quot;, ... ~25</span></p></td>
+</tr>
+</tbody>
+</table>
+<p><span class="docutils literal">BTSMarker</span> is a <span class="docutils literal">BTSNamedTypedObject</span>, but its type field seems to be free text provided by the user.</p>
+</dd>
+<dt><span class="docutils literal">subtype</span></dt>
+<dd><p>This field is sometimes used to describe a subtype of an object. It is used only in the following object types:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 79%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>List of possible of values in JSON</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal">Base:ConfigItem</span></p></td>
+<td><p><span class="docutils literal">&quot;IMG_THS&quot;, &quot;IMG_ANNOTATION&quot;, &quot;IMG_OVR_OBSOLETE&quot;, ... ~30</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:LemmaEntry</span></p></td>
+<td><p><span class="docutils literal">&quot;person_name&quot;, &quot;substantive_masc&quot;, &quot;gods_name&quot;, &quot;title&quot;, <span class="pre">&quot;verb_2-lit&quot;,</span> ... ~50</span></p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:Annotation</span></p></td>
+<td><p><span class="docutils literal">&quot;MetaphorRelatedWord&quot;, &quot;Metonym&quot;, &quot;subtype&quot;, <span class="pre">&quot;left-to-right&quot;,</span> ... ~10</span>. Only used very infrequently.</p></td>
+</tr>
+<tr><td><p><span class="docutils literal">Corpus:TCObject</span></p></td>
+<td><p>Only four overall usages, with values <span class="docutils literal">&quot;undefined&quot;</span> (thrice) and <span class="docutils literal">&quot;subcaption&quot;</span> (once)</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><span class="docutils literal">sortKey</span></dt>
+<dd><p>An integer field that in several places is used instead of <span class="docutils literal">name</span> to sort things. Following is an exhaustive table
+of occurences.</p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 20%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>Corpus:Text</p></td>
+<td><p>14196</p></td>
+<td><p>46.38%</p></td>
+</tr>
+<tr><td><p>Corpus:TCObject</p></td>
+<td><p>1403</p></td>
+<td><p>8.76%</p></td>
+</tr>
+<tr><td><p>Corpus:ThsEntry</p></td>
+<td><p>4</p></td>
+<td><p>0.115%</p></td>
+</tr>
+<tr><td><p>Corpus:Annotation</p></td>
+<td><p>2</p></td>
+<td><p>0.014%</p></td>
+</tr>
+<tr><td><p>Corpus:TextCorpus</p></td>
+<td><p>1</p></td>
+<td><p>2.00%</p></td>
+</tr>
+<tr><td><p>Base:ConfigItem</p></td>
+<td><p>297</p></td>
+<td><p>36.89%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</div>
+<div class="section" id="btsobject">
+<h2>BTSObject</h2>
+<p>Base type for a large part of database objects. Brings in <span class="docutils literal">_id, name, type, subtype, sortKey</span> by means of inheritance
+from <span class="docutils literal">BTSNamedTypedObject</span> and in turn <span class="docutils literal">BTSIdentifiableItem</span>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Despite its name only about half of the database object types inherit from this. Also, do not trust even the meager
+amounts of documentation in its source code.</p>
+</div>
+<p>The model for BTSObject includes a field <span class="docutils literal">tempSortKey</span> that is used in some places, but this field never makes it to
+the database. It is instead used as some kind of object-global variable.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">code</span></dt>
+<dd><p>Never used.</p>
+</dd>
+<dt><span class="docutils literal">relations</span></dt>
+<dd><p>Array field of <span class="docutils literal">Relation</span> objects describing relations between the containing object and other objects. This is
+used to describe complex relations such as <span class="docutils literal">rootOf</span> or <span class="docutils literal">composedOf</span> for lemmata. <em>Everywhere</em> else it is only
+ever used with <span class="docutils literal">partOf</span> to express the hierarchical structure of the object tree. Below is an exhaustive table of
+occurences.</p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 20%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>Corpus:Annotation</p></td>
+<td><p>13862</p></td>
+<td><p>100%</p></td>
+</tr>
+<tr><td><p>Corpus:TCObject</p></td>
+<td><p>16008</p></td>
+<td><p>100%</p></td>
+</tr>
+<tr><td><p>Corpus:Text</p></td>
+<td><p>30605</p></td>
+<td><p>99.99%</p></td>
+</tr>
+<tr><td><p>Base:Comment</p></td>
+<td><p>33312</p></td>
+<td><p>99.99%</p></td>
+</tr>
+<tr><td><p>Corpus:ThsEntry</p></td>
+<td><p>3457</p></td>
+<td><p>99.34%</p></td>
+</tr>
+<tr><td><p>Corpus:LemmaEntry</p></td>
+<td><p>20195</p></td>
+<td><p>30.11%!</p></td>
+</tr>
+<tr><td><p>Corpus:TextCorpus</p></td>
+<td><p>1</p></td>
+<td><p>2%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><span class="docutils literal">externalReferences</span></dt>
+<dd><p>This field is an array of <span class="docutils literal">ExternalReference</span> objects. The idea here seems to be to store alternative ways to
+refer to the entry containing the field. In practice, it only used a handful (&lt;50) times outside the dictionary
+proper with the notable exception of the TLA demotic corpus. In the TLA demotic corpus it is used to store malformed
+URLs pointing to an external database. In the dictionary it is used to store reference numbers of the entries. In
+the user database it is used to store what seems to be user IDs of a previous BTS version.</p>
+<p>Below is a listing of occurrences by object type in the database.</p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 20%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>Corpus:LemmaEntry</p></td>
+<td><p>63391</p></td>
+<td><p>94.52%</p></td>
+</tr>
+<tr><td><p>Corpus:ThsEntry</p></td>
+<td><p>3459</p></td>
+<td><p>99.40%</p></td>
+</tr>
+<tr><td><p>Base:User</p></td>
+<td><p>55</p></td>
+<td><p>47%</p></td>
+</tr>
+<tr><td><p>Corpus:TCObject</p></td>
+<td><p>1370</p></td>
+<td><p>8.56%</p></td>
+</tr>
+<tr><td><p>Corpus:Text</p></td>
+<td><p>109</p></td>
+<td><p>0.36%</p></td>
+</tr>
+<tr><td><p>Base:UserGroup</p></td>
+<td><p>11</p></td>
+<td><p>0.45%</p></td>
+</tr>
+<tr><td><p>Corpus:Annotation</p></td>
+<td><p>3</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>Corpus:TextCorpus</p></td>
+<td><p>1</p></td>
+<td><p>2%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</div>
+<div class="section" id="btsobservableobject">
+<h2>BTSObservableObject</h2>
+<p>BTSObservableObject is purely internal. It extends EObject and adds an interface for third parties to track
+modifications of this object's eclipsey properties.</p>
+</div>
+<div class="section" id="btsoperator">
+<h2>BTSOperator</h2>
+</div>
+<div class="section" id="btspassporteditorconfig">
+<h2>BTSPassportEditorConfig</h2>
+</div>
+<div class="section" id="btsproject">
+<h2>BTSProject</h2>
+</div>
+<div class="section" id="btsprojectdbcollection">
+<h2>BTSProjectDBCollection</h2>
+</div>
+<div class="section" id="btsreferencableitem">
+<h2>BTSReferencableItem</h2>
+</div>
+<div class="section" id="btsrelation">
+<h2>BTSRelation</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Technically, the <span class="docutils literal">partOf</span> graph is only directed. In practice, it seems it is also acyclic and something would
+probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as objects can have several parents.</p>
+</div>
+</div>
+<div class="section" id="btsrevision">
+<h2>BTSRevision</h2>
+</div>
+<div class="section" id="btstimespan">
+<h2>BTSTimespan</h2>
+</div>
+<div class="section" id="btstranslation">
+<h2>BTSTranslation</h2>
+</div>
+<div class="section" id="btstranslations">
+<h2>BTSTranslations</h2>
+</div>
+<div class="section" id="btsuser">
+<h2>BTSUser</h2>
+</div>
+<div class="section" id="btsusergroup">
+<h2>BTSUserGroup</h2>
+</div>
+<div class="section" id="btsworkflowrule">
+<h2>BTSWorkflowRule</h2>
+</div>
+<div class="section" id="btsworkflowruleitem">
+<h2>BTSWorkflowRuleItem</h2>
+</div>
+<div class="section" id="dblease">
+<h2>DBLease</h2>
+</div>
+<div class="section" id="useractioncounter">
+<h2>UserActionCounter</h2>
+</div>
+<div class="section" id="stringtostringlistmap">
+<h2>StringToStringListMap</h2>
+</div>
+<div class="section" id="stringtostringmap">
+<h2>StringToStringMap</h2>
+</div>
+</div>
+<div class="section" id="objekttypen-des-corpus-modells">
+<h1>Objekttypen des Corpus-Modells</h1>
+<div class="section" id="btsabstractparagraph">
+<h2>BTSAbstractParagraph</h2>
+</div>
+<div class="section" id="btsabstracttext">
+<h2>BTSAbstractText</h2>
+</div>
+<div class="section" id="btsambivalence">
+<h2>BTSAmbivalence</h2>
+</div>
+<div class="section" id="btsambivalenceitem">
+<h2>BTSAmbivalenceItem</h2>
+</div>
+<div class="section" id="btsannotation">
+<h2>BTSAnnotation</h2>
+</div>
+<div class="section" id="btscorpusheader">
+<h2>BTSCorpusHeader</h2>
+</div>
+<div class="section" id="btscorpusobject">
+<h2>BTSCorpusObject</h2>
+</div>
+<div class="section" id="btsgraphic">
+<h2>BTSGraphic</h2>
+</div>
+<div class="section" id="btsimage">
+<h2>BTSImage</h2>
+</div>
+<div class="section" id="btslemmacase">
+<h2>BTSLemmaCase</h2>
+</div>
+<div class="section" id="btslemmaentry">
+<h2>BTSLemmaEntry</h2>
+</div>
+<div class="section" id="btsmarker">
+<h2>BTSMarker</h2>
+</div>
+<div class="section" id="btspassport">
+<h2>BTSPassport</h2>
+</div>
+<div class="section" id="btspassportentry">
+<h2>BTSPassportEntry</h2>
+</div>
+<div class="section" id="btspassportentrygroup">
+<h2>BTSPassportEntryGroup</h2>
+</div>
+<div class="section" id="btspassportentryitem">
+<h2>BTSPassportEntryItem</h2>
+</div>
+<div class="section" id="btssenctence">
+<h2>BTSSenctence</h2>
+</div>
+<div class="section" id="btssentenceitem">
+<h2>BTSSentenceItem</h2>
+</div>
+<div class="section" id="btstcobject">
+<h2>BTSTCObject</h2>
+</div>
+<div class="section" id="btstext">
+<h2>BTSText</h2>
+</div>
+<div class="section" id="btstextcontent">
+<h2>BTSTextContent</h2>
+</div>
+<div class="section" id="btstextcorpus">
+<h2>BTSTextCorpus</h2>
+</div>
+<div class="section" id="btstextitems">
+<h2>BTSTextItems</h2>
+</div>
+<div class="section" id="btstextsentenceitem">
+<h2>BTSTextSentenceItem</h2>
+</div>
+<div class="section" id="btsthsentry">
+<h2>BTSThsEntry</h2>
+</div>
+<div class="section" id="btsword">
+<h2>BTSWord</h2>
+</div>
 </div>
 </div>
 </body>

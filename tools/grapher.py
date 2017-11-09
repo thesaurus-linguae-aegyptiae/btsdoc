@@ -25,8 +25,9 @@ from collections import Counter
 
 _GRAPH_TEMPLATE = '''
 digraph G {{
-    graph [sep=0.5, ranksep=2];
-    node [colorscheme="pastel18"];
+    graph [sep=0.5, ranksep=2, fontname="monospace bold"];
+    node [colorscheme="pastel18", fontname="monospace bold"];
+    edge [fontname="monospace bold"];
     rankdir="LR";
 
     subgraph {cluster}interface_like {{
@@ -98,7 +99,7 @@ def makecolor(s):
     r,g,b = colorsys.hsv_to_rgb(val, 0.7, 0.8)
     return '#{:02x}{:02x}{:02x}'.format(int(r*256), int(g*256), int(b*256))
 
-def db_to_dot(conn, prettify=lambda s: s, include_pkgs={}, exclude_pkgs={}, exclude_simple_hierarchies=True, cluster=False, interfaces_only=False, classes_only=False):
+def db_to_dot(conn, prettify=lambda s: s, include_pkgs={}, gray_pkgs={}, exclude_pkgs={}, exclude_simple_hierarchies=True, cluster=False, interfaces_only=False, classes_only=False):
     cur = conn.cursor()
     escape = lambda s: '"{}"'.format(prettify(s))
     
@@ -117,13 +118,13 @@ def db_to_dot(conn, prettify=lambda s: s, include_pkgs={}, exclude_pkgs={}, excl
     references = fetch_relation('reference')
 
     all_types = interfaces | classes | abstract_classes | enums
-    inheritance = extends | implements
+    inheritance = extends | implements | iextends
     inheritance_any = Counter( e for edge in inheritance for e in edge )
 
     exclude_types = set()
 
     if include_pkgs:
-        exclude_types |= { t for t in all_types if not any(t.startswith(pkg) for pkg in include_pkgs) }
+        exclude_types |= { t for t in all_types if not any(t.startswith(pkg) for pkg in include_pkgs | gray_pkgs) }
 
     if exclude_pkgs:
         exclude_types |= { t for t in all_types if any(t.startswith(pkg) for pkg in exclude_pkgs) }
@@ -131,8 +132,23 @@ def db_to_dot(conn, prettify=lambda s: s, include_pkgs={}, exclude_pkgs={}, excl
     if exclude_simple_hierarchies:
         exclude_types |= { t for t in all_types if inheritance_any[t] == 0 } # exclude single nodes or two-subgraphs
 
-    format_type = lambda elems: textwrap.indent('\n'.join( '{} [color="{}"];'.format(escape(e), makecolor(e)) for e in elems-exclude_types ), ' '*8)
-    format_relation = lambda elems, left_color=True: textwrap.indent('\n'.join( '{} -> {} [color="{}"];'.format(escape(a), escape(b), makecolor(a if left_color else b)) for a, b in elems if not (a in exclude_types or b in exclude_types) ), ' '*8)
+    indent = lambda gen: textwrap.indent('\n'.join(gen), ' '*8)
+    def format_type_gen(elems):
+        for e in elems - exclude_types:
+            if e in gray_pkgs:
+                yield '{} [fontcolor="#aaaaaa", color="#aaaaaa"];'.format(escape(e))
+            else:
+                yield '{} [color="{}"];'.format(escape(e), makecolor(e))
+    format_type = lambda elems: indent(format_type_gen(elems))
+    def format_relation_gen(elems, left_color):
+        for a, b in elems:
+            if a in exclude_types or b in exclude_types:
+                continue
+            if a in gray_pkgs or b in gray_pkgs:
+                yield '{} -> {} [color="#aaaaaa"];'.format(escape(a), escape(b))
+            else:
+                yield '{} -> {} [color="{}"];'.format(escape(a), escape(b), makecolor(a if left_color else b))
+    format_relation = lambda elems, left_color=True: indent(format_relation_gen(elems, left_color))
 
     # This is to make interfaces stack to the right of regular classes
     reverse_relation = lambda rel: { (b, a) for (a, b) in rel }
@@ -154,6 +170,7 @@ if __name__ == '__main__':
     parser.add_argument('db', help='The sqlite3 relationship database file to read')
     parser.add_argument('output', help='The DOT output file to write')
     parser.add_argument('-i', '--include-pkgs', nargs='*', help='Include only these java packages. Can be given multiple times and takes comma-separated package names.')
+    parser.add_argument('-g', '--gray-pkgs', nargs='*', help='Include these java packages, and gray them out in the output. Can be given multiple times and takes comma-separated package names.')
     parser.add_argument('-e', '--exclude-pkgs', nargs='*', help='Exclude these java packages. Takes precedence over --include-pkgs. Can be given multiple times and takes comma-separated package names.')
     parser.add_argument('-s', '--strip-pkg-prefix', default=None, help='Strip this prefix from all package names and replace it with "*".')
     parser.add_argument('--with-shallow', action='store_true', help='Do not suppress shallow one or two-type connected components in output.')
@@ -172,5 +189,5 @@ if __name__ == '__main__':
     db = sqlite3.connect(args.db)
     with open(args.output, 'w') as f:
         with db as conn:
-            f.write(db_to_dot(conn, prettify, comma_set_opt(args.include_pkgs), comma_set_opt(args.exclude_pkgs), not args.with_shallow, args.cluster, args.only_interfaces, args.only_classes))
+            f.write(db_to_dot(conn, prettify, comma_set_opt(args.include_pkgs), comma_set_opt(args.gray_pkgs), comma_set_opt(args.exclude_pkgs), not args.with_shallow, args.cluster, args.only_interfaces, args.only_classes))
 

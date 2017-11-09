@@ -5,4 +5,4 @@ OUTDIR = docs
 all: $(addprefix $(OUTDIR)/,$(SOURCES:%.rst=%.html))
 
 $(OUTDIR)/%.html: %.rst
-	rst2html $< $@
+	rst2html5 --link-stylesheet --stylesheet=bootstrap.css,style.css $< $@
