@@ -613,6 +613,110 @@ three fields to it of which only <span class="docutils literal">masterServer</sp
 </div>
 <div class="section" id="btsexternalreference">
 <h2>BTSExternalReference</h2>
+<p>Below is a table of which types use <span class="docutils literal">BTSExternalReference</span> objects in their <span class="docutils literal">externalReferences</span> fields.</p>
+<table>
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 17%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>count</p></th>
+<th class="head"><p>frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a></p></td>
+<td><p>63391</p></td>
+<td><p>92.66%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsthsentry">BTSThsEntry</a></p></td>
+<td><p>3459</p></td>
+<td><p>5.06%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btstcobject">BTSTCObject</a></p></td>
+<td><p>1377</p></td>
+<td><p>2.01%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btstext">BTSText</a></p></td>
+<td><p>111</p></td>
+<td><p>0.16%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsuser">BTSUser</a></p></td>
+<td><p>55</p></td>
+<td><p>0.08%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsusergroup">BTSUserGroup</a></p></td>
+<td><p>11</p></td>
+<td><p>0.02%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsannotation">BTSAnnotation</a></p></td>
+<td><p>3</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a></p></td>
+<td><p>2</p></td>
+<td><p>0.00%</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>The <span class="docutils literal">type</span> of an external reference describes roughly the target domain of the reference. The most common <span class="docutils literal">type</span>
+is <span class="docutils literal">aaew_wcn</span> which stands for <span class="docutils literal">Altägyptisches Wörterbuch: Wortcorpusnummer</span>. This is simply the index number
+(and thus in this database couchdb object id) of the target entry. AFAIK <span class="docutils literal">aaew_1</span> are references into an older
+version of the AÄW. Note that anything besides these two is perfectly irrelevant in practice.</p>
+<!-- TODO confirm  what aaew_1 is -->
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 23%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>type</p></th>
+<th class="head"><p>count</p></th>
+<th class="head"><p>frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>aaew_wcn</p></td>
+<td><p>63391</p></td>
+<td><p>92.66%</p></td>
+</tr>
+<tr><td><p>aaew_1</p></td>
+<td><p>3525</p></td>
+<td><p>5.15%</p></td>
+</tr>
+<tr><td><p>&lt;none&gt;</p></td>
+<td><p>1487</p></td>
+<td><p>2.17%</p></td>
+</tr>
+<tr><td><p>URI</p></td>
+<td><p>2</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>text</p></td>
+<td><p>2</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>Text</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>geo</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><span class="docutils literal">reference</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">provider</span></dt>
+<dd><p></p></dd>
+</dl>
 </div>
 <div class="section" id="btsidreservationobject">
 <h2>BTSIDReservationObject</h2>
@@ -991,7 +1095,7 @@ stored in object <span class="docutils literal">A</span>. Read: <span class="doc
 <p>Every relation contains the couchDB <span class="docutils literal">_id</span> of its target object in its <span class="docutils literal">objectId</span> field.</p>
 <p>Relations come in many flavors. The important one is <span class="docutils literal">partOf</span>, which is used to express hierarchical structure in the
 object browser. It can be used on most anything. The other relation type flavors are only used on <span class="docutils literal">BTSLemmaEntry</span>
-objects. Below is a nice list of what is related to what and how and how often.</p>
+objects. Below are some nice stats on these.</p>
 <p>Due to the inherently asymmetric nature of this representation, most &quot;relation types&quot; need a reciprocal type to be put
 at the far end of the relation. Such pairs are e.g. <span class="docutils literal">successor</span> and <span class="docutils literal">predecessor</span> or <span class="docutils literal">composes</span> and
 <span class="docutils literal">composedOf</span>. Note that these are sometimes not named very well.</p>
@@ -1004,6 +1108,43 @@ at the far end of the relation. Such pairs are e.g. <span class="docutils litera
 <p>reciprocal relations are maintained by hand, this does in practice lead to inconsistencies as are evident
 for example from the untyped relations shown in the data below.</p>
 </div>
+<div class="section" id="relation-type-statistics">
+<h3>Relation type statistics</h3>
+<pre>Type <font color="#cc3333">CorpusModel:Annotation</font>
+      13864 <font color="#cc6633">partOf</font>
+
+Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
+      10809 <font color="#3333cc">rootOf</font>
+       7028 <font color="#6633cc">referencing</font>
+       6999 <font color="#33cccc">referencedBy</font>
+       3877 <font color="#6633cc">successor</font>
+       3765 <font color="#cc33cc">predecessor</font>
+       3278 <font color="#33cc33">composedOf</font>
+       3278 <font color="#cc3333">composes</font>
+       1812 <font color="#cc6633">partOf</font>
+       1729 <font color="#cc3399">contains</font>
+          4 <font color="#3399cc">&lt;none&gt;</font>
+
+Type <font color="#33cc99">CorpusModel:TCObject</font>
+      16029 <font color="#cc6633">partOf</font>
+          1 <font color="#3399cc">&lt;none&gt;</font>
+
+Type <font color="#3333cc">CorpusModel:Text</font>
+      30641 <font color="#cc6633">partOf</font>
+          2 <font color="#3399cc">&lt;none&gt;</font>
+
+Type <font color="#cc3366">CorpusModel:TextCorpus</font>
+          1 <font color="#3399cc">&lt;none&gt;</font>
+
+Type <font color="#cc3366">CorpusModel:ThsEntry</font>
+       3452 <font color="#cc6633">partOf</font>
+          5 <font color="#33cc33">owner</font>
+
+Type <font color="#cc3333">model:Comment</font>
+      33314 <font color="#cc6633">partOf</font></pre>
+</div>
+<div class="section" id="relation-target-type-statistics">
+<h3>Relation target type statistics</h3>
 <pre>Type <font color="#cc3333">CorpusModel:Annotation</font>
        13830 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
           15 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
@@ -1012,7 +1153,7 @@ for example from the untyped relations shown in the data below.</p>
            4 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
            1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
            1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
-
+ 
 Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
        10808 <font color="#3333cc">rootOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
         7028 <font color="#6633cc">referencing</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
@@ -1029,36 +1170,38 @@ Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
            2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
            1 <font color="#33cccc">referencedBy</font>(<font color="#6633cc">&lt;parts&gt;</font>)
            1 <font color="#3333cc">rootOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-
+ 
  Type <font color="#33cc99">CorpusModel:TCObject</font>
        15843 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
          169 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
           16 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
            1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
            1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-
+ 
  Type <font color="#3333cc">CorpusModel:Text</font>
        26586 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
         4007 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
           46 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
            2 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
            2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-
+ 
  Type <font color="#cc3366">CorpusModel:TextCorpus</font>
            1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-
+ 
  Type <font color="#cc3366">CorpusModel:ThsEntry</font>
         3441 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
           11 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
            5 <font color="#33cc33">owner</font>(<font color="#3333cc">None</font>)
-
+ 
  Type <font color="#cc3333">model:Comment</font>
        33295 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
            8 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
            6 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
            3 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
            1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
-           1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre><div class="section" id="partof-relations">
+           1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre>
+</div>
+<div class="section" id="partof-relations">
 <h3>PartOf relations</h3>
 <p>In certain cases such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a> a <span class="docutils literal">partOf</span> relation may contain <span class="docutils literal">parts</span>. Each &quot;part&quot; is a
 <a class="reference internal" href="#btsintertextreference">BTSInterTextReference</a> pointing to part of some text. The statistics of the number of parts as extracted from a

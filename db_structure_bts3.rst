@@ -404,6 +404,46 @@ BTSDate
 
 BTSExternalReference
 ~~~~~~~~~~~~~~~~~~~~
+
+Below is a table of which types use ``BTSExternalReference`` objects in their ``externalReferences`` fields.
+
+================ ===== =========
+Type             count frequency
+================ ===== =========
+`BTSLemmaEntry`_ 63391    92.66%
+`BTSThsEntry`_    3459     5.06%
+`BTSTCObject`_    1377     2.01%
+`BTSText`_         111     0.16%
+`BTSUser`_          55     0.08%
+`BTSUserGroup`_     11     0.02%
+`BTSAnnotation`_     3     0.00%
+`BTSTextCorpus`_     2     0.00%
+================ ===== =========
+
+:``type``:
+    The ``type`` of an external reference describes roughly the target domain of the reference. The most common ``type``
+    is ``aaew_wcn`` which stands for ``Altägyptisches Wörterbuch: Wortcorpusnummer``. This is simply the index number
+    (and thus in this database couchdb object id) of the target entry. AFAIK ``aaew_1`` are references into an older
+    version of the AÄW. Note that anything besides these two is perfectly irrelevant in practice.
+    
+    .. TODO confirm  what aaew_1 is
+
+    ======== ===== =========
+    type     count frequency
+    ======== ===== =========
+    aaew_wcn 63391    92.66%
+    aaew_1    3525     5.15%
+    <none>    1487     2.17%
+    URI          2     0.00%
+    text         2     0.00%
+    Text         1     0.00%
+    geo          1     0.00%
+    ======== ===== =========
+
+:``reference``:
+
+:``provider``:
+
 BTSIDReservationObject
 ~~~~~~~~~~~~~~~~~~~~~~
 BTSIdentifiableItem
@@ -610,7 +650,7 @@ Every relation contains the couchDB ``_id`` of its target object in its ``object
 
 Relations come in many flavors. The important one is ``partOf``, which is used to express hierarchical structure in the
 object browser. It can be used on most anything. The other relation type flavors are only used on ``BTSLemmaEntry``
-objects. Below is a nice list of what is related to what and how and how often.
+objects. Below are some nice stats on these.
 
 Due to the inherently asymmetric nature of this representation, most "relation types" need a reciprocal type to be put
 at the far end of the relation. Such pairs are e.g. ``successor`` and ``predecessor`` or ``composes`` and
@@ -621,63 +661,17 @@ at the far end of the relation. Such pairs are e.g. ``successor`` and ``predeces
 .. WARNING:: reciprocal relations are maintained by hand, this does in practice lead to inconsistencies as are evident
     for example from the untyped relations shown in the data below.
 
-.. raw:: html
+Relation type statistics
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-    <pre>Type <font color="#cc3333">CorpusModel:Annotation</font>
-           13830 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
-              15 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
-               8 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-               5 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
-               4 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
-               1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
-     
-    Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
-           10808 <font color="#3333cc">rootOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            7028 <font color="#6633cc">referencing</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            6992 <font color="#33cccc">referencedBy</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            3768 <font color="#6633cc">successor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            3765 <font color="#cc33cc">predecessor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            3278 <font color="#33cc33">composedOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            3278 <font color="#cc3333">composes</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            1810 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-            1729 <font color="#cc3399">contains</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-             109 <font color="#6633cc">successor</font>(<font color="#3333cc">None</font>)
-               6 <font color="#33cccc">referencedBy</font>(<font color="#3333cc">None</font>)
-               4 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               1 <font color="#33cccc">referencedBy</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               1 <font color="#3333cc">rootOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-     
-     Type <font color="#33cc99">CorpusModel:TCObject</font>
-           15843 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
-             169 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
-              16 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
-               1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-     
-     Type <font color="#3333cc">CorpusModel:Text</font>
-           26586 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
-            4007 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
-              46 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
-               2 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-               2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-     
-     Type <font color="#cc3366">CorpusModel:TextCorpus</font>
-               1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
-     
-     Type <font color="#cc3366">CorpusModel:ThsEntry</font>
-            3441 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
-              11 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
-               5 <font color="#33cc33">owner</font>(<font color="#3333cc">None</font>)
-     
-     Type <font color="#cc3333">model:Comment</font>
-           33295 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
-               8 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
-               6 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
-               3 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
-               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
-               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre>
+.. raw:: html
+    :file: relation_types.html
+    
+Relation target type statistics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+    :file: relation_child_types.html
 
 PartOf relations
 ^^^^^^^^^^^^^^^^
