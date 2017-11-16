@@ -19,9 +19,8 @@ Instanz synchronisiert. Lokal redet der BTS3-Java-Prozess über HTTP an localhos
 BTS3-Java-prozess läuft eingebettet eine Elasticsearch-Instanz, die mit Daten aus der lokalen CouchDB gefüttert wird.
 Deshalb ist die auch ständig nicht mehr synchron und muss ständig von Hand über den BTS3-Datenbankmanager neu
 synchronisiert werden.</p>
-<p>In diesem Dokument werden alle Objekttypen <em>wie sie in der CouchDB vorkommen</em> beschrieben. Das bedeutet, dass dieses
-Dokument all die Dinge außenvor lässt, die zwar irgendwo im Code zu finden sind, aber in der Praxis entweder nicht
-funktionieren oder nicht benutzt werden.</p>
+<p>This document starts out with an overview of all object types defined in the source, not their manifestation in the
+database. Thus it includes super-types that are not directly present in the database.</p>
 </div>
 <div class="section" id="allgemeines-objektlayout-in-der-datenbank">
 <h1>Allgemeines Objektlayout in der Datenbank</h1>
@@ -379,15 +378,141 @@ to be described in the <span class="docutils literal">Visibility</span> meta mod
 </div>
 <div class="section" id="btscomment">
 <h2>BTSComment</h2>
+<p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored in
+the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of exactly one
+<span class="docutils literal">partOf</span> relation. For details, see <a class="reference internal" href="#partof-relations">PartOf relations</a>.</p>
+<p>A <span class="docutils literal">BTSComment</span> is a <a class="reference internal" href="#btsobject">BTSObject</a> and has the following fields:</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">comment</span></dt>
+<dd><p>The comment's human-readable plain text</p>
+</dd>
+<dt><span class="docutils literal">tags</span></dt>
+<dd><p>Unused.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsconfig">
 <h2>BTSConfig</h2>
+<p><span class="docutils literal">BTSConfig</span> is a super-type of <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> and <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> that provides their <span class="docutils literal">children</span> attributes.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">children</span></dt>
+<dd><p>The logical children of this <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> or <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>. On the top levels of a <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a>
+this is used to categorize according to function of the config subtree. In the passport configuration this hierarchy
+is used to describe the hierarchy of passport fields and their groups. Have a look at the <a class="reference internal" href="#config-graph">Config Graph</a> for
+details.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsconfigitem">
 <h2>BTSConfigItem</h2>
+<p>A <span class="docutils literal">BTSConfigItem</span> is a single node in the configuration tree rooted in a single <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> object. A
+<span class="docutils literal">BTSConfigItem</span> is a <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>, a <a class="reference internal" href="#btsconfig">BTSConfig</a> and a <a class="reference internal" href="#btsobservableobject">BTSObservableObject</a>.  Have a look at the <a class="reference internal" href="#config-graph">Config
+Graph</a> to see how this is actually used.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Note that despite what it might initially seem like, <span class="docutils literal">BTSConfigItem</span> does <em>not</em> inherit from either of
+<a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>, <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>, <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> or <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+</div>
+<dl class="field-list simple">
+<dt><span class="docutils literal">abbreviation</span></dt>
+<dd><p>This field is only used with some objects with <span class="docutils literal">.type == 'objectType'</span> and contains a human-readable abbreviation
+of the described type.</p>
+</dd>
+<dt><span class="docutils literal">description</span></dt>
+<dd><p>This rarely used field is meant to contain human-readable comment on this node beyond what fits into <span class="docutils literal">label</span>. For
+good measure, its contents are wrapped into an array of <a class="reference internal" href="#btstranslation">BTSTranslation</a> objects.</p>
+</dd>
+<dt><span class="docutils literal">ignore</span></dt>
+<dd><p>This is a boolean field that can be used to &quot;comment out&quot; parts of the configuration. It seems setting this to
+<span class="docutils literal">true</span> will also ignore any descendents of this node.</p>
+</dd>
+<dt><span class="docutils literal">label</span></dt>
+<dd><p>This field is apparently meant to contain a human-readable label for the config node. It is similar to <span class="docutils literal">value</span>
+<span class="docutils literal">value</span> except that the contents of <span class="docutils literal">label</span> are wrapped into an array of <a class="reference internal" href="#btstranslation">BTSTranslation</a> objects. Because why
+not.</p>
+</dd>
+<dt><span class="docutils literal">ownerReferencedTypesStringList</span></dt>
+<dd><p>The purpose of this field is a bit unclear. Its idea seems to be to scope configuration entries to certain object
+types.</p>
+</dd>
+</dl>
+<!-- TODO find out wth was the idea with this -->
+<dl class="field-list simple">
+<dt><span class="docutils literal">passportEditorConfig</span></dt>
+<dd><p>This field is only used for config items describing the passport structure and points to a
+<a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a> object describing the way the UI should behave for this field.</p>
+</dd>
+<dt><span class="docutils literal">sortKey</span></dt>
+<dd><p>An integer field that in several places is used instead of <span class="docutils literal">name</span> to sort things.</p>
+</dd>
+<dt><span class="docutils literal">subtype</span></dt>
+<dd><p>This is only used when <span class="docutils literal">.type == &quot;objectType&quot;</span> to express some sort of icon to use somewhere. The values are all
+like <span class="docutils literal">IMG_SOMETHING_OR_OTHER</span>.</p>
+</dd>
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>This describes the type <em>of the config node itself</em>. One might think that this would be redundant given the
+<span class="docutils literal">value</span> attribute and the hierarchical structure of the config, but come on, we're not in the <span class="docutils literal">.ini</span> days
+anymore, are we? So, we end up with the following <span class="docutils literal">type</span> values:
+* <span class="docutils literal">&lt;none&gt;</span>
+* <span class="docutils literal"><span class="pre">Passport-Category</span></span>
+* <span class="docutils literal"><span class="pre">Passport-Entry-GroupCategories</span></span>
+* <span class="docutils literal"><span class="pre">Passport-Entry-Item</span> Passport</span>
+* <span class="docutils literal">Relation</span>
+* <span class="docutils literal">objectType</span>
+* <span class="docutils literal">objectTypes</span></p>
+</dd>
+<dt><span class="docutils literal">value</span></dt>
+<dd><p>This is the textual value of the config node. For top-level nodes this is generally the same as the Type, for
+lower-level nodes this contains e.g. the type names in an enumeration or the passport field names. This field's
+value is supposed to be used as an identifier, and thus generally <span class="docutils literal">looks_like_this</span>.</p>
+</dd>
+<dt><span class="docutils literal">rules</span></dt>
+<dd><p>Unused.</p>
+</dd>
+<dt><span class="docutils literal">showWidget</span></dt>
+<dd><p>Unused.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsconfiguration">
 <h2>BTSConfiguration</h2>
+<p>Every project has exactly one <span class="docutils literal">BTSConfiguration</span> stored in its <span class="docutils literal">{project name}_admin</span> database. A
+<span class="docutils literal">BTSConfiguration</span> is a <a class="reference internal" href="#btsobject">BTSObject</a> and a <a class="reference internal" href="#btsconfig">BTSConfig</a>. This <span class="docutils literal">BTSConfiguration</span> describes everything and the
+kitchen sink, from UI defaults through the ACL to the database schema.  The top-level <span class="docutils literal">BTSConfiguration</span> object is the
+root of the config tree. Its descendants are all <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>. They are stored in the <span class="docutils literal">children</span> attribute
+inherited from <a class="reference internal" href="#btsconfig">BTSConfig</a>. Have a look at the <a class="reference internal" href="#config-graph">Config Graph</a> to see how this is actually used.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">provider</span></dt>
+<dd><p>A symbolic name of the config. This is only used to find the configuration object specified in the application
+preferences. There is no reason the <span class="docutils literal">_id</span> could not be used there.</p>
+<p>Following is a table of all two values this field may take.</p>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 17%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p><span class="docutils literal">_id</span></p></th>
+<th class="head"><p><span class="docutils literal">provider</span></p></th>
+<th class="head"><p><span class="docutils literal">name</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><span class="docutils literal">74cb6b70ab6b58566bfadc664b001f0c</span></p></td>
+<td><p><span class="docutils literal">aaew</span></p></td>
+<td><p>Altägyptisches Wörterbuch (AAEW)</p></td>
+</tr>
+<tr><td><p><span class="docutils literal">WTJMUMGNKBGYDMYAYFRNGFNBDQ</span></p></td>
+<td><p><span class="docutils literal">aemconfig</span></p></td>
+<td><p>AEM Configuration</p></td>
+</tr>
+</tbody>
+</table>
+<p>Generated with
+<span class="docutils literal">for f in *_admin.json; jq <span class="pre">-C</span> '.docs[] | <span class="pre">select(.eClass</span> == <span class="pre">&quot;http://btsmodel/1.0#//BTSConfiguration&quot;)</span> | .name, .provider' $f; end</span></p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsdbbaseobject">
 <h2>BTSDBBaseObject</h2>
@@ -656,7 +781,7 @@ of occurences.</p>
 <div class="section" id="btsobject">
 <h2>BTSObject</h2>
 <p>Base type for a large part of database objects. Brings in <span class="docutils literal">_id, name, type, subtype, sortKey</span> by means of inheritance
-from <span class="docutils literal">BTSNamedTypedObject</span> and in turn <span class="docutils literal">BTSIdentifiableItem</span>.</p>
+from <span class="docutils literal">BTSNamedTypedObject</span> and in turn <span class="docutils literal">BTSIdentifiableItem</span>. Also brings in <span class="docutils literal">revisions, state, revisionState, visibility</span> from AdministrativDataObject.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Despite its name only about half of the database object types inherit from this. Also, do not trust even the meager
@@ -801,6 +926,40 @@ modifications of this object's eclipsey properties.</p>
 <p>Technically, the <span class="docutils literal">partOf</span> graph is only directed. In practice, it seems it is also acyclic and something would
 probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as objects can have several parents.</p>
 </div>
+<div class="section" id="partof-relations">
+<h3>PartOf relations</h3>
+<p>Every <span class="docutils literal">partOf</span> relation contains the couchDB <span class="docutils literal">_id</span> of its target object in its <span class="docutils literal">objectId</span> field. In certain cases
+such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a>, its <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> may be set. If that is the case, the target is a
+range of the content of a <span class="docutils literal">BTSText</span> and <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> both refer to objects such as <a class="reference internal" href="#btsword">BTSWord</a>.</p>
+<p>Following is an exhaustive table of the object types <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> refer to in the live data.</p>
+<table>
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 19%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><a class="reference internal" href="#btsword">BTSWord</a></p></td>
+<td><p>44727</p></td>
+<td><p>72.2%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsmarker">BTSMarker</a></p></td>
+<td><p>17212</p></td>
+<td><p>27.8%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a></p></td>
+<td><p>10</p></td>
+<td><p>0.0%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section" id="btsrevision">
 <h2>BTSRevision</h2>
@@ -843,6 +1002,10 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 <h1>Objekttypen des Corpus-Modells</h1>
 <div class="section" id="btsabstractparagraph">
 <h2>BTSAbstractParagraph</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btsabstracttext">
 <h2>BTSAbstractText</h2>
@@ -861,6 +1024,29 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="btscorpusobject">
 <h2>BTSCorpusObject</h2>
+<p>This is the base class for objects that can be shown in one of the tree viewers. This is a subtype of BTSObject, and as
+such also includes everything of BTSNamedTypedObject, AdministrativDataObject and BTSIdentifiableItem:</p>
+<pre class="code literal-block"><code>_id, name, type, subtype, sortKey, code, relations, externalReferences, revisions, state, revisionState, visibility</code></pre>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Do not confuse this with the similarly named <span class="docutils literal">BTSTCObject</span> (from &quot;Text Corpus Object&quot;) or <span class="docutils literal">BTSTextCorpus</span>. Both
+are subclasses of <span class="docutils literal">BTSCorpusObject</span>. The later is an individual corpus such as the <span class="docutils literal">bbawfelsinschriften</span> while
+the former is something like an annotated folder that is part of a corpus or another folder.</p>
+</div>
+<dl class="field-list simple">
+<dt><span class="docutils literal">passport</span></dt>
+<dd><p>The BTSPassport of the object. This contains a more-or-less arbitrary, loosely schematized collection of keys and
+values describing this object.</p>
+</dd>
+<dt><span class="docutils literal">corpusPrefix</span></dt>
+<dd><p>This field contains the name of the corpus this object is stored in, which corresponds to the couchDB database name.
+For example, <span class="docutils literal">bbawfelsinschriften</span> for <span class="docutils literal">aaew_corpus_bbawfelsinschriften</span>. Obviously, maintaining a local copy of
+the database name inside every single object is of the highest priority for purposes of data security.</p>
+</dd>
+<dt><span class="docutils literal">workPhase</span></dt>
+<dd><p>Never used.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsgraphic">
 <h2>BTSGraphic</h2>
@@ -918,6 +1104,14 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="btsword">
 <h2>BTSWord</h2>
+</div>
+</div>
+<div class="section" id="config-graph">
+<h1>Config Graph</h1>
+<div class="figure">
+<a class="reference external image-reference" href="graphs/config_graph_hybrid.pdf"><img alt="graphs/config_graph_hybrid.png" src="graphs/config_graph_hybrid.png" style="width: 100%;" /></a>
+<p class="caption">Graph of the unified hierarchical structure of both <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> instances. Each <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> is
+annotated with its <span class="docutils literal">type</span> attribute.</p>
 </div>
 </div>
 </div>

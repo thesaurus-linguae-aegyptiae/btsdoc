@@ -11,9 +11,8 @@ BTS3-Java-prozess läuft eingebettet eine Elasticsearch-Instanz, die mit Daten a
 Deshalb ist die auch ständig nicht mehr synchron und muss ständig von Hand über den BTS3-Datenbankmanager neu
 synchronisiert werden.
 
-In diesem Dokument werden alle Objekttypen *wie sie in der CouchDB vorkommen* beschrieben. Das bedeutet, dass dieses
-Dokument all die Dinge außenvor lässt, die zwar irgendwo im Code zu finden sind, aber in der Praxis entweder nicht
-funktionieren oder nicht benutzt werden.
+This document starts out with an overview of all object types defined in the source, not their manifestation in the
+database. Thus it includes super-types that are not directly present in the database.
 
 Allgemeines Objektlayout in der Datenbank
 -----------------------------------------
@@ -195,14 +194,126 @@ the following.
 
 BTSComment
 ~~~~~~~~~~
+
+A ``BTSComment`` describes a human-language comment on some object or text section. All comments on a project are stored in
+the project's ``{project name}_admin`` database and link to their target object or text part by means of exactly one
+``partOf`` relation. For details, see `PartOf relations`_.
+
+A ``BTSComment`` is a `BTSObject`_ and has the following fields:
+
+:``comment``:
+    The comment's human-readable plain text
+
+:``tags``:
+    Unused.
+
 BTSConfig
 ~~~~~~~~~
+
+``BTSConfig`` is a super-type of `BTSConfigItem`_ and `BTSConfiguration`_ that provides their ``children`` attributes.
+
+:``children``:
+    The logical children of this `BTSConfiguration`_ or `BTSConfigItem`_. On the top levels of a `BTSConfiguration`_
+    this is used to categorize according to function of the config subtree. In the passport configuration this hierarchy
+    is used to describe the hierarchy of passport fields and their groups. Have a look at the `Config Graph`_ for
+    details.
+
 BTSConfigItem
 ~~~~~~~~~~~~~
+
+A ``BTSConfigItem`` is a single node in the configuration tree rooted in a single `BTSConfiguration`_ object. A
+``BTSConfigItem`` is a `BTSIdentifiableItem`_, a `BTSConfig`_ and a `BTSObservableObject`_.  Have a look at the `Config
+Graph`_ to see how this is actually used.
+
+.. ATTENTION::
+    Note that despite what it might initially seem like, ``BTSConfigItem`` does *not* inherit from either of
+    `BTSNamedTypedObject`_, `BTSDBBaseObject`_, `AdministrativDataObject`_ or `BTSObject`_.
+
+:``abbreviation``:
+    This field is only used with some objects with ``.type == 'objectType'`` and contains a human-readable abbreviation
+    of the described type.
+
+:``description``: 
+    This rarely used field is meant to contain human-readable comment on this node beyond what fits into ``label``. For
+    good measure, its contents are wrapped into an array of `BTSTranslation`_ objects.
+
+:``ignore``:
+    This is a boolean field that can be used to "comment out" parts of the configuration. It seems setting this to
+    ``true`` will also ignore any descendents of this node.
+
+:``label``:
+    This field is apparently meant to contain a human-readable label for the config node. It is similar to ``value``
+    ``value`` except that the contents of ``label`` are wrapped into an array of `BTSTranslation`_ objects. Because why
+    not.
+
+:``ownerReferencedTypesStringList``:
+    The purpose of this field is a bit unclear. Its idea seems to be to scope configuration entries to certain object
+    types.
+
+.. TODO find out wth was the idea with this
+
+:``passportEditorConfig``:
+    This field is only used for config items describing the passport structure and points to a
+    `BTSPassportEditorConfig`_ object describing the way the UI should behave for this field.
+
+:``sortKey``:
+    An integer field that in several places is used instead of ``name`` to sort things.
+
+:``subtype``:
+    This is only used when ``.type == "objectType"`` to express some sort of icon to use somewhere. The values are all
+    like ``IMG_SOMETHING_OR_OTHER``.
+
+:``type``:
+    This describes the type *of the config node itself*. One might think that this would be redundant given the
+    ``value`` attribute and the hierarchical structure of the config, but come on, we're not in the ``.ini`` days
+    anymore, are we? So, we end up with the following ``type`` values:
+    * ``<none>``
+    * ``Passport-Category``
+    * ``Passport-Entry-GroupCategories``
+    * ``Passport-Entry-Item Passport``
+    * ``Relation``
+    * ``objectType``
+    * ``objectTypes``
+
+:``value``:
+    This is the textual value of the config node. For top-level nodes this is generally the same as the Type, for
+    lower-level nodes this contains e.g. the type names in an enumeration or the passport field names. This field's
+    value is supposed to be used as an identifier, and thus generally ``looks_like_this``.
+
+:``rules``:
+    Unused.
+
+:``showWidget``:
+    Unused.
+
 BTSConfiguration
 ~~~~~~~~~~~~~~~~
+
+Every project has exactly one ``BTSConfiguration`` stored in its ``{project name}_admin`` database. A
+``BTSConfiguration`` is a `BTSObject`_ and a `BTSConfig`_. This ``BTSConfiguration`` describes everything and the
+kitchen sink, from UI defaults through the ACL to the database schema.  The top-level ``BTSConfiguration`` object is the
+root of the config tree. Its descendants are all `BTSConfigItem`_. They are stored in the ``children`` attribute
+inherited from `BTSConfig`_. Have a look at the `Config Graph`_ to see how this is actually used.
+
+:``provider``:
+    A symbolic name of the config. This is only used to find the configuration object specified in the application
+    preferences. There is no reason the ``_id`` could not be used there.
+
+    Following is a table of all two values this field may take.
+
+    ======================================= =============== ================================
+    ``_id``                                 ``provider``    ``name``
+    ======================================= =============== ================================
+    ``74cb6b70ab6b58566bfadc664b001f0c``    ``aaew``        Altägyptisches Wörterbuch (AAEW)
+    ``WTJMUMGNKBGYDMYAYFRNGFNBDQ``          ``aemconfig``   AEM Configuration
+    ======================================= =============== ================================
+
+    Generated with 
+    ``for f in *_admin.json; jq -C '.docs[] | select(.eClass == "http://btsmodel/1.0#//BTSConfiguration") | .name, .provider' $f; end``
+
 BTSDBBaseObject
 ~~~~~~~~~~~~~~~
+
 BTSDBBaseObject is another of those base types of just about half of everything. 
 
 :``_rev``:
@@ -228,6 +339,7 @@ objects do not seem to contain sensible ACLs.
 
 Fields for local caching of values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 :``conflictingRevs``:
     This field is a pseudo-attribute that is not written to db. Under certain circumstances it is populated by
     `CouchDBDao.java`__ with the ids of conflicting revisions of the document containing the field as couchDB sees them.
@@ -265,6 +377,7 @@ BTSIDReservationObject
 ~~~~~~~~~~~~~~~~~~~~~~
 BTSIdentifiableItem
 ~~~~~~~~~~~~~~~~~~~
+
 BTSIdentifiableItem is a base interface of most everything in the database. Its purpose is to describe anything that
 holds an ``_id`` attribute, which in couchdb is every top-level document (i.e. that is not embedded into some other
 document). Its sole field is:
@@ -301,6 +414,7 @@ BTSInterTextReference
 ~~~~~~~~~~~~~~~~~~~~~
 BTSNamedTypedObject
 ~~~~~~~~~~~~~~~~~~~
+
 BTSNamedTypedObject is an interface that through ``BTSObject`` and other inheritance paths is implemented by a large
 number of types. It describes an object that may have a ``name``, a ``type``, a ``subtype`` and a ``sortKey``. ``type``
 and ``subtype`` are used somewhat inconsistently. For some object types, their range of values is described in the meta
@@ -364,8 +478,10 @@ also has one or more ``subtype``.
 
 BTSObject
 ~~~~~~~~~
+
 Base type for a large part of database objects. Brings in ``_id, name, type, subtype, sortKey`` by means of inheritance
-from ``BTSNamedTypedObject`` and in turn ``BTSIdentifiableItem``.
+from ``BTSNamedTypedObject`` and in turn ``BTSIdentifiableItem``. Also brings in ``revisions, state, revisionState,
+visibility`` from AdministrativDataObject.
 
 .. ATTENTION::
     Despite its name only about half of the database object types inherit from this. Also, do not trust even the meager
@@ -419,6 +535,7 @@ the database. It is instead used as some kind of object-global variable.
 
 BTSObservableObject
 ~~~~~~~~~~~~~~~~~~~
+
 BTSObservableObject is purely internal. It extends EObject and adds an interface for third parties to track
 modifications of this object's eclipsey properties.
 
@@ -434,9 +551,27 @@ BTSReferencableItem
 ~~~~~~~~~~~~~~~~~~~
 BTSRelation
 ~~~~~~~~~~~
+
 .. ATTENTION::
     Technically, the ``partOf`` graph is only directed. In practice, it seems it is also acyclic and something would
     probably crash if it wasn't. It is, however, *not* a vanilla tree as objects can have several parents.
+
+PartOf relations
+^^^^^^^^^^^^^^^^
+
+Every ``partOf`` relation contains the couchDB ``_id`` of its target object in its ``objectId`` field. In certain cases
+such as when used with a `BTSComment`_, its ``beginId`` and ``endId`` may be set. If that is the case, the target is a
+range of the content of a ``BTSText`` and ``beginId`` and ``endId`` both refer to objects such as `BTSWord`_.
+
+Following is an exhaustive table of the object types ``beginId`` and ``endId`` refer to in the live data.
+
+=================== ======= ==========
+Type                Count   Frequency
+=================== ======= ==========
+`BTSWord`_          44727   72.2%
+`BTSMarker`_        17212   27.8%
+`BTSAmbivalence`_   10      0.0%
+=================== ======= ==========
 
 BTSRevision
 ~~~~~~~~~~~
@@ -468,6 +603,10 @@ Objekttypen des Corpus-Modells
 
 BTSAbstractParagraph
 ~~~~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSAbstractText
 ~~~~~~~~~~~~~~~
 BTSAmbivalence
@@ -480,6 +619,31 @@ BTSCorpusHeader
 ~~~~~~~~~~~~~~~
 BTSCorpusObject
 ~~~~~~~~~~~~~~~
+
+This is the base class for objects that can be shown in one of the tree viewers. This is a subtype of BTSObject, and as
+such also includes everything of BTSNamedTypedObject, AdministrativDataObject and BTSIdentifiableItem:
+
+.. code::
+
+    _id, name, type, subtype, sortKey, code, relations, externalReferences, revisions, state, revisionState, visibility
+
+.. ATTENTION::
+    Do not confuse this with the similarly named ``BTSTCObject`` (from "Text Corpus Object") or ``BTSTextCorpus``. Both
+    are subclasses of ``BTSCorpusObject``. The later is an individual corpus such as the ``bbawfelsinschriften`` while
+    the former is something like an annotated folder that is part of a corpus or another folder.
+
+:``passport``:
+    The BTSPassport of the object. This contains a more-or-less arbitrary, loosely schematized collection of keys and
+    values describing this object.
+
+:``corpusPrefix``:
+    This field contains the name of the corpus this object is stored in, which corresponds to the couchDB database name.
+    For example, ``bbawfelsinschriften`` for ``aaew_corpus_bbawfelsinschriften``. Obviously, maintaining a local copy of
+    the database name inside every single object is of the highest priority for purposes of data security.
+
+:``workPhase``:
+    Never used.
+
 BTSGraphic
 ~~~~~~~~~~
 BTSImage
@@ -518,3 +682,13 @@ BTSThsEntry
 ~~~~~~~~~~~
 BTSWord
 ~~~~~~~
+
+Config Graph
+------------
+.. figure:: graphs/config_graph_hybrid.png
+    :width: 100%
+    :target: graphs/config_graph_hybrid.pdf
+
+    Graph of the unified hierarchical structure of both `BTSConfiguration`_ instances. Each `BTSConfigItem`_ is
+    annotated with its ``type`` attribute.
+
