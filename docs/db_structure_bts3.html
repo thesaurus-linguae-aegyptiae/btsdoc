@@ -573,12 +573,43 @@ a particular obejct.  Has no functional value.</p>
 </div>
 <div class="section" id="btsdbcollectionroledesc">
 <h2>BTSDBCollectionRoleDesc</h2>
+<p>This type describes a per-corpus &quot;role&quot;. A role seems to be just a set of permissions such as &quot;r&quot; for a &quot;reader&quot; or
+&quot;rw&quot; for an updater.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">roleName</span></dt>
+<dd><p>This field contains the name of the role, such as <span class="docutils literal">&quot;guests&quot;</span> or <span class="docutils literal">&quot;editors&quot;</span>.</p>
+</dd>
+<dt><span class="docutils literal">userNames</span></dt>
+<dd><p>This field is a list of (human-readable) user names that have this role.</p>
+</dd>
+<dt><span class="docutils literal">userRoles</span></dt>
+<dd><p>Contrary to its name, this field contains a list of couchDB ids of <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> objects. I'm not sure what the
+meaning of this is, but I suppose that all members of these groups kinda also get to have this role??</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsdbconnection">
 <h2>BTSDBConnection</h2>
+<p>This type describes on a per-corpus basis where to sync to. In practice, all corpora have the same target. There are
+three fields to it of which only <span class="docutils literal">masterServer</span> seems to be relevant at all.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>This field is either <span class="docutils literal">couchdb</span>, <span class="docutils literal">Couchdb</span> or absent. It does not seem to matter which of those.</p>
+</dd>
+<dt><span class="docutils literal">masterServer</span></dt>
+<dd><p>This field is always the same value, It contains an HTTP URL where the couchDB is to be found.</p>
+</dd>
+<dt><span class="docutils literal">dbPath</span></dt>
+<dd><p>Unused.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsdate">
 <h2>BTSDate</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btsexternalreference">
 <h2>BTSExternalReference</h2>
@@ -644,6 +675,36 @@ it: As an arbitrary string. Fun fact: There is both an object with the <span cla
 </div>
 <div class="section" id="btsintertextreference">
 <h2>BTSInterTextReference</h2>
+<p><span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> may be set. If that is the case, the target is a
+range of the content of a <span class="docutils literal">BTSText</span> and <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> both refer to objects such as <a class="reference internal" href="#btsword">BTSWord</a>.</p>
+<p>Following is an exhaustive table of the object types <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> refer to in the live data.</p>
+<table>
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 19%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><a class="reference internal" href="#btsword">BTSWord</a></p></td>
+<td><p>44727</p></td>
+<td><p>72.2%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsmarker">BTSMarker</a></p></td>
+<td><p>17212</p></td>
+<td><p>27.8%</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a></p></td>
+<td><p>10</p></td>
+<td><p>0.0%</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="btsnamedtypedobject">
 <h2>BTSNamedTypedObject</h2>
@@ -921,44 +982,166 @@ modifications of this object's eclipsey properties.</p>
 </div>
 <div class="section" id="btsrelation">
 <h2>BTSRelation</h2>
+<p>Since CouchDB is a document oriented database what more natural way is there to describe the tree-like hierarchy of
+objects than by kludging an ersatz relational layer on it?</p>
+<p>A <span class="docutils literal">BTSRelation</span> represents a single item in a relation (and not as the name implies the relation itself). An
+implementation detail is that these relations are inherently directional, and the <span class="docutils literal">BTSRelation</span> object is always
+stored in the <em>head</em> object. So, a <span class="docutils literal">partOf</span> relation describing that object <span class="docutils literal">A</span> is a part of object <span class="docutils literal">B</span> would be
+stored in object <span class="docutils literal">A</span>. Read: <span class="docutils literal">A is partOf B</span>.</p>
+<p>Every relation contains the couchDB <span class="docutils literal">_id</span> of its target object in its <span class="docutils literal">objectId</span> field.</p>
+<p>Relations come in many flavors. The important one is <span class="docutils literal">partOf</span>, which is used to express hierarchical structure in the
+object browser. It can be used on most anything. The other relation type flavors are only used on <span class="docutils literal">BTSLemmaEntry</span>
+objects. Below is a nice list of what is related to what and how and how often.</p>
+<p>Due to the inherently asymmetric nature of this representation, most &quot;relation types&quot; need a reciprocal type to be put
+at the far end of the relation. Such pairs are e.g. <span class="docutils literal">successor</span> and <span class="docutils literal">predecessor</span> or <span class="docutils literal">composes</span> and
+<span class="docutils literal">composedOf</span>. Note that these are sometimes not named very well.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p><span class="docutils literal">partOf</span> relations do not have a reciprocal element.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>reciprocal relations are maintained by hand, this does in practice lead to inconsistencies as are evident
+for example from the untyped relations shown in the data below.</p>
+</div>
+<pre>Type <font color="#cc3333">CorpusModel:Annotation</font>
+       13830 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+          15 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+           8 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+           5 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+           4 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+           1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
+
+Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
+       10808 <font color="#3333cc">rootOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        7028 <font color="#6633cc">referencing</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        6992 <font color="#33cccc">referencedBy</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        3768 <font color="#6633cc">successor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        3765 <font color="#cc33cc">predecessor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        3278 <font color="#33cc33">composedOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        3278 <font color="#cc3333">composes</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        1810 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+        1729 <font color="#cc3399">contains</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+         109 <font color="#6633cc">successor</font>(<font color="#3333cc">None</font>)
+           6 <font color="#33cccc">referencedBy</font>(<font color="#3333cc">None</font>)
+           4 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           1 <font color="#33cccc">referencedBy</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           1 <font color="#3333cc">rootOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+
+ Type <font color="#33cc99">CorpusModel:TCObject</font>
+       15843 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+         169 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+          16 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+           1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+
+ Type <font color="#3333cc">CorpusModel:Text</font>
+       26586 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+        4007 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+          46 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+           2 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+           2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+
+ Type <font color="#cc3366">CorpusModel:TextCorpus</font>
+           1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+
+ Type <font color="#cc3366">CorpusModel:ThsEntry</font>
+        3441 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
+          11 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+           5 <font color="#33cc33">owner</font>(<font color="#3333cc">None</font>)
+
+ Type <font color="#cc3333">model:Comment</font>
+       33295 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+           8 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+           6 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+           3 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+           1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+           1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre><div class="section" id="partof-relations">
+<h3>PartOf relations</h3>
+<p>In certain cases such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a> a <span class="docutils literal">partOf</span> relation may contain <span class="docutils literal">parts</span>. Each &quot;part&quot; is a
+<a class="reference internal" href="#btsintertextreference">BTSInterTextReference</a> pointing to part of some text. The statistics of the number of parts as extracted from a
+database backup are as follows.</p>
+<p><span class="docutils literal">jq <span class="pre">'.docs[].relations[]?.parts</span> | length' *.json | sort | uniq <span class="pre">-c</span> | sort <span class="pre">-bnk2</span></span></p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>length</p></th>
+<th class="head"><p>count</p></th>
+<th class="head"><p>percentage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>0</p></td>
+<td><p>92685</p></td>
+<td><p>66.26</p></td>
+</tr>
+<tr><td><p>1</p></td>
+<td><p>46892</p></td>
+<td><p>33.52</p></td>
+</tr>
+<tr><td><p>2</p></td>
+<td><p>206</p></td>
+<td><p>0.15</p></td>
+</tr>
+<tr><td><p>3</p></td>
+<td><p>53</p></td>
+<td><p>0.04</p></td>
+</tr>
+<tr><td><p>4</p></td>
+<td><p>28</p></td>
+<td><p>0.02</p></td>
+</tr>
+<tr><td><p>5</p></td>
+<td><p>11</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr><td><p>6</p></td>
+<td><p>6</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>7</p></td>
+<td><p>2</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>9</p></td>
+<td><p>1</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>12</p></td>
+<td><p>1</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>13</p></td>
+<td><p>1</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr><td><p>16</p></td>
+<td><p>1</p></td>
+<td><p>0.00</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Technically, the <span class="docutils literal">partOf</span> graph is only directed. In practice, it seems it is also acyclic and something would
 probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as objects can have several parents.</p>
 </div>
-<div class="section" id="partof-relations">
-<h3>PartOf relations</h3>
-<p>Every <span class="docutils literal">partOf</span> relation contains the couchDB <span class="docutils literal">_id</span> of its target object in its <span class="docutils literal">objectId</span> field. In certain cases
-such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a>, its <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> may be set. If that is the case, the target is a
-range of the content of a <span class="docutils literal">BTSText</span> and <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> both refer to objects such as <a class="reference internal" href="#btsword">BTSWord</a>.</p>
-<p>Following is an exhaustive table of the object types <span class="docutils literal">beginId</span> and <span class="docutils literal">endId</span> refer to in the live data.</p>
-<table>
-<colgroup>
-<col style="width: 53%" />
-<col style="width: 19%" />
-<col style="width: 28%" />
-</colgroup>
-<thead>
-<tr><th class="head"><p>Type</p></th>
-<th class="head"><p>Count</p></th>
-<th class="head"><p>Frequency</p></th>
-</tr>
-</thead>
-<tbody>
-<tr><td><p><a class="reference internal" href="#btsword">BTSWord</a></p></td>
-<td><p>44727</p></td>
-<td><p>72.2%</p></td>
-</tr>
-<tr><td><p><a class="reference internal" href="#btsmarker">BTSMarker</a></p></td>
-<td><p>17212</p></td>
-<td><p>27.8%</p></td>
-</tr>
-<tr><td><p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a></p></td>
-<td><p>10</p></td>
-<td><p>0.0%</p></td>
-</tr>
-</tbody>
-</table>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>TODO: Right now I can't make any statements on the equivalency of two <span class="docutils literal">partOf</span> relations using the same target
+<span class="docutils literal">objectId</span> but each containing different <span class="docutils literal">parts</span> and only one <span class="docutils literal">partOf</span> relation using the same target
+<span class="docutils literal">objectId</span> but containing the union of both partses .</p>
+</div>
 </div>
 </div>
 <div class="section" id="btsrevision">
@@ -966,6 +1149,10 @@ range of the content of a <span class="docutils literal">BTSText</span> and <spa
 </div>
 <div class="section" id="btstimespan">
 <h2>BTSTimespan</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btstranslation">
 <h2>BTSTranslation</h2>

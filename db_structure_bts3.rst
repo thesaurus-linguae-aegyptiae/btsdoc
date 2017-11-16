@@ -367,10 +367,41 @@ __ https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/d
 
 BTSDBCollectionRoleDesc
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+This type describes a per-corpus "role". A role seems to be just a set of permissions such as "r" for a "reader" or
+"rw" for an updater.
+
+:``roleName``:
+    This field contains the name of the role, such as ``"guests"`` or ``"editors"``.
+
+:``userNames``:
+    This field is a list of (human-readable) user names that have this role.
+
+:``userRoles``:
+    Contrary to its name, this field contains a list of couchDB ids of `BTSUserGroup`_ objects. I'm not sure what the
+    meaning of this is, but I suppose that all members of these groups kinda also get to have this role??
+
 BTSDBConnection
 ~~~~~~~~~~~~~~~
+
+This type describes on a per-corpus basis where to sync to. In practice, all corpora have the same target. There are
+three fields to it of which only ``masterServer`` seems to be relevant at all.
+
+:``type``:
+    This field is either ``couchdb``, ``Couchdb`` or absent. It does not seem to matter which of those.
+
+:``masterServer``:
+    This field is always the same value, It contains an HTTP URL where the couchDB is to be found.
+
+:``dbPath``:
+    Unused.
+
 BTSDate
 ~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSExternalReference
 ~~~~~~~~~~~~~~~~~~~~
 BTSIDReservationObject
@@ -412,6 +443,21 @@ document). Its sole field is:
 
 BTSInterTextReference
 ~~~~~~~~~~~~~~~~~~~~~
+
+``beginId`` and ``endId`` may be set. If that is the case, the target is a
+range of the content of a ``BTSText`` and ``beginId`` and ``endId`` both refer to objects such as `BTSWord`_.
+
+Following is an exhaustive table of the object types ``beginId`` and ``endId`` refer to in the live data.
+
+=================== ======= ==========
+Type                Count   Frequency
+=================== ======= ==========
+`BTSWord`_          44727   72.2%
+`BTSMarker`_        17212   27.8%
+`BTSAmbivalence`_   10      0.0%
+=================== ======= ==========
+
+
 BTSNamedTypedObject
 ~~~~~~~~~~~~~~~~~~~
 
@@ -552,31 +598,131 @@ BTSReferencableItem
 BTSRelation
 ~~~~~~~~~~~
 
-.. ATTENTION::
-    Technically, the ``partOf`` graph is only directed. In practice, it seems it is also acyclic and something would
-    probably crash if it wasn't. It is, however, *not* a vanilla tree as objects can have several parents.
+Since CouchDB is a document oriented database what more natural way is there to describe the tree-like hierarchy of
+objects than by kludging an ersatz relational layer on it?
+
+A ``BTSRelation`` represents a single item in a relation (and not as the name implies the relation itself). An
+implementation detail is that these relations are inherently directional, and the ``BTSRelation`` object is always
+stored in the *head* object. So, a ``partOf`` relation describing that object ``A`` is a part of object ``B`` would be
+stored in object ``A``. Read: ``A is partOf B``.
+
+Every relation contains the couchDB ``_id`` of its target object in its ``objectId`` field. 
+
+Relations come in many flavors. The important one is ``partOf``, which is used to express hierarchical structure in the
+object browser. It can be used on most anything. The other relation type flavors are only used on ``BTSLemmaEntry``
+objects. Below is a nice list of what is related to what and how and how often.
+
+Due to the inherently asymmetric nature of this representation, most "relation types" need a reciprocal type to be put
+at the far end of the relation. Such pairs are e.g. ``successor`` and ``predecessor`` or ``composes`` and
+``composedOf``. Note that these are sometimes not named very well.
+
+.. ATTENTION:: ``partOf`` relations do not have a reciprocal element.
+
+.. WARNING:: reciprocal relations are maintained by hand, this does in practice lead to inconsistencies as are evident
+    for example from the untyped relations shown in the data below.
+
+.. raw:: html
+
+    <pre>Type <font color="#cc3333">CorpusModel:Annotation</font>
+           13830 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+              15 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+               8 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+               5 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+               4 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+               1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
+     
+    Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
+           10808 <font color="#3333cc">rootOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            7028 <font color="#6633cc">referencing</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            6992 <font color="#33cccc">referencedBy</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            3768 <font color="#6633cc">successor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            3765 <font color="#cc33cc">predecessor</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            3278 <font color="#33cc33">composedOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            3278 <font color="#cc3333">composes</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            1810 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+            1729 <font color="#cc3399">contains</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+             109 <font color="#6633cc">successor</font>(<font color="#3333cc">None</font>)
+               6 <font color="#33cccc">referencedBy</font>(<font color="#3333cc">None</font>)
+               4 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               1 <font color="#33cccc">referencedBy</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               1 <font color="#3333cc">rootOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+     
+     Type <font color="#33cc99">CorpusModel:TCObject</font>
+           15843 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+             169 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+              16 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+               1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               1 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+     
+     Type <font color="#3333cc">CorpusModel:Text</font>
+           26586 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+            4007 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+              46 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+               2 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+               2 <font color="#cc6633">partOf</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+     
+     Type <font color="#cc3366">CorpusModel:TextCorpus</font>
+               1 <font color="#3399cc">&lt;none&gt;</font>(<font color="#6633cc">&lt;parts&gt;</font>)
+     
+     Type <font color="#cc3366">CorpusModel:ThsEntry</font>
+            3441 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)
+              11 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+               5 <font color="#33cc33">owner</font>(<font color="#3333cc">None</font>)
+     
+     Type <font color="#cc3333">model:Comment</font>
+           33295 <font color="#cc6633">partOf</font>(<font color="#3333cc">CorpusModel:Text</font>)
+               8 <font color="#cc6633">partOf</font>(<font color="#3333cc">None</font>)
+               6 <font color="#cc6633">partOf</font>(<font color="#33cc99">CorpusModel:TCObject</font>)
+               3 <font color="#cc6633">partOf</font>(<font color="#3399cc">CorpusModel:LemmaEntry</font>)
+               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:TextCorpus</font>)
+               1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre>
 
 PartOf relations
 ^^^^^^^^^^^^^^^^
 
-Every ``partOf`` relation contains the couchDB ``_id`` of its target object in its ``objectId`` field. In certain cases
-such as when used with a `BTSComment`_, its ``beginId`` and ``endId`` may be set. If that is the case, the target is a
-range of the content of a ``BTSText`` and ``beginId`` and ``endId`` both refer to objects such as `BTSWord`_.
+In certain cases such as when used with a `BTSComment`_ a ``partOf`` relation may contain ``parts``. Each "part" is a
+`BTSInterTextReference`_ pointing to part of some text. The statistics of the number of parts as extracted from a
+database backup are as follows.
 
-Following is an exhaustive table of the object types ``beginId`` and ``endId`` refer to in the live data.
+``jq '.docs[].relations[]?.parts | length' *.json | sort | uniq -c | sort -bnk2``
 
-=================== ======= ==========
-Type                Count   Frequency
-=================== ======= ==========
-`BTSWord`_          44727   72.2%
-`BTSMarker`_        17212   27.8%
-`BTSAmbivalence`_   10      0.0%
-=================== ======= ==========
+======= ======= ==========
+length  count   percentage
+======= ======= ==========
+      0   92685      66.26
+      1   46892      33.52
+      2     206       0.15
+      3      53       0.04
+      4      28       0.02
+      5      11       0.01
+      6       6       0.00
+      7       2       0.00
+      8       1       0.00
+      9       1       0.00
+     12       1       0.00
+     13       1       0.00
+     16       1       0.00
+======= ======= ==========
+
+.. ATTENTION::
+    Technically, the ``partOf`` graph is only directed. In practice, it seems it is also acyclic and something would
+    probably crash if it wasn't. It is, however, *not* a vanilla tree as objects can have several parents.
+
+.. ATTENTION::
+    TODO: Right now I can't make any statements on the equivalency of two ``partOf`` relations using the same target
+    ``objectId`` but each containing different ``parts`` and only one ``partOf`` relation using the same target
+    ``objectId`` but containing the union of both partses .
 
 BTSRevision
 ~~~~~~~~~~~
 BTSTimespan
 ~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSTranslation
 ~~~~~~~~~~~~~~
 BTSTranslations
