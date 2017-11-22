@@ -413,7 +413,7 @@ Graph</a> to see how this is actually used.</p>
 <p>Note that despite what it might initially seem like, <span class="docutils literal">BTSConfigItem</span> does <em>not</em> inherit from either of
 <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>, <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>, <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> or <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
 </div>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt><span class="docutils literal">abbreviation</span></dt>
 <dd><p>This field is only used with some objects with <span class="docutils literal">.type == 'objectType'</span> and contains a human-readable abbreviation
 of the described type.</p>
@@ -432,11 +432,26 @@ good measure, its contents are wrapped into an array of <a class="reference inte
 not.</p>
 </dd>
 <dt><span class="docutils literal">ownerReferencedTypesStringList</span></dt>
-<dd><p>The purpose of this field is a bit unclear. Its idea seems to be to scope configuration entries to certain object
-types.</p>
+<dd><p>This field is relevant only(?) for a <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> describing a passport field. In this case, this field
+points at an enumeration of the allowed values for the described passport field. Example:</p>
+<pre class="code literal-block"><code>[
+    &quot;objectTypes.CorpusObject&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
+    &quot;objectTypes.Text&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
+    &quot;objectTypes.Thesaurus Entry&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
+]</code></pre>
+<p>This field contains a list of strings, each describing one pointer from one thing to several other things. The
+format roughly is <span class="docutils literal"><span class="pre">{source}&gt;&gt;{target}[,{target}...]</span></span>. with <span class="docutils literal">{source}</span> generally being one of the strings
+described in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/global-commons/src/org/bbaw/bts/commons/BTSConstants.java#L83-L97">BASIC_OBJECT_TYPES in BTSConstants.java</a> and each <span class="docutils literal">{target}</span> pointing either at a <a class="reference internal" href="#btsconfig">BTSConfig</a> subtree
+with leaf nodes being possible values or pointing out specific values.</p>
+<p>In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
+proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
+inclined you may have look at all its nasty innards in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSConfigurationServiceImpl.java#L535">BTSConfigurationServiceImpl.java</a></p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This field is generally accessed as <span class="docutils literal">ownerTypesMap</span>. See <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BTSConfigItemImpl.java#L693-L711">fillOwnerTypesMap in BTSConfigItemImpl.java</a>.</p>
+</div>
 </dd>
 </dl>
-<!-- TODO find out wth was the idea with this -->
 <dl class="field-list simple">
 <dt><span class="docutils literal">passportEditorConfig</span></dt>
 <dd><p>This field is only used for config items describing the passport structure and points to a
@@ -1098,9 +1113,103 @@ modifications of this object's eclipsey properties.</p>
 </div>
 <div class="section" id="btsoperator">
 <h2>BTSOperator</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btspassporteditorconfig">
 <h2>BTSPassportEditorConfig</h2>
+<p>This is a rather hairy one. An instance of this type describes
+<span class="docutils literal">BTSPassportEditorConfig</span> is a subtype of <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">widgetType</span></dt>
+<dd><p>This indicates what type of input field is desired. These widget types are the following:</p>
+<pre class="code literal-block"><code>jq -c '.docs[] | recurse(.children[]?) | .passportEditorConfig? | select(. != null) | .widgetType' aem_admin.json aaew_admin.json | sort | uniq -c | sort -rn</code></pre>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 18%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p><span class="docutils literal">widgetType</span></p></th>
+<th class="head"><p><span class="docutils literal">count</span></p></th>
+<th class="head"><p><span class="docutils literal">percentage</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>null</p></td>
+<td><p>558</p></td>
+<td><p>69%</p></td>
+</tr>
+<tr><td><p>&quot;Text&quot;</p></td>
+<td><p>81</p></td>
+<td><p>10%</p></td>
+</tr>
+<tr><td><p>&quot;Boolean Select&quot;</p></td>
+<td><p>62</p></td>
+<td><p>8%</p></td>
+</tr>
+<tr><td><p>&quot;Text Field&quot;</p></td>
+<td><p>46</p></td>
+<td><p>6%</p></td>
+</tr>
+<tr><td><p>&quot;Select from Thesaurus&quot;</p></td>
+<td><p>32</p></td>
+<td><p>4%</p></td>
+</tr>
+<tr><td><p>&quot;Select from Configuration&quot;</p></td>
+<td><p>26</p></td>
+<td><p>3%</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt><span class="docutils literal">Text</span></dt>
+<dd><p>is a single-line text field.</p>
+</dd>
+<dt><span class="docutils literal">Text Field</span></dt>
+<dd><p>is a multi-line text field</p>
+</dd>
+<dt><span class="docutils literal">Boolean Select</span></dt>
+<dd><p>is a simple checkbox</p>
+</dd>
+<dt><span class="docutils literal">Select from Thesaurus</span></dt>
+<dd><p>This is a text field that can be used to enter a dictionary entry's <span class="docutils literal">_id</span> or <span class="docutils literal">name</span>.
+There is a keyboard shortcut on this that will trigger an extremely slow lookup of the object in the database and
+present substring matches to choose for the current input. There is a button that opens a tree viewer for the
+target objects instead.</p>
+</dd>
+<dt><span class="docutils literal">Select from Configuration</span></dt>
+<dd><p>This results in a drop-down list containing entries that are themselves read from
+&quot;the configuration&quot;. The values this drop-down list allows are pointed at in the
+<span class="docutils literal">ownerReferencedTypesStringList</span> field of <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>.</p>
+</dd>
+</dl>
+<p>The <span class="docutils literal">null</span> values are there since many <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> instances that don't actually need a
+<span class="docutils literal">BTSPassportEditorConfig</span> for some reason still have an empty one.</p>
+</dd>
+<dt><span class="docutils literal">horizontalWidth</span></dt>
+<dd><p>This sets the width of this input field in the UI as a number of layout grid cells. This has nothing to do with the
+data contained within the field which still may be of arbitrary length.</p>
+</dd>
+<dt><span class="docutils literal">allowMultiple</span></dt>
+<dd><p>This indicates whether this entry may hold a list of values instead of a single value. In the UI this is solved
+using the &quot;add row&quot; input field pattern.</p>
+</dd>
+<dt><span class="docutils literal">required</span></dt>
+<dd><p>This is never used in practice. The idea is that when this is set, the corresponding passport entry must be set
+before submitting changes.</p>
+</dd>
+<dt><span class="docutils literal">regex</span></dt>
+<dd><p>This is never used in practice. The idea is that when this is set, the corresponding passport entry must conform to
+this regex before submitting changes.</p>
+</dd>
+<dt><span class="docutils literal">predicateList</span></dt>
+<dd><p>This is never used in practice. No idea what the idea was with this.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsproject">
 <h2>BTSProject</h2>
@@ -1338,9 +1447,17 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="btsworkflowrule">
 <h2>BTSWorkflowRule</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btsworkflowruleitem">
 <h2>BTSWorkflowRuleItem</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="dblease">
 <h2>DBLease</h2>
@@ -1382,7 +1499,7 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 <div class="section" id="btscorpusobject">
 <h2>BTSCorpusObject</h2>
 <p>This is the base class for objects that can be shown in one of the tree viewers. This is a subtype of BTSObject, and as
-such also includes everything of BTSNamedTypedObject, AdministrativDataObject and BTSIdentifiableItem:</p>
+such also includes everything of <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>, <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>:</p>
 <pre class="code literal-block"><code>_id, name, type, subtype, sortKey, code, relations, externalReferences, revisions, state, revisionState, visibility</code></pre>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>

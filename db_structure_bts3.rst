@@ -247,10 +247,34 @@ Graph`_ to see how this is actually used.
     not.
 
 :``ownerReferencedTypesStringList``:
-    The purpose of this field is a bit unclear. Its idea seems to be to scope configuration entries to certain object
-    types.
+    This field is relevant only(?) for a `BTSConfigItem`_ describing a passport field. In this case, this field
+    points at an enumeration of the allowed values for the described passport field. See `BTSPassportEditorConfig`_.
+    Example:
+    
+    .. code::
 
-.. TODO find out wth was the idea with this
+            [
+                "objectTypes.CorpusObject>>74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,",
+                "objectTypes.Text>>74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,",
+                "objectTypes.Thesaurus Entry>>74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,",
+            ]
+
+    This field contains a list of strings, each describing one pointer from one thing to several other things. The
+    format roughly is ``{source}>>{target}[,{target}...]``. with ``{source}`` generally being one of the strings
+    described in `BASIC_OBJECT_TYPES in BTSConstants.java`_ and each ``{target}`` pointing either at a `BTSConfig`_ subtree
+    with leaf nodes being possible values or pointing out specific values.
+
+    In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
+    proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
+    inclined you may have look at all its nasty innards in `BTSConfigurationServiceImpl.java`_
+
+    .. ATTENTION::
+
+        This field is generally accessed as ``ownerTypesMap``. See `fillOwnerTypesMap in BTSConfigItemImpl.java`_.
+
+.. _`fillOwnerTypesMap in BTSConfigItemImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BTSConfigItemImpl.java#L693-L711
+.. _`BASIC_OBJECT_TYPES in BTSConstants.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/global-commons/src/org/bbaw/bts/commons/BTSConstants.java#L83-L97
+.. _`BTSConfigurationServiceImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSConfigurationServiceImpl.java#L535
 
 :``passportEditorConfig``:
     This field is only used for config items describing the passport structure and points to a
@@ -659,8 +683,63 @@ modifications of this object's eclipsey properties.
 
 BTSOperator
 ~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSPassportEditorConfig
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a rather hairy one. An instance of this type describes 
+``BTSPassportEditorConfig`` is a subtype of `BTSIdentifiableItem`_.
+
+:``widgetType``:
+    This indicates what type of input field is desired. These widget types are the following:
+
+    .. code::
+
+        jq -c '.docs[] | recurse(.children[]?) | .passportEditorConfig? | select(. != null) | .widgetType' aem_admin.json aaew_admin.json | sort | uniq -c | sort -rn
+
+    =========================== ========= ==============
+    ``widgetType``              ``count`` ``percentage``
+    =========================== ========= ==============
+    null                              558 69%
+    "Text"                             81 10%
+    "Boolean Select"                   62  8%
+    "Text Field"                       46  6%
+    "Select from Thesaurus"            32  4%
+    "Select from Configuration"        26  3%
+    =========================== ========= ==============
+
+    :``Text``: is a single-line text field.
+    :``Text Field``: is a multi-line text field
+    :``Boolean Select``: is a simple checkbox
+    :``Select from Thesaurus``: This is a text field that can be used to enter a dictionary entry's ``_id`` or ``name``.
+        There is a keyboard shortcut on this that will trigger an extremely slow lookup of the object in the database and
+        present substring matches to choose for the current input. There is a button that opens a tree viewer for the
+        target objects instead.
+    :``Select from Configuration``: This results in a drop-down list containing entries that are themselves read from
+        "the configuration". The values this drop-down list allows are pointed at in the
+        ``ownerReferencedTypesStringList`` field of `BTSConfigItem`_.
+
+    The ``null`` values are there since many `BTSConfigItem`_ instances that don't actually need a
+    ``BTSPassportEditorConfig`` for some reason still have an empty one.
+
+:``horizontalWidth``:
+    This sets the width of this input field in the UI as a number of layout grid cells. This has nothing to do with the
+    data contained within the field which still may be of arbitrary length.
+:``allowMultiple``:
+    This indicates whether this entry may hold a list of values instead of a single value. In the UI this is solved
+    using the "add row" input field pattern.
+:``required``:
+    This is never used in practice. The idea is that when this is set, the corresponding passport entry must be set
+    before submitting changes.
+:``regex``:
+    This is never used in practice. The idea is that when this is set, the corresponding passport entry must conform to
+    this regex before submitting changes.
+:``predicateList``:
+    This is never used in practice. No idea what the idea was with this.
+
 BTSProject
 ~~~~~~~~~~
 BTSProjectDBCollection
@@ -759,8 +838,16 @@ BTSUserGroup
 ~~~~~~~~~~~~
 BTSWorkflowRule
 ~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSWorkflowRuleItem
 ~~~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 DBLease
 ~~~~~~~
 UserActionCounter
@@ -793,7 +880,7 @@ BTSCorpusObject
 ~~~~~~~~~~~~~~~
 
 This is the base class for objects that can be shown in one of the tree viewers. This is a subtype of BTSObject, and as
-such also includes everything of BTSNamedTypedObject, AdministrativDataObject and BTSIdentifiableItem:
+such also includes everything of `BTSNamedTypedObject`_, `AdministrativDataObject`_ and `BTSIdentifiableItem`_:
 
 .. code::
 
