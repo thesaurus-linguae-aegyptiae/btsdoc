@@ -446,10 +446,42 @@ Type             count frequency
 
 BTSIDReservationObject
 ~~~~~~~~~~~~~~~~~~~~~~
+
+``BTSIDReservationObject`` is meant to allow an user to pre-commit an object ID. Since in some cases the objects couchDB
+id is actually the lemma number this is actually mission-critical and collisions would actually produce a lot of
+problems. The logic surrounding this is quite brittle and lacks proper error handling or locking.
+
+A single ``BTSIDReservationObject`` represents a reservation of a single ID. The application always tries to keep a
+fixed number of reservations in cache. If the application can't find a reservation, it will just make up an ID in a
+totally different format (mangled UUID) instead.
+
+Since in different places different ID formats are used (see `BTSIdentifiableItem`_), ``BTSIDReservationObject`` allows
+prefixes. There is no further scoping or proper namespacing.
+
+``BTSIDReservationObject`` is a subtype of `BTSDBBaseObject`_. From there it inherits its useless `_rev` field.
+
+:``_id``:
+    This is the actual ID being reserved. This is a couchDB id, but it also carries a semantic value. This is always
+    something human-readable, some arbitrary prefix (generally ``""`` or ``"d"``) followed by a 4-6 digit number.
+:``updaters``:
+    This field has a totally different meaning than elsewhere, though I suspect that that might only be the java side
+    and the javascript view functions might not actually care. Here, this is always an array of one element, which
+    always is the ID (which is also sometimes the human-readable name) of the user that created this reservation.
+:``btsUUID``:
+    This is an ID meant to identify a single BTS installation. It is set to a string of the decimal timestamp
+    of the first time that BTS installation was started. Example: ``"1447396852251"``.  Be careful in that generally
+    within the BTS the name "uuid" does not always refer to what is commonly known as an `UUID`_. In fact, it may
+    neither be guaranteed to be universal nor unique as you can see in one case in `applicationStartup in
+    ApplicationStartupControllerImpl.java`_.  Also, have a look at `createId in IDServiceImpl.java`_.
+
+.. _`UUID`: https://en.wikipedia.org/wiki/Universally_unique_identifier
+.. _`createId in IDServiceImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/IDServiceImpl.java#L68 
+.. _`applicationStartup in ApplicationStartupControllerImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/ApplicationStartupControllerImpl.java#L162
+
 BTSIdentifiableItem
 ~~~~~~~~~~~~~~~~~~~
 
-BTSIdentifiableItem is a base interface of most everything in the database. Its purpose is to describe anything that
+``BTSIdentifiableItem`` is a base interface of most everything in the database. Its purpose is to describe anything that
 holds an ``_id`` attribute, which in couchdb is every top-level document (i.e. that is not embedded into some other
 document). Its sole field is:
 

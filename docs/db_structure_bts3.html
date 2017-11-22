@@ -720,10 +720,37 @@ version of the AÄW. Note that anything besides these two is perfectly irrelevan
 </div>
 <div class="section" id="btsidreservationobject">
 <h2>BTSIDReservationObject</h2>
+<p><span class="docutils literal">BTSIDReservationObject</span> is meant to allow an user to pre-commit an object ID. Since in some cases the objects couchDB
+id is actually the lemma number this is actually mission-critical and collisions would actually produce a lot of
+problems. The logic surrounding this is quite brittle and lacks proper error handling or locking.</p>
+<p>A single <span class="docutils literal">BTSIDReservationObject</span> represents a reservation of a single ID. The application always tries to keep a
+fixed number of reservations in cache. If the application can't find a reservation, it will just make up an ID in a
+totally different format (mangled UUID) instead.</p>
+<p>Since in different places different ID formats are used (see <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>), <span class="docutils literal">BTSIDReservationObject</span> allows
+prefixes. There is no further scoping or proper namespacing.</p>
+<p><span class="docutils literal">BTSIDReservationObject</span> is a subtype of <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>. From there it inherits its useless <cite>_rev</cite> field.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">_id</span></dt>
+<dd><p>This is the actual ID being reserved. This is a couchDB id, but it also carries a semantic value. This is always
+something human-readable, some arbitrary prefix (generally <span class="docutils literal">&quot;&quot;</span> or <span class="docutils literal">&quot;d&quot;</span>) followed by a 4-6 digit number.</p>
+</dd>
+<dt><span class="docutils literal">updaters</span></dt>
+<dd><p>This field has a totally different meaning than elsewhere, though I suspect that that might only be the java side
+and the javascript view functions might not actually care. Here, this is always an array of one element, which
+always is the ID (which is also sometimes the human-readable name) of the user that created this reservation.</p>
+</dd>
+<dt><span class="docutils literal">btsUUID</span></dt>
+<dd><p>This is an ID meant to identify a single BTS installation. It is set to a string of the decimal timestamp
+of the first time that BTS installation was started. Example: <span class="docutils literal">&quot;1447396852251&quot;</span>.  Be careful in that generally
+within the BTS the name &quot;uuid&quot; does not always refer to what is commonly known as an <a class="reference external" href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>. In fact, it may
+neither be guaranteed to be universal nor unique as you can see in one case in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/ApplicationStartupControllerImpl.java#L162">applicationStartup in
+ApplicationStartupControllerImpl.java</a>.  Also, have a look at <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/IDServiceImpl.java#L68">createId in IDServiceImpl.java</a>.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsidentifiableitem">
 <h2>BTSIdentifiableItem</h2>
-<p>BTSIdentifiableItem is a base interface of most everything in the database. Its purpose is to describe anything that
+<p><span class="docutils literal">BTSIdentifiableItem</span> is a base interface of most everything in the database. Its purpose is to describe anything that
 holds an <span class="docutils literal">_id</span> attribute, which in couchdb is every top-level document (i.e. that is not embedded into some other
 document). Its sole field is:</p>
 <dl class="field-list">
