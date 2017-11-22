@@ -926,8 +926,55 @@ subclass of `BTSIdentifiableItem`_.
 
 BTSUser
 ~~~~~~~
+
+This type describes an user account for the BTS. This account is synchronized and used both locally and remote. A
+`BTSUser`_ is a `BTSObject`_.
+
+In addition to the specific fields below, some `BTSUser`_ objects have their inherited ``externalReferences`` field set
+to a list containing one `BTSExternalReference`_ of type ``aaew_1`` with a string-formatted small number that apparently
+is this user's ID in a previous incarnation of the BTS.
+
+:``comment``:
+    Not used.
+:``dbAdmin``:
+    Flag only used during user creation and not manifested in database.
+:``description``:
+    Miscellaneous comments. Very rarely used.
+:``groupIds``:
+    This is a list of `BTSUserGroup`_ object couchDB ids of groups this user is a member of.
+:``loggedIn``:
+    Not used.
+:``mail``:
+    This is the email address of this user. This is not always present!
+:``password``:
+    This contains the very insecurely encrypted (sic!) password of this user.
+:``sigle``:
+    This is a short identifier for this user such as ``SDS/AAEW/BBAW``. This field is not always present.
+:``status``:
+    Not used.
+:``userName``:
+    login name of this user. Often this is also the user objects couchDB ``_id``.
+:``foreName``:
+    given name
+:``sureName``:
+    surname
+:``webDescription``:
+    This contains a human-readable description of this persons's position. This is rarely present.
+:``webURL``:
+    This contains an URL to some website where this person may be found. This is rarely present.
+
 BTSUserGroup
 ~~~~~~~~~~~~
+
+This type describes a group of users. The group membership is managed in the individual `BTSUser`_ objects via their
+``groupIds`` field. `BTSUserGroup`_ is a subtype of `BTSObject`_.
+
+:``name``:
+    This field contains the human-readable long-form name of this group, such as ``"Totenbuch-Projekt, Ägyptologisches Seminar der Universität Bonn"``.
+    This field is not present in ``terminated`` groups.
+:``state``:
+    Either ``active`` or ``terminated``.
+
 BTSWorkflowRule
 ~~~~~~~~~~~~~~~
 
@@ -942,8 +989,25 @@ BTSWorkflowRuleItem
 
 DBLease
 ~~~~~~~
+
+This type is part of the borked locking infrastructure. The basic idea is that a `DBLease`_ instance is automatically
+created for every object that is opened in the BTS. This is done via the selection mechanism centered around
+`setSelection in PermissionsAndExpressionsEvaluationController.java`_.
+
+The logic behind lock creation (e.g. `acquireLockOptimistic in BTSEvaluationServiceImpl.java`_) is very racy. Also,
+there is no good guarantee that things that are locked are also unlocked in time. And locks expire at some point, and
+AFAICT there is noone actively checking when exactly that happens.
+
+.. _`setSelection in PermissionsAndExpressionsEvaluationController.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L150-L198
+.. _`acquireLockOptimistic in BTSEvaluationServiceImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSEvaluationServiceImpl.java#L416-L468
+
 UserActionCounter
 ~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+    This is a purely internal type. It seems to be meant to allow for some history-dependent scheduling of
+    completions(?) but despite fragments of database infrastructure code it has never been manifested into the database.
+
 StringToStringListMap
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -956,8 +1020,8 @@ StringToStringMap
 .. ATTENTION::
     This is a purely internal type.
 
-Objekttypen des Corpus-Modells
-------------------------------
+Object Types of the Corpus Model
+--------------------------------
 
 BTSAbstractParagraph
 ~~~~~~~~~~~~~~~~~~~~

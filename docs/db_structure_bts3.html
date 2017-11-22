@@ -1534,9 +1534,69 @@ string in a set of translations.</p>
 </div>
 <div class="section" id="btsuser">
 <h2>BTSUser</h2>
+<p>This type describes an user account for the BTS. This account is synchronized and used both locally and remote. A
+<a class="reference internal" href="#btsuser">BTSUser</a> is a <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+<p>In addition to the specific fields below, some <a class="reference internal" href="#btsuser">BTSUser</a> objects have their inherited <span class="docutils literal">externalReferences</span> field set
+to a list containing one <a class="reference internal" href="#btsexternalreference">BTSExternalReference</a> of type <span class="docutils literal">aaew_1</span> with a string-formatted small number that apparently
+is this user's ID in a previous incarnation of the BTS.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">comment</span></dt>
+<dd><p>Not used.</p>
+</dd>
+<dt><span class="docutils literal">dbAdmin</span></dt>
+<dd><p>Flag only used during user creation and not manifested in database.</p>
+</dd>
+<dt><span class="docutils literal">description</span></dt>
+<dd><p>Miscellaneous comments. Very rarely used.</p>
+</dd>
+<dt><span class="docutils literal">groupIds</span></dt>
+<dd><p>This is a list of <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> object couchDB ids of groups this user is a member of.</p>
+</dd>
+<dt><span class="docutils literal">loggedIn</span></dt>
+<dd><p>Not used.</p>
+</dd>
+<dt><span class="docutils literal">mail</span></dt>
+<dd><p>This is the email address of this user. This is not always present!</p>
+</dd>
+<dt><span class="docutils literal">password</span></dt>
+<dd><p>This contains the very insecurely encrypted (sic!) password of this user.</p>
+</dd>
+<dt><span class="docutils literal">sigle</span></dt>
+<dd><p>This is a short identifier for this user such as <span class="docutils literal">SDS/AAEW/BBAW</span>. This field is not always present.</p>
+</dd>
+<dt><span class="docutils literal">status</span></dt>
+<dd><p>Not used.</p>
+</dd>
+<dt><span class="docutils literal">userName</span></dt>
+<dd><p>login name of this user. Often this is also the user objects couchDB <span class="docutils literal">_id</span>.</p>
+</dd>
+<dt><span class="docutils literal">foreName</span></dt>
+<dd><p>given name</p>
+</dd>
+<dt><span class="docutils literal">sureName</span></dt>
+<dd><p>surname</p>
+</dd>
+<dt><span class="docutils literal">webDescription</span></dt>
+<dd><p>This contains a human-readable description of this persons's position. This is rarely present.</p>
+</dd>
+<dt><span class="docutils literal">webURL</span></dt>
+<dd><p>This contains an URL to some website where this person may be found. This is rarely present.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsusergroup">
 <h2>BTSUserGroup</h2>
+<p>This type describes a group of users. The group membership is managed in the individual <a class="reference internal" href="#btsuser">BTSUser</a> objects via their
+<span class="docutils literal">groupIds</span> field. <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> is a subtype of <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>This field contains the human-readable long-form name of this group, such as <span class="docutils literal"><span class="pre">&quot;Totenbuch-Projekt,</span> Ägyptologisches Seminar der Universität Bonn&quot;</span>.
+This field is not present in <span class="docutils literal">terminated</span> groups.</p>
+</dd>
+<dt><span class="docutils literal">state</span></dt>
+<dd><p>Either <span class="docutils literal">active</span> or <span class="docutils literal">terminated</span>.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsworkflowrule">
 <h2>BTSWorkflowRule</h2>
@@ -1554,9 +1614,20 @@ string in a set of translations.</p>
 </div>
 <div class="section" id="dblease">
 <h2>DBLease</h2>
+<p>This type is part of the borked locking infrastructure. The basic idea is that a <a class="reference internal" href="#dblease">DBLease</a> instance is automatically
+created for every object that is opened in the BTS. This is done via the selection mechanism centered around
+<a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L150-L198">setSelection in PermissionsAndExpressionsEvaluationController.java</a>.</p>
+<p>The logic behind lock creation (e.g. <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSEvaluationServiceImpl.java#L416-L468">acquireLockOptimistic in BTSEvaluationServiceImpl.java</a>) is very racy. Also,
+there is no good guarantee that things that are locked are also unlocked in time. And locks expire at some point, and
+AFAICT there is noone actively checking when exactly that happens.</p>
 </div>
 <div class="section" id="useractioncounter">
 <h2>UserActionCounter</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This is a purely internal type. It seems to be meant to allow for some history-dependent scheduling of
+completions(?) but despite fragments of database infrastructure code it has never been manifested into the database.</p>
+</div>
 </div>
 <div class="section" id="stringtostringlistmap">
 <h2>StringToStringListMap</h2>
@@ -1573,8 +1644,8 @@ string in a set of translations.</p>
 </div>
 </div>
 </div>
-<div class="section" id="objekttypen-des-corpus-modells">
-<h1>Objekttypen des Corpus-Modells</h1>
+<div class="section" id="object-types-of-the-corpus-model">
+<h1>Object Types of the Corpus Model</h1>
 <div class="section" id="btsabstractparagraph">
 <h2>BTSAbstractParagraph</h2>
 <div class="admonition attention">
