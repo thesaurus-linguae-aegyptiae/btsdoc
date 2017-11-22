@@ -371,7 +371,7 @@ code</a> looks like this:</p>
 <dd><p>This field is supposed to provide basic read/list access control on objects. Its possible values seem to be supposed
 to be described in the <span class="docutils literal">Visibility</span> meta model entry, which contains <span class="docutils literal">group</span>, <span class="docutils literal">project</span>, <span class="docutils literal">public</span>,
 <span class="docutils literal">Reader</span> and <span class="docutils literal">all_authenticated</span>. The code however contains at least one reference to one additional value
-<span class="docutils literal">repository</span> in one of the obfuscated embedded design documents in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java#L98">CouchDBManager.java</a>.</p>
+<span class="docutils literal">repository</span> in one of the obfuscated <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java#L98">embedded design documents in CouchDBManager.java</a>.</p>
 <p>The code can't quite decide whether to check this at the database level (see the above reference) or <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-controller-impl/src/org/bbaw/bts/core/corpus/controller/impl/partController/CorpusNavigatorControllerImpl.java#L373">in the client</a>.</p>
 </dd>
 </dl>
@@ -433,7 +433,8 @@ not.</p>
 </dd>
 <dt><span class="docutils literal">ownerReferencedTypesStringList</span></dt>
 <dd><p>This field is relevant only(?) for a <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> describing a passport field. In this case, this field
-points at an enumeration of the allowed values for the described passport field. Example:</p>
+points at an enumeration of the allowed values for the described passport field. See <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a>.
+Example:</p>
 <pre class="code literal-block"><code>[
     &quot;objectTypes.CorpusObject&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
     &quot;objectTypes.Text&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
@@ -588,7 +589,7 @@ a particular obejct.  Has no functional value.</p>
 </div>
 <div class="section" id="btsdbcollectionroledesc">
 <h2>BTSDBCollectionRoleDesc</h2>
-<p>This type describes a per-corpus &quot;role&quot;. A role seems to be just a set of permissions such as &quot;r&quot; for a &quot;reader&quot; or
+<p>This type describes a per-project &quot;role&quot;. A role seems to be just a set of permissions such as &quot;r&quot; for a &quot;reader&quot; or
 &quot;rw&quot; for an updater.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">roleName</span></dt>
@@ -605,7 +606,7 @@ meaning of this is, but I suppose that all members of these groups kinda also ge
 </div>
 <div class="section" id="btsdbconnection">
 <h2>BTSDBConnection</h2>
-<p>This type describes on a per-corpus basis where to sync to. In practice, all corpora have the same target. There are
+<p>This type describes on a per-project basis where to sync to. In practice, all corpora have the same target. There are
 three fields to it of which only <span class="docutils literal">masterServer</span> seems to be relevant at all.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">type</span></dt>
@@ -743,6 +744,11 @@ fixed number of reservations in cache. If the application can't find a reservati
 totally different format (mangled UUID) instead.</p>
 <p>Since in different places different ID formats are used (see <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>), <span class="docutils literal">BTSIDReservationObject</span> allows
 prefixes. There is no further scoping or proper namespacing.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>The details of the reservation logic are controlled by the <span class="docutils literal">propertyStrings</span> field on the
+<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a> belonging to the active (dictionary) object.</p>
+</div>
 <p><span class="docutils literal">BTSIDReservationObject</span> is a subtype of <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>. From there it inherits its useless <cite>_rev</cite> field.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">_id</span></dt>
@@ -1213,9 +1219,59 @@ this regex before submitting changes.</p>
 </div>
 <div class="section" id="btsproject">
 <h2>BTSProject</h2>
+<p>A &quot;Project&quot; is a single administrative entity. It has its own database configuration, access control rules and set of
+corpora. <span class="docutils literal">BTSProject</span> is a subtype of <a class="reference internal" href="#btsobject">BTSObject</a>. As in any good data model, there is no direct link between a
+<span class="docutils literal">BTSProject</span> and its constituent <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> instances. Both are only linked through the <span class="docutils literal">corpusPrefix</span> field
+in <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> pointing at one of the <a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a> instances of the <a class="reference internal" href="#btsproject">BTSProject</a>. Every time the
+<span class="docutils literal">BTSProject</span> side of the database has to be accessed from the <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> side, the
+<a class="reference internal" href="#btsproject">BTSProject</a>/<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a>/whatever is simply looked up by <span class="docutils literal">corpusPrefix</span>. A good starting point for
+looking into this is <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L691-L704">getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java</a>.</p>
+<p>The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
+one can select one or multiple projects to download.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">prefix</span></dt>
+<dd><p>&quot;key&quot; of this project, such as <span class="docutils literal">&quot;aaew&quot;</span> in case of the Altägyptisches Wörterbuch. Among others, this is used in
+the database name of this project's personal database.</p>
+</dd>
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>Inherited from <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a> via <a class="reference internal" href="#btsobject">BTSObject</a> this contains the project's human-readable name, such as
+<span class="docutils literal">&quot;Altägyptisches Wörterbuch BBAW&quot;</span>.</p>
+</dd>
+<dt><span class="docutils literal">description</span></dt>
+<dd><p>Does not contain much if anything at all, such as &quot;Höhlenbuch (Unterweltsbuch)&quot; for the &quot;Höhlenbuch&quot;.</p>
+</dd>
+<dt><span class="docutils literal">dbConnection</span></dt>
+<dd><p><a class="reference internal" href="#btsdbconnection">BTSDBConnection</a> of this project. This describes which database this project is supposed to sync to.</p>
+</dd>
+<dt><span class="docutils literal">dbCollections</span></dt>
+<dd><p>This field contains a list of <a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a> objects. Though from the code it seems higher ambitions were
+had there is always exactly one database collection per text corpus.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsprojectdbcollection">
 <h2>BTSProjectDBCollection</h2>
+<p>A <span class="docutils literal">BTSProjectDBCollection</span> describes one couchDB database belonging to the project. This database contains the objects
+of a single <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a>.  <span class="docutils literal">BTSProjectDBCollection</span> is a subtype of <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">collectionName</span></dt>
+<dd><p>The name of the couchDB database, such as <span class="docutils literal">aaew_corpus_bbawfelsinschriften</span>.</p>
+</dd>
+<dt><span class="docutils literal">propertyStrings</span></dt>
+<dd><p>This field contains a (json) list of <span class="docutils literal">&quot;key=value&quot;</span> (json) strings. In practice, these are solely used on the
+dictionaries to configure the ID reservation logic.</p>
+</dd>
+<dt><span class="docutils literal">roleDescriptions</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">indexed</span></dt>
+<dd><p>This boolean flag sets whether this database is supposed to be indexed by elasticsearch. See <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java">CouchDBManager.java</a>
+for details.</p>
+</dd>
+<dt><span class="docutils literal">synchronized</span></dt>
+<dd><p>This boolean flag sets whether this database is supposed to be synchronized to remote described in this
+<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a>'s owner <a class="reference internal" href="#btsproject">BTSProject</a>'s <a class="reference internal" href="#btsdbconnection">BTSDBConnection</a>.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsreferencableitem">
 <h2>BTSReferencableItem</h2>

@@ -185,11 +185,11 @@ the following.
     This field is supposed to provide basic read/list access control on objects. Its possible values seem to be supposed
     to be described in the ``Visibility`` meta model entry, which contains ``group``, ``project``, ``public``,
     ``Reader`` and ``all_authenticated``. The code however contains at least one reference to one additional value
-    ``repository`` in one of the obfuscated embedded design documents in `CouchDBManager.java`_.
+    ``repository`` in one of the obfuscated `embedded design documents in CouchDBManager.java`_.
 
     The code can't quite decide whether to check this at the database level (see the above reference) or `in the client`_.
 
-.. _`CouchDBManager.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java#L98
+.. _`embedded design documents in CouchDBManager.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java#L98
 .. _`in the client`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-controller-impl/src/org/bbaw/bts/core/corpus/controller/impl/partController/CorpusNavigatorControllerImpl.java#L373
 
 BTSComment
@@ -392,7 +392,7 @@ __ https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/d
 BTSDBCollectionRoleDesc
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This type describes a per-corpus "role". A role seems to be just a set of permissions such as "r" for a "reader" or
+This type describes a per-project "role". A role seems to be just a set of permissions such as "r" for a "reader" or
 "rw" for an updater.
 
 :``roleName``:
@@ -408,7 +408,7 @@ This type describes a per-corpus "role". A role seems to be just a set of permis
 BTSDBConnection
 ~~~~~~~~~~~~~~~
 
-This type describes on a per-corpus basis where to sync to. In practice, all corpora have the same target. There are
+This type describes on a per-project basis where to sync to. In practice, all corpora have the same target. There are
 three fields to it of which only ``masterServer`` seems to be relevant at all.
 
 :``type``:
@@ -481,6 +481,9 @@ totally different format (mangled UUID) instead.
 
 Since in different places different ID formats are used (see `BTSIdentifiableItem`_), ``BTSIDReservationObject`` allows
 prefixes. There is no further scoping or proper namespacing.
+
+.. ATTENTION:: The details of the reservation logic are controlled by the ``propertyStrings`` field on the
+    `BTSProjectDBCollection`_ belonging to the active (dictionary) object.
 
 ``BTSIDReservationObject`` is a subtype of `BTSDBBaseObject`_. From there it inherits its useless `_rev` field.
 
@@ -742,8 +745,55 @@ This is a rather hairy one. An instance of this type describes
 
 BTSProject
 ~~~~~~~~~~
+
+A "Project" is a single administrative entity. It has its own database configuration, access control rules and set of
+corpora. ``BTSProject`` is a subtype of `BTSObject`_. As in any good data model, there is no direct link between a
+``BTSProject`` and its constituent `BTSTextCorpus`_ instances. Both are only linked through the ``corpusPrefix`` field
+in `BTSCorpusObject`_ pointing at one of the `BTSProjectDBCollection`_ instances of the `BTSProject`_. Every time the
+``BTSProject`` side of the database has to be accessed from the `BTSCorpusObject`_ side, the
+`BTSProject`_/`BTSProjectDBCollection`_/whatever is simply looked up by ``corpusPrefix``. A good starting point for
+looking into this is `getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java`_.
+
+The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
+one can select one or multiple projects to download.
+
+:``prefix``:
+    "key" of this project, such as ``"aaew"`` in case of the Altägyptisches Wörterbuch. Among others, this is used in
+    the database name of this project's personal database.
+:``name``:
+    Inherited from `BTSNamedTypedObject`_ via `BTSObject`_ this contains the project's human-readable name, such as
+    ``"Altägyptisches Wörterbuch BBAW"``.
+:``description``:
+    Does not contain much if anything at all, such as "Höhlenbuch (Unterweltsbuch)" for the "Höhlenbuch".
+:``dbConnection``:
+    `BTSDBConnection`_ of this project. This describes which database this project is supposed to sync to.
+:``dbCollections``:
+    This field contains a list of `BTSProjectDBCollection`_ objects. Though from the code it seems higher ambitions were
+    had there is always exactly one database collection per text corpus.
+
+.. _`getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L691-L704
+
 BTSProjectDBCollection
 ~~~~~~~~~~~~~~~~~~~~~~
+
+A ``BTSProjectDBCollection`` describes one couchDB database belonging to the project. This database contains the objects
+of a single `BTSTextCorpus`_.  ``BTSProjectDBCollection`` is a subtype of `BTSIdentifiableItem`_.
+
+:``collectionName``:
+    The name of the couchDB database, such as ``aaew_corpus_bbawfelsinschriften``.
+:``propertyStrings``:
+    This field contains a (json) list of ``"key=value"`` (json) strings. In practice, these are solely used on the
+    dictionaries to configure the ID reservation logic.
+:``roleDescriptions``:
+:``indexed``:
+    This boolean flag sets whether this database is supposed to be indexed by elasticsearch. See `CouchDBManager.java`_
+    for details.
+:``synchronized``:
+    This boolean flag sets whether this database is supposed to be synchronized to remote described in this
+    `BTSProjectDBCollection`_'s owner `BTSProject`_'s `BTSDBConnection`_.
+
+.. _`CouchDBManager.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/couch/src/org/bbaw/bts/db/couchdb/impl/CouchDBManager.java
+
 BTSReferencableItem
 ~~~~~~~~~~~~~~~~~~~
 BTSRelation
