@@ -342,6 +342,17 @@ like this:</p>
 <p>The first element is an incrementing revision number, the second one is a timestamp in some random timezone and the
 third one is the couchdb object id of the user to blame. As usual, don't expect these to <em>always</em> actually follow
 that format as <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BtsmodelFactoryImpl.java#L491">the parsing code in BtsmodelFactoryImpl.java</a> made to fail silently.</p>
+<p>In the java domain these revisions are represented by eclipsey <a class="reference internal" href="#btsrevision">BTSRevision</a> objects.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>The CouchDB user ID in some cases is some random-looking string, but in some cases it is the user's login name.</p>
+</div>
+<!-- ATTENTION:
+
+Do not confuse this with CouchDB's ``_rev`` field, which is mapped by `BTSDBBaseObject`_. These two have nothing
+to do with each other. In particular, the revsion counter at the beginning of this field's revision strings may
+coincide with the revision counter at the beginning of couchdb's ``_rev`` field, but that is not guaranteed in
+any way. Just have a look at `addRevisionStatementInternal in GenericObjectServiceImpl.java`_. -->
 </dd>
 </dl>
 <dl class="field-list">
@@ -532,7 +543,7 @@ preferences. There is no reason the <span class="docutils literal">_id</span> co
 </div>
 <div class="section" id="btsdbbaseobject">
 <h2>BTSDBBaseObject</h2>
-<p>BTSDBBaseObject is another of those base types of just about half of everything.</p>
+<p><span class="docutils literal">BTSDBBaseObject</span> is another of those base types of just about half of everything.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">_rev</span></dt>
 <dd><p>Current couchDB MVCC revision of this object. This is a string such as <span class="docutils literal"><span class="pre">1-37221aa74fd85dcb3286a87fadb9cee3</span></span>, with
@@ -1275,6 +1286,10 @@ for details.</p>
 </div>
 <div class="section" id="btsreferencableitem">
 <h2>BTSReferencableItem</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btsrelation">
 <h2>BTSRelation</h2>
@@ -1481,6 +1496,8 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="btsrevision">
 <h2>BTSRevision</h2>
+<p>Internal object used to represent the entries of the <span class="docutils literal">_rev</span> field in a <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>. This type incorrectly
+inherits from <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
 </div>
 <div class="section" id="btstimespan">
 <h2>BTSTimespan</h2>
@@ -1491,9 +1508,29 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="btstranslation">
 <h2>BTSTranslation</h2>
+<p>This type describes a string along with its language. It inherits <span class="docutils literal">_id</span> from <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a> and has its own
+two properties. Several <span class="docutils literal">BTSTranslation</span> instances are aggregated into one <a class="reference internal" href="#btstranslations">BTSTranslations</a> instance. Don't confuse
+the two!</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">lang</span></dt>
+<dd><p>The language of this string. This is a ISO 639-1 two-letter language code from the hardcoded <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-commons/src/org/bbaw/bts/core/commons/BTSCoreConstants.java#L111-L143">language list in
+BTSCoreConstants.java</a>.</p>
+</dd>
+<dt><span class="docutils literal">value</span></dt>
+<dd><p>The string proper</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btstranslations">
 <h2>BTSTranslations</h2>
+<p>This type describes a string possibly translated into several languages. In contrast to <a class="reference internal" href="#btstranslation">BTSTranslation</a> it is <em>not</em> a
+subclass of <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">translations</span></dt>
+<dd><p>Array of <a class="reference internal" href="#btstranslation">BTSTranslation</a> objects, one for each language present. Note that there is no way to specify the original
+string in a set of translations.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsuser">
 <h2>BTSUser</h2>
@@ -1523,9 +1560,17 @@ probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as obje
 </div>
 <div class="section" id="stringtostringlistmap">
 <h2>StringToStringListMap</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This is a purely internal type.</p>
+</div>
 </div>
 <div class="section" id="stringtostringmap">
 <h2>StringToStringMap</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This is a purely internal type.</p>
+</div>
 </div>
 </div>
 <div class="section" id="objekttypen-des-corpus-modells">

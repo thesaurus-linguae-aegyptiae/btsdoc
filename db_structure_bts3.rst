@@ -147,6 +147,20 @@ the following.
     third one is the couchdb object id of the user to blame. As usual, don't expect these to *always* actually follow
     that format as `the parsing code in BtsmodelFactoryImpl.java`_ made to fail silently.
 
+    In the java domain these revisions are represented by eclipsey `BTSRevision`_ objects.
+
+    .. ATTENTION::
+
+        The CouchDB user ID in some cases is some random-looking string, but in some cases it is the user's login name.
+
+    .. ATTENTION:
+        
+        Do not confuse this with CouchDB's ``_rev`` field, which is mapped by `BTSDBBaseObject`_. These two have nothing
+        to do with each other. In particular, the revsion counter at the beginning of this field's revision strings may
+        coincide with the revision counter at the beginning of couchdb's ``_rev`` field, but that is not guaranteed in
+        any way. Just have a look at `addRevisionStatementInternal in GenericObjectServiceImpl.java`_.
+
+.. _`addRevisionStatementInternal in GenericObjectServiceImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/generic/GenericObjectServiceImpl.java#L262
 .. _`the parsing code in BtsmodelFactoryImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BtsmodelFactoryImpl.java#L491
 
 :``state``:
@@ -338,7 +352,7 @@ inherited from `BTSConfig`_. Have a look at the `Config Graph`_ to see how this 
 BTSDBBaseObject
 ~~~~~~~~~~~~~~~
 
-BTSDBBaseObject is another of those base types of just about half of everything. 
+``BTSDBBaseObject`` is another of those base types of just about half of everything. 
 
 :``_rev``:
     Current couchDB MVCC revision of this object. This is a string such as ``1-37221aa74fd85dcb3286a87fadb9cee3``, with
@@ -796,6 +810,10 @@ of a single `BTSTextCorpus`_.  ``BTSProjectDBCollection`` is a subtype of `BTSId
 
 BTSReferencableItem
 ~~~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSRelation
 ~~~~~~~~~~~
 
@@ -872,6 +890,10 @@ length  count   percentage
 
 BTSRevision
 ~~~~~~~~~~~
+
+Internal object used to represent the entries of the ``_rev`` field in a `BTSDBBaseObject`_. This type incorrectly
+inherits from `BTSIdentifiableItem`_.
+
 BTSTimespan
 ~~~~~~~~~~~
 
@@ -880,8 +902,28 @@ BTSTimespan
 
 BTSTranslation
 ~~~~~~~~~~~~~~
+
+This type describes a string along with its language. It inherits ``_id`` from `BTSIdentifiableItem`_ and has its own
+two properties. Several ``BTSTranslation`` instances are aggregated into one `BTSTranslations`_ instance. Don't confuse
+the two!
+
+:``lang``:
+    The language of this string. This is a ISO 639-1 two-letter language code from the hardcoded `language list in
+    BTSCoreConstants.java`_.
+:``value``: The string proper
+
+.. _`language list in BTSCoreConstants.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-commons/src/org/bbaw/bts/core/commons/BTSCoreConstants.java#L111-L143
+
 BTSTranslations
 ~~~~~~~~~~~~~~~
+
+This type describes a string possibly translated into several languages. In contrast to `BTSTranslation`_ it is *not* a
+subclass of `BTSIdentifiableItem`_.
+
+:``translations``:
+    Array of `BTSTranslation`_ objects, one for each language present. Note that there is no way to specify the original
+    string in a set of translations.
+
 BTSUser
 ~~~~~~~
 BTSUserGroup
@@ -904,8 +946,15 @@ UserActionCounter
 ~~~~~~~~~~~~~~~~~
 StringToStringListMap
 ~~~~~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+    This is a purely internal type.
+
 StringToStringMap
 ~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+    This is a purely internal type.
 
 Objekttypen des Corpus-Modells
 ------------------------------
