@@ -405,6 +405,13 @@ the project's <span class="docutils literal">{project name}_admin</span> databas
 <div class="section" id="btsconfig">
 <h2>BTSConfig</h2>
 <p><span class="docutils literal">BTSConfig</span> is a super-type of <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> and <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> that provides their <span class="docutils literal">children</span> attributes.</p>
+<div class="section" id="config-graph">
+<h3>Config Graph</h3>
+<div class="figure">
+<a class="reference external image-reference" href="graphs/config_graph_hybrid.pdf"><img alt="graphs/config_graph_hybrid.png" src="graphs/config_graph_hybrid.png" style="width: 100%;" /></a>
+<p class="caption">Graph of the unified hierarchical structure of both <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> instances. Each <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> is
+annotated with its <span class="docutils literal">type</span> attribute.</p>
+</div>
 <dl class="field-list simple">
 <dt><span class="docutils literal">children</span></dt>
 <dd><p>The logical children of this <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> or <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>. On the top levels of a <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a>
@@ -413,6 +420,7 @@ is used to describe the hierarchy of passport fields and their groups. Have a lo
 details.</p>
 </dd>
 </dl>
+</div>
 </div>
 <div class="section" id="btsconfigitem">
 <h2>BTSConfigItem</h2>
@@ -692,9 +700,8 @@ three fields to it of which only <span class="docutils literal">masterServer</sp
 <dt><span class="docutils literal">type</span></dt>
 <dd><p>The <span class="docutils literal">type</span> of an external reference describes roughly the target domain of the reference. The most common <span class="docutils literal">type</span>
 is <span class="docutils literal">aaew_wcn</span> which stands for <span class="docutils literal">Altägyptisches Wörterbuch: Wortcorpusnummer</span>. This is simply the index number
-(and thus in this database couchdb object id) of the target entry. AFAIK <span class="docutils literal">aaew_1</span> are references into an older
+(and thus in this database couchdb object id) of the target entry. <span class="docutils literal">aaew_1</span> are references to row IDs in an older
 version of the AÄW. Note that anything besides these two is perfectly irrelevant in practice.</p>
-<!-- TODO confirm  what aaew_1 is -->
 <table>
 <colgroup>
 <col style="width: 36%" />
@@ -1691,9 +1698,14 @@ seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaC
 </div>
 <div class="section" id="btsannotation">
 <h2>BTSAnnotation</h2>
+<!-- TODO BTSAnnotation -->
 </div>
 <div class="section" id="btscorpusheader">
 <h2>BTSCorpusHeader</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btscorpusobject">
 <h2>BTSCorpusObject</h2>
@@ -1750,6 +1762,10 @@ in a different order.</p>
 </div>
 <div class="section" id="btsimage">
 <h2>BTSImage</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>This seems to be unused.</p>
+</div>
 </div>
 <div class="section" id="btslemmacase">
 <h2>BTSLemmaCase</h2>
@@ -1807,15 +1823,105 @@ and <span class="docutils literal">name</span> fields of <a class="reference int
 </div>
 <div class="section" id="btspassport">
 <h2>BTSPassport</h2>
+<p><a class="reference internal" href="#btspassport">BTSPassport</a> is a type describing attributes on a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a>. The attributes in a <a class="reference internal" href="#btspassport">BTSPassport</a> instance are
+of form key➜value and may be categorized into nested named groups. A loose schema of this (which keys are allowed, in
+which groups they may occur) is described in the <a class="reference internal" href="#btsconfig">BTSConfig</a>. 95.61% of roughly 1M attributes conform to this schema,
+4.39% or roughly 40k do not. Below is a list of all attribute paths that do not conform to the schema in the
+<a class="reference internal" href="#btsconfig">BTSConfig</a>.</p>
+<table>
+<colgroup>
+<col style="width: 72%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Attribute path</p></th>
+<th class="head"><p>count</p></th>
+<th class="head"><p>percentage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>√.object.description_of_object→copy</p></td>
+<td><p>169</p></td>
+<td><p>0.02</p></td>
+</tr>
+<tr><td><p>√.object.description_of_object→agent</p></td>
+<td><p>3165</p></td>
+<td><p>0.34</p></td>
+</tr>
+<tr><td><p>√.object.description_of_object→&lt;none&gt;</p></td>
+<td><p>2016</p></td>
+<td><p>0.21</p></td>
+</tr>
+<tr><td><p>√.thesaurus.main_group→old_id</p></td>
+<td><p>3442</p></td>
+<td><p>0.37</p></td>
+</tr>
+<tr><td><p>√.thesaurus.main_group→old_thesaurus_number</p></td>
+<td><p>3442</p></td>
+<td><p>0.37</p></td>
+</tr>
+<tr><td><p>√.thesaurus.main_group→termsort</p></td>
+<td><p>3442</p></td>
+<td><p>0.37</p></td>
+</tr>
+<tr><td><p>√.text.textual_metadata→egyTextName</p></td>
+<td><p>25676</p></td>
+<td><p>2.73</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="passport-key-graph">
+<h3>Passport Key Graph</h3>
+<div class="figure">
+<a class="reference external image-reference" href="graphs/passport_graph_mapped.pdf"><img alt="graphs/passport_graph_mapped.png" src="graphs/passport_graph_mapped.png" style="width: 100%;" /></a>
+<p class="caption">A Graph of passport attribute paths found in actual live data.</p>
+</div>
+<dl class="field-list simple">
+<dt><span class="docutils literal">children</span></dt>
+<dd><p>A list of <a class="reference internal" href="#btspassportentrygroup">BTSPassportEntryGroup</a> instances</p>
+</dd>
+</dl>
+</div>
 </div>
 <div class="section" id="btspassportentry">
 <h2>BTSPassportEntry</h2>
+<p>This type is a simple superclass of <a class="reference internal" href="#btspassportentryitem">BTSPassportEntryItem</a> and <a class="reference internal" href="#btspassportentrygroup">BTSPassportEntryGroup</a>. It is a subtype of
+<a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<!-- ATTENTION: Do not confuse `BTSPassportEntry`_ and its subtype `BTSPassportEntryItem`_. -->
 </div>
 <div class="section" id="btspassportentrygroup">
 <h2>BTSPassportEntryGroup</h2>
+<p>This type describes a group of <a class="reference internal" href="#btspassportentry">BTSPassportEntry</a> objects in a <a class="reference internal" href="#btspassport">BTSPassport</a> or nested in another
+<a class="reference internal" href="#btspassportentrygroup">BTSPassportEntryGroup</a>. <a class="reference internal" href="#btspassportentrygroup">BTSPassportEntryGroup</a> is a subtype of <a class="reference internal" href="#btspassportentry">BTSPassportEntry</a> and in turn
+<a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>The key of this group. This is the same as the <span class="docutils literal">value</span> attribute of the <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> instance corresponding to
+the node of this attribute in the schema in the <a class="reference internal" href="#btsconfig">BTSConfig</a>.</p>
+</dd>
+<dt><span class="docutils literal">children</span></dt>
+<dd><p>A list of <a class="reference internal" href="#btspassportentrygroup">BTSPassportEntryGroup</a> and further nested <cite>BTSPassportEntryGroup</cite> instances (possibly both types). This
+hierarchy seems to be mostly just 2-3 levels deep.</p>
+</dd>
+</dl>
+<!-- ATTENTION: The ``type`` attribute is used differently than in `BTSNamedTypedObject`_ here. -->
 </div>
 <div class="section" id="btspassportentryitem">
 <h2>BTSPassportEntryItem</h2>
+<p>This type describes a single key→value attribute in a <a class="reference internal" href="#btspassport">BTSPassport</a>. <a class="reference internal" href="#btspassportentryitem">BTSPassportEntryItem</a> is a subtype of
+<a class="reference internal" href="#btspassportentry">BTSPassportEntry</a> and in turn <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<!-- ATTENTION: Do not confuse `BTSPassportEntry`_ and its subtype `BTSPassportEntryItem`_. -->
+<dl class="field-list simple">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p>The key of this attribute. This is the same as the <span class="docutils literal">value</span> attribute of the <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> instance
+corresponding to the node of this attribute in the schema in the <a class="reference internal" href="#btsconfig">BTSConfig</a>.</p>
+</dd>
+<dt><span class="docutils literal">value</span></dt>
+<dd><p>The actual string value of this attribute.</p>
+</dd>
+</dl>
+<!-- ATTENTION: The ``type`` attribute is used differently than in `BTSNamedTypedObject`_ here. -->
 </div>
 <div class="section" id="btssenctence">
 <h2>BTSSenctence</h2>
@@ -1839,9 +1945,11 @@ translations into a number of languages. <a class="reference internal" href="#bt
 <p class="admonition-title">Warning</p>
 <p>Despite the misspelling in the name of <a class="reference internal" href="#btssenctence">BTSSenctence</a>, <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a> is not misspelled.</p>
 </div>
+<!-- TODO BTSSentenceItem -->
 </div>
 <div class="section" id="btstcobject">
 <h2>BTSTCObject</h2>
+<!-- TODO BTSTCObject -->
 </div>
 <div class="section" id="btstext">
 <h2>BTSText</h2>
@@ -1865,6 +1973,7 @@ exclusively <a class="reference internal" href="#btssenctence">BTSSenctence</a> 
 </div>
 <div class="section" id="btstextcorpus">
 <h2>BTSTextCorpus</h2>
+<!-- TODO BTSTextCorpus -->
 </div>
 <div class="section" id="btstextitems">
 <h2>BTSTextItems</h2>
@@ -1873,9 +1982,11 @@ from <a class="reference internal" href="#administrativdataobject">Administrativ
 </div>
 <div class="section" id="btstextsentenceitem">
 <h2>BTSTextSentenceItem</h2>
+<p>This is an interface combining <a class="reference internal" href="#btstextitems">BTSTextItems</a> and <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a>.</p>
 </div>
 <div class="section" id="btsthsentry">
 <h2>BTSThsEntry</h2>
+<!-- TODO BTSThsEntry -->
 </div>
 <div class="section" id="btsword">
 <h2>BTSWord</h2>
@@ -1911,14 +2022,6 @@ rather complex and differs depending on whether this is part of a text translite
 <dd><p>This field contains a list <a class="reference internal" href="#btsgraphic">BTSGraphic</a> objects that when concatenated make up this word.</p>
 </dd>
 </dl>
-</div>
-</div>
-<div class="section" id="config-graph">
-<h1>Config Graph</h1>
-<div class="figure">
-<a class="reference external image-reference" href="graphs/config_graph_hybrid.pdf"><img alt="graphs/config_graph_hybrid.png" src="graphs/config_graph_hybrid.png" style="width: 100%;" /></a>
-<p class="caption">Graph of the unified hierarchical structure of both <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> instances. Each <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> is
-annotated with its <span class="docutils literal">type</span> attribute.</p>
 </div>
 </div>
 </div>

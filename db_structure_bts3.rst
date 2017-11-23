@@ -226,6 +226,15 @@ BTSConfig
 
 ``BTSConfig`` is a super-type of `BTSConfigItem`_ and `BTSConfiguration`_ that provides their ``children`` attributes.
 
+Config Graph
+^^^^^^^^^^^^
+.. figure:: graphs/config_graph_hybrid.png
+    :width: 100%
+    :target: graphs/config_graph_hybrid.pdf
+
+    Graph of the unified hierarchical structure of both `BTSConfiguration`_ instances. Each `BTSConfigItem`_ is
+    annotated with its ``type`` attribute.
+
 :``children``:
     The logical children of this `BTSConfiguration`_ or `BTSConfigItem`_. On the top levels of a `BTSConfiguration`_
     this is used to categorize according to function of the config subtree. In the passport configuration this hierarchy
@@ -461,11 +470,9 @@ Type             count frequency
 :``type``:
     The ``type`` of an external reference describes roughly the target domain of the reference. The most common ``type``
     is ``aaew_wcn`` which stands for ``Altägyptisches Wörterbuch: Wortcorpusnummer``. This is simply the index number
-    (and thus in this database couchdb object id) of the target entry. AFAIK ``aaew_1`` are references into an older
+    (and thus in this database couchdb object id) of the target entry. ``aaew_1`` are references to row IDs in an older
     version of the AÄW. Note that anything besides these two is perfectly irrelevant in practice.
     
-    .. TODO confirm  what aaew_1 is
-
     ======== ===== =========
     type     count frequency
     ======== ===== =========
@@ -1066,8 +1073,15 @@ BTSAmbivalenceItem
 
 BTSAnnotation
 ~~~~~~~~~~~~~
+
+.. TODO BTSAnnotation
+
 BTSCorpusHeader
 ~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSCorpusObject
 ~~~~~~~~~~~~~~~
 
@@ -1128,6 +1142,10 @@ implementation the BTS grammar is more lenient than the one of `JSesh`_. A good 
 
 BTSImage
 ~~~~~~~~
+
+.. ATTENTION::
+     This seems to be unused.
+
 BTSLemmaCase
 ~~~~~~~~~~~~
 
@@ -1177,12 +1195,77 @@ and ``name`` fields of `BTSMarker`_ is used totally differently than the ``type`
 
 BTSPassport
 ~~~~~~~~~~~
+
+`BTSPassport`_ is a type describing attributes on a `BTSCorpusObject`_. The attributes in a `BTSPassport`_ instance are
+of form key➜value and may be categorized into nested named groups. A loose schema of this (which keys are allowed, in
+which groups they may occur) is described in the `BTSConfig`_. 95.61% of roughly 1M attributes conform to this schema,
+4.39% or roughly 40k do not. Below is a list of all attribute paths that do not conform to the schema in the
+`BTSConfig`_.
+
+=========================================== ======= ==========
+Attribute path                              count   percentage
+=========================================== ======= ==========
+√.object.description_of_object→copy             169 0.02
+√.object.description_of_object→agent           3165 0.34
+√.object.description_of_object→<none>          2016 0.21
+√.thesaurus.main_group→old_id                  3442 0.37
+√.thesaurus.main_group→old_thesaurus_number    3442 0.37
+√.thesaurus.main_group→termsort                3442 0.37
+√.text.textual_metadata→egyTextName           25676 2.73
+=========================================== ======= ==========
+
+Passport Key Graph
+^^^^^^^^^^^^^^^^^^
+.. figure:: graphs/passport_graph_mapped.png
+    :width: 100%
+    :target: graphs/passport_graph_mapped.pdf
+
+    A Graph of passport attribute paths found in actual live data.
+
+
+:``children``:
+    A list of `BTSPassportEntryGroup`_ instances
+
 BTSPassportEntry
 ~~~~~~~~~~~~~~~~
+
+This type is a simple superclass of `BTSPassportEntryItem`_ and `BTSPassportEntryGroup`_. It is a subtype of
+`BTSIdentifiableItem`_.
+
+.. ATTENTION: Do not confuse `BTSPassportEntry`_ and its subtype `BTSPassportEntryItem`_.
+
 BTSPassportEntryGroup
 ~~~~~~~~~~~~~~~~~~~~~
+
+This type describes a group of `BTSPassportEntry`_ objects in a `BTSPassport`_ or nested in another
+`BTSPassportEntryGroup`_. `BTSPassportEntryGroup`_ is a subtype of `BTSPassportEntry`_ and in turn
+`BTSIdentifiableItem`_.
+
+:``type``:
+    The key of this group. This is the same as the ``value`` attribute of the `BTSConfigItem`_ instance corresponding to
+    the node of this attribute in the schema in the `BTSConfig`_.
+:``children``:
+    A list of `BTSPassportEntryGroup`_ and further nested `BTSPassportEntryGroup` instances (possibly both types). This
+    hierarchy seems to be mostly just 2-3 levels deep.
+
+.. ATTENTION: The ``type`` attribute is used differently than in `BTSNamedTypedObject`_ here.
+
 BTSPassportEntryItem
 ~~~~~~~~~~~~~~~~~~~~
+
+This type describes a single key→value attribute in a `BTSPassport`_. `BTSPassportEntryItem`_ is a subtype of
+`BTSPassportEntry`_ and in turn `BTSIdentifiableItem`_.
+
+.. ATTENTION: Do not confuse `BTSPassportEntry`_ and its subtype `BTSPassportEntryItem`_.
+
+:``type``:
+    The key of this attribute. This is the same as the ``value`` attribute of the `BTSConfigItem`_ instance
+    corresponding to the node of this attribute in the schema in the `BTSConfig`_.
+:``value``:
+    The actual string value of this attribute.
+
+.. ATTENTION: The ``type`` attribute is used differently than in `BTSNamedTypedObject`_ here.
+
 BTSSenctence
 ~~~~~~~~~~~~
 
@@ -1200,8 +1283,13 @@ BTSSentenceItem
 
 .. WARNING:: Despite the misspelling in the name of `BTSSenctence`_, `BTSSentenceItem`_ is not misspelled.
 
+.. TODO BTSSentenceItem
+
 BTSTCObject
 ~~~~~~~~~~~
+
+.. TODO BTSTCObject
+
 BTSText
 ~~~~~~~
 
@@ -1225,6 +1313,9 @@ This type is a simple container for a list of `BTSSenctence`_ objects. It is a v
 
 BTSTextCorpus
 ~~~~~~~~~~~~~
+
+.. TODO BTSTextCorpus
+
 BTSTextItems
 ~~~~~~~~~~~~
 
@@ -1233,8 +1324,14 @@ from `AdministrativDataObject`_ and `BTSNamedTypedObject`_ and thus only *nearly
 
 BTSTextSentenceItem
 ~~~~~~~~~~~~~~~~~~~
+
+This is an interface combining `BTSTextItems`_ and `BTSSentenceItem`_.
+
 BTSThsEntry
 ~~~~~~~~~~~
+
+.. TODO BTSThsEntry
+
 BTSWord
 ~~~~~~~
 
@@ -1270,13 +1367,4 @@ never used with it.
 
 :``graphics``:
     This field contains a list `BTSGraphic`_ objects that when concatenated make up this word.
-
-Config Graph
-------------
-.. figure:: graphs/config_graph_hybrid.png
-    :width: 100%
-    :target: graphs/config_graph_hybrid.pdf
-
-    Graph of the unified hierarchical structure of both `BTSConfiguration`_ instances. Each `BTSConfigItem`_ is
-    annotated with its ``type`` attribute.
 
