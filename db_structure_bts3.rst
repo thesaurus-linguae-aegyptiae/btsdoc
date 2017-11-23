@@ -920,6 +920,10 @@ BTSTranslations
 This type describes a string possibly translated into several languages. In contrast to `BTSTranslation`_ it is *not* a
 subclass of `BTSIdentifiableItem`_.
 
+Objects of this type are used in the translation of texts and their constituent words in `BTSSenctence`_ and `BTSWord`_,
+in the translation of dictionary entries in `BTSLemmaEntry`_ and in `BTSConfigItem`_ as a means of internationalization
+of small parts of the UI.
+
 :``translations``:
     Array of `BTSTranslation`_ objects, one for each language present. Note that there is no way to specify the original
     string in a set of translations.
@@ -1023,6 +1027,9 @@ StringToStringMap
 Object Types of the Corpus Model
 --------------------------------
 
+The corpus model is the second EMF model and the one that contains most of the things an user can actually *see* and
+edit in the UI.
+
 BTSAbstractParagraph
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1031,10 +1038,32 @@ BTSAbstractParagraph
 
 BTSAbstractText
 ~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+    There is a lot of code around this, but it does not seem to be used anywhere.
+
 BTSAmbivalence
 ~~~~~~~~~~~~~~
+
+`BTSAmbivalence`_ may be part of a `BTSSenctence`_ and describes the case when a transliteration is ambiguous. It
+contains nothing but an array of `BTSLemmaCase`_ objects in its ``cases`` attribute, each being one of the possible
+transliterations of this part of the sentence.
+
+`BTSAmbivalence`_ is a subtype of `BTSTextSentenceItem`_.
+
+:``cases``: 
+    One `BTSLemmaCase`_ for each possible transliteration
+
+    .. ATTENTION::
+        Despite its name this field contains `BTSLemmaCase`_ objects, not `BTSAmbivalenceItem`_ objects.
+
 BTSAmbivalenceItem
 ~~~~~~~~~~~~~~~~~~
+
+.. ATTENTION::
+    Despite the name suggesting that this is what is found in the ``cases`` field of a `BTSAmbivalence`_, this in fact
+    seems to be unused, `BTSLemmaCase`_ being used there instead.
+
 BTSAnnotation
 ~~~~~~~~~~~~~
 BTSCorpusHeader
@@ -1068,14 +1097,84 @@ such also includes everything of `BTSNamedTypedObject`_, `AdministrativDataObjec
 
 BTSGraphic
 ~~~~~~~~~~
+
+This type generally describes a single hieroglyph. Generally, a word is rendered as a sequence of several `BTSGraphic`_
+objects, each containing one component of the word's `MdC`_ encoding. Note that since a word's `MdC`_ encoding sometimes
+contains elements that don't directly map to hieroglyphs such as the `cartouche`_ markers ``<>`` not every `BTSGraphic`_
+directly maps to a graphical representation. Also note that `MdC`_ control characters such as ``:`` or ``*`` are
+prepended to the affected `BTSGraphic`_ instance's ``code``.
+
+Hieroglyphs are rendered by `JSesh`_. There is some transformation logic that feeds `MdC`_ into `JSesh`_ given e.g.
+`BTSWord`_ or `BTSSenctence`_. Note that the `MdC`_ variant BTS uses in `BTSGraphic`_ is slightly different to the one
+`JSesh`_ parses. Due to the one-way nature (`MdC`_ always goes from the BTS into `JSesh`_) and the particular
+implementation the BTS grammar is more lenient than the one of `JSesh`_. A good starting point to understand this is
+`transformTextToJSeshMdCString in BTSTextEditorControllerImpl.java`_.
+
+:``code``:
+    This hieroglyph's `MdC`_ string.
+:``ignored``:
+:``innerSentenceOrder``:
+    This is an integer field that in rare cases is used to reorder ``graphics`` within a word. When the sentence is
+    translated into `MdC`_ for display, each word's ``graphics`` are passed through a stable sort keyed on
+    ``innerSentenceOrder``. This results in the intermediate `MdC`_ representation of the word passed to `JSesh`_ being
+    in a different order.
+
+.. TODO exactly explain what ``innerSentenceOrder`` does.
+
+.. _`MdC`: https://en.wikipedia.org/wiki/Manuel_de_Codage
+.. _`cartouche`: https://en.wikipedia.org/wiki/Cartouche
+.. _`JSesh`: https://jsesh.qenherkhopeshef.org/
+.. _`transformTextToJSeshMdCString in BTSTextEditorControllerImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-controller-impl/src/org/bbaw/bts/core/corpus/controller/impl/partController/BTSTextEditorControllerImpl.java#L1036-L1115
+
 BTSImage
 ~~~~~~~~
 BTSLemmaCase
 ~~~~~~~~~~~~
+
+This type describes one of several alternative transliterations in a `BTSAmbivalence`_. It is a `BTSNamedTypedObject`_
+and thus also a `BTSIdentifiableItem`_.
+
+.. ATTENTION::
+    Do not confuse this with `BTSLemmaEntry`_. These two a totally diferrent. `BTSLemmaEntry`_ describes a single
+    dictionary entry. `BTSLemmaCase`_ one of several alternative transliterations in a `BTSSenctence`_ via
+    `BTSAmbivalence`_.
+
+:``name``:
+    This field contains a string with a number identifying this alternative transliteration, e.g. ``"1"`` or ``"2"``.
+    This string is entered by a human. There is some inconsistencies, but almost always this string is equal to the
+    index (starting from 1) of this `BTSLemmaCase`_ instance in the containing `BTSAmbivalence`_ instance's ``cases``
+    array.
+:``scenario``:
+    This field contains the actual transliteration content of this alternative. This field behaves just like
+    ``sentenceItems`` in `BTSSenctence`_ with the exception that in practice, a `BTSAmbivalence`_ instance does not
+    contain other `BTSAmbivalence`_ instances.
+
 BTSLemmaEntry
 ~~~~~~~~~~~~~
+
+.. ATTENTION::
+    Do not confuse this with `BTSLemmaCase`_. These two a totally diferrent. `BTSLemmaEntry`_ describes a single
+    dictionary entry. `BTSLemmaCase`_ one of several alternative transliterations in a `BTSSenctence`_ via
+    `BTSAmbivalence`_.
+
 BTSMarker
 ~~~~~~~~~
+
+This type describes a marker such as "begin of sentence" or "this is line number $foo". It is a possible element in the
+``sentenceItems`` array of a `BTSSenctence`_ or the ``scenario`` array of a `BTSLemmaCase`_. `BTSMarker`_ is a subtype
+of `AdministrativDataObject`_ and `BTSNamedTypedObject`_ and thus in turn `BTSIdentifiableItem`_. Note that the ``type``
+and ``name`` fields of `BTSMarker`_ is used totally differently than the ``type`` and ``name`` fields of
+`BTSNamedTypedObject`_.
+
+:``type``:
+:``name``:
+    Both these fields are used to contain human-readable, non-standardized comment on this marker's function
+
+.. TODO properly understand how both of these are used in practice.
+
+:``value``:
+    Almost never used.
+
 BTSPassport
 ~~~~~~~~~~~
 BTSPassportEntry
@@ -1086,24 +1185,91 @@ BTSPassportEntryItem
 ~~~~~~~~~~~~~~~~~~~~
 BTSSenctence
 ~~~~~~~~~~~~
+
+.. WARNING:: This is actually written BTSSen*c*tence.
+
+A `BTSSenctence`_ (sic!) is the basic element of a `BTSText`_. It consists of a list of `BTSSentenceItem`_ objects along
+translations into a number of languages. `BTSSenctence`_ is a subtype of `BTSTextItems`_.
+
+:``sentenceItems``:
+:``translation``:
+    The multilingual translations of this sentence as a `BTSTranslations`_ object.
+
 BTSSentenceItem
 ~~~~~~~~~~~~~~~
+
+.. WARNING:: Despite the misspelling in the name of `BTSSenctence`_, `BTSSentenceItem`_ is not misspelled.
+
 BTSTCObject
 ~~~~~~~~~~~
 BTSText
 ~~~~~~~
+
+This type describes a single text. It is a subtype of `BTSCorpusObject`_ and uses most of the fields defined there. The
+actual text content is contained as a list of sentences in the ``textItems`` field of the `BTSTextContent`_ instance in
+this object's ``textContent`` field.
+
+Note that as `BTSText`_ inherits from `BTSCorpusObject`_ it can have its own passport filled with information and it is
+displayed in the object browser. Everything below `BTSText`_ such as `BTSSenctence`_ or `BTSWord`_ objects is not a
+`BTSCorpusObject`_ and thus cannot be navigated to in the object browser and cannot hold its own passport.
+
+:``textContent``: 
+    A `BTSTextContent`_ object. Technically, this is a list of `BTSTextItems`_ objects each of which could be either a
+    `BTSSenctence`_, a `BTSAmbivalence`_ or a `BTSMarker`_. Luckily, in practice the immediate contents of this are
+    exclusively `BTSSenctence`_ instances.
+
 BTSTextContent
 ~~~~~~~~~~~~~~
+
+This type is a simple container for a list of `BTSSenctence`_ objects. It is a very basic EObject.
+
 BTSTextCorpus
 ~~~~~~~~~~~~~
 BTSTextItems
 ~~~~~~~~~~~~
+
+This is an interface meant to bundle a bunch of stuff that could theoretically be put into a text. It directly inherits
+from `AdministrativDataObject`_ and `BTSNamedTypedObject`_ and thus only *nearly* is a `BTSObject`_.
+
 BTSTextSentenceItem
 ~~~~~~~~~~~~~~~~~~~
 BTSThsEntry
 ~~~~~~~~~~~
 BTSWord
 ~~~~~~~
+
+`BTSWord`_ is a type describing a single transliteration of a single egyptian word.  It is a possible element in the
+``sentenceItems`` array of a `BTSSenctence`_ or the ``scenario`` array of a `BTSLemmaCase`_ (transliteration
+alternative), and it can be in ``words`` of a `BTSLemmaEntry`_ (dictionary entry).
+
+`BTSWord`_ is a subtype of `BTSIdentifiableItem`_ and `BTSNamedTypedObject`_. Despite this, ``name`` or ``type`` are
+never used with it.
+
+.. TODO check the definition of this with Jakob and Simon
+
+:``lKey``:
+    This field is only used when this `BTSWord`_ is part of a transliteration in a `BTSText`_. If this `BTSWord`_ is
+    part of a `BTSLemmaEntry`_, this field is always null.
+
+    This field contains the couchDB object ``_id`` of the `BTSLemmaEntry`_ this word can be found in. Note that
+    `BTSLemmaEntry`_ object ids are human-readable short numbers (5-6 digit) that also serve as human-readable
+    dictionary keys.
+
+:``flexCode``:
+    This field is only used when this `BTSWord`_ is part of a transliteration in a `BTSText`_. If this `BTSWord`_ is
+    part of a `BTSLemmaEntry`_, this field is always null.
+
+.. TODO explain this, and where it comes from
+
+:``wChar``:
+    This field contains this word's unicode transliteration, such as ``"pꜣy=j-nb-n-ꜥḏdjw"``. The grammar of this is
+    rather complex and differs depending on whether this is part of a text transliteration or a dictionary entry.
+
+:``translation``:
+    This field contains a `BTSTranslations`_ instance with all translations of this word.
+
+:``graphics``:
+    This field contains a list `BTSGraphic`_ objects that when concatenated make up this word.
 
 Config Graph
 ------------

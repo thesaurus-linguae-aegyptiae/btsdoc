@@ -1525,6 +1525,9 @@ BTSCoreConstants.java</a>.</p>
 <h2>BTSTranslations</h2>
 <p>This type describes a string possibly translated into several languages. In contrast to <a class="reference internal" href="#btstranslation">BTSTranslation</a> it is <em>not</em> a
 subclass of <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<p>Objects of this type are used in the translation of texts and their constituent words in <a class="reference internal" href="#btssenctence">BTSSenctence</a> and <a class="reference internal" href="#btsword">BTSWord</a>,
+in the translation of dictionary entries in <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> and in <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> as a means of internationalization
+of small parts of the UI.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">translations</span></dt>
 <dd><p>Array of <a class="reference internal" href="#btstranslation">BTSTranslation</a> objects, one for each language present. Note that there is no way to specify the original
@@ -1646,6 +1649,8 @@ completions(?) but despite fragments of database infrastructure code it has neve
 </div>
 <div class="section" id="object-types-of-the-corpus-model">
 <h1>Object Types of the Corpus Model</h1>
+<p>The corpus model is the second EMF model and the one that contains most of the things an user can actually <em>see</em> and
+edit in the UI.</p>
 <div class="section" id="btsabstractparagraph">
 <h2>BTSAbstractParagraph</h2>
 <div class="admonition attention">
@@ -1655,12 +1660,34 @@ completions(?) but despite fragments of database infrastructure code it has neve
 </div>
 <div class="section" id="btsabstracttext">
 <h2>BTSAbstractText</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>There is a lot of code around this, but it does not seem to be used anywhere.</p>
+</div>
 </div>
 <div class="section" id="btsambivalence">
 <h2>BTSAmbivalence</h2>
+<p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> may be part of a <a class="reference internal" href="#btssenctence">BTSSenctence</a> and describes the case when a transliteration is ambiguous. It
+contains nothing but an array of <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> objects in its <span class="docutils literal">cases</span> attribute, each being one of the possible
+transliterations of this part of the sentence.</p>
+<p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> is a subtype of <a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a>.</p>
+<dl class="field-list">
+<dt><span class="docutils literal">cases</span></dt>
+<dd><p>One <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> for each possible transliteration</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Despite its name this field contains <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> objects, not <a class="reference internal" href="#btsambivalenceitem">BTSAmbivalenceItem</a> objects.</p>
+</div>
+</dd>
+</dl>
 </div>
 <div class="section" id="btsambivalenceitem">
 <h2>BTSAmbivalenceItem</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Despite the name suggesting that this is what is found in the <span class="docutils literal">cases</span> field of a <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>, this in fact
+seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> being used there instead.</p>
+</div>
 </div>
 <div class="section" id="btsannotation">
 <h2>BTSAnnotation</h2>
@@ -1696,18 +1723,87 @@ the database name inside every single object is of the highest priority for purp
 </div>
 <div class="section" id="btsgraphic">
 <h2>BTSGraphic</h2>
+<p>This type generally describes a single hieroglyph. Generally, a word is rendered as a sequence of several <a class="reference internal" href="#btsgraphic">BTSGraphic</a>
+objects, each containing one component of the word's <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> encoding. Note that since a word's <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> encoding sometimes
+contains elements that don't directly map to hieroglyphs such as the <a class="reference external" href="https://en.wikipedia.org/wiki/Cartouche">cartouche</a> markers <span class="docutils literal">&lt;&gt;</span> not every <a class="reference internal" href="#btsgraphic">BTSGraphic</a>
+directly maps to a graphical representation. Also note that <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> control characters such as <span class="docutils literal">:</span> or <span class="docutils literal">*</span> are
+prepended to the affected <a class="reference internal" href="#btsgraphic">BTSGraphic</a> instance's <span class="docutils literal">code</span>.</p>
+<p>Hieroglyphs are rendered by <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a>. There is some transformation logic that feeds <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> into <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a> given e.g.
+<a class="reference internal" href="#btsword">BTSWord</a> or <a class="reference internal" href="#btssenctence">BTSSenctence</a>. Note that the <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> variant BTS uses in <a class="reference internal" href="#btsgraphic">BTSGraphic</a> is slightly different to the one
+<a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a> parses. Due to the one-way nature (<a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> always goes from the BTS into <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a>) and the particular
+implementation the BTS grammar is more lenient than the one of <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a>. A good starting point to understand this is
+<a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-controller-impl/src/org/bbaw/bts/core/corpus/controller/impl/partController/BTSTextEditorControllerImpl.java#L1036-L1115">transformTextToJSeshMdCString in BTSTextEditorControllerImpl.java</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">code</span></dt>
+<dd><p>This hieroglyph's <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> string.</p>
+</dd>
+<dt><span class="docutils literal">ignored</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">innerSentenceOrder</span></dt>
+<dd><p>This is an integer field that in rare cases is used to reorder <span class="docutils literal">graphics</span> within a word. When the sentence is
+translated into <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> for display, each word's <span class="docutils literal">graphics</span> are passed through a stable sort keyed on
+<span class="docutils literal">innerSentenceOrder</span>. This results in the intermediate <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> representation of the word passed to <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a> being
+in a different order.</p>
+</dd>
+</dl>
+<!-- TODO exactly explain what ``innerSentenceOrder`` does. -->
 </div>
 <div class="section" id="btsimage">
 <h2>BTSImage</h2>
 </div>
 <div class="section" id="btslemmacase">
 <h2>BTSLemmaCase</h2>
+<p>This type describes one of several alternative transliterations in a <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>. It is a <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>
+and thus also a <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Do not confuse this with <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>. These two a totally diferrent. <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> describes a single
+dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> one of several alternative transliterations in a <a class="reference internal" href="#btssenctence">BTSSenctence</a> via
+<a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>.</p>
+</div>
+<dl class="field-list simple">
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>This field contains a string with a number identifying this alternative transliteration, e.g. <span class="docutils literal">&quot;1&quot;</span> or <span class="docutils literal">&quot;2&quot;</span>.
+This string is entered by a human. There is some inconsistencies, but almost always this string is equal to the
+index (starting from 1) of this <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> instance in the containing <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> instance's <span class="docutils literal">cases</span>
+array.</p>
+</dd>
+<dt><span class="docutils literal">scenario</span></dt>
+<dd><p>This field contains the actual transliteration content of this alternative. This field behaves just like
+<span class="docutils literal">sentenceItems</span> in <a class="reference internal" href="#btssenctence">BTSSenctence</a> with the exception that in practice, a <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> instance does not
+contain other <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> instances.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btslemmaentry">
 <h2>BTSLemmaEntry</h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Do not confuse this with <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a>. These two a totally diferrent. <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> describes a single
+dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> one of several alternative transliterations in a <a class="reference internal" href="#btssenctence">BTSSenctence</a> via
+<a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>.</p>
+</div>
 </div>
 <div class="section" id="btsmarker">
 <h2>BTSMarker</h2>
+<p>This type describes a marker such as &quot;begin of sentence&quot; or &quot;this is line number $foo&quot;. It is a possible element in the
+<span class="docutils literal">sentenceItems</span> array of a <a class="reference internal" href="#btssenctence">BTSSenctence</a> or the <span class="docutils literal">scenario</span> array of a <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a>. <a class="reference internal" href="#btsmarker">BTSMarker</a> is a subtype
+of <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a> and thus in turn <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>. Note that the <span class="docutils literal">type</span>
+and <span class="docutils literal">name</span> fields of <a class="reference internal" href="#btsmarker">BTSMarker</a> is used totally differently than the <span class="docutils literal">type</span> and <span class="docutils literal">name</span> fields of
+<a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>Both these fields are used to contain human-readable, non-standardized comment on this marker's function</p>
+</dd>
+</dl>
+<!-- TODO properly understand how both of these are used in practice. -->
+<dl class="field-list simple">
+<dt><span class="docutils literal">value</span></dt>
+<dd><p>Almost never used.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btspassport">
 <h2>BTSPassport</h2>
@@ -1723,24 +1819,57 @@ the database name inside every single object is of the highest priority for purp
 </div>
 <div class="section" id="btssenctence">
 <h2>BTSSenctence</h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is actually written BTSSen*c*tence.</p>
+</div>
+<p>A <a class="reference internal" href="#btssenctence">BTSSenctence</a> (sic!) is the basic element of a <a class="reference internal" href="#btstext">BTSText</a>. It consists of a list of <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a> objects along
+translations into a number of languages. <a class="reference internal" href="#btssenctence">BTSSenctence</a> is a subtype of <a class="reference internal" href="#btstextitems">BTSTextItems</a>.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">sentenceItems</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">translation</span></dt>
+<dd><p>The multilingual translations of this sentence as a <a class="reference internal" href="#btstranslations">BTSTranslations</a> object.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btssentenceitem">
 <h2>BTSSentenceItem</h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Despite the misspelling in the name of <a class="reference internal" href="#btssenctence">BTSSenctence</a>, <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a> is not misspelled.</p>
+</div>
 </div>
 <div class="section" id="btstcobject">
 <h2>BTSTCObject</h2>
 </div>
 <div class="section" id="btstext">
 <h2>BTSText</h2>
+<p>This type describes a single text. It is a subtype of <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and uses most of the fields defined there. The
+actual text content is contained as a list of sentences in the <span class="docutils literal">textItems</span> field of the <a class="reference internal" href="#btstextcontent">BTSTextContent</a> instance in
+this object's <span class="docutils literal">textContent</span> field.</p>
+<p>Note that as <a class="reference internal" href="#btstext">BTSText</a> inherits from <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> it can have its own passport filled with information and it is
+displayed in the object browser. Everything below <a class="reference internal" href="#btstext">BTSText</a> such as <a class="reference internal" href="#btssenctence">BTSSenctence</a> or <a class="reference internal" href="#btsword">BTSWord</a> objects is not a
+<a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and thus cannot be navigated to in the object browser and cannot hold its own passport.</p>
+<dl class="field-list simple">
+<dt><span class="docutils literal">textContent</span></dt>
+<dd><p>A <a class="reference internal" href="#btstextcontent">BTSTextContent</a> object. Technically, this is a list of <a class="reference internal" href="#btstextitems">BTSTextItems</a> objects each of which could be either a
+<a class="reference internal" href="#btssenctence">BTSSenctence</a>, a <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> or a <a class="reference internal" href="#btsmarker">BTSMarker</a>. Luckily, in practice the immediate contents of this are
+exclusively <a class="reference internal" href="#btssenctence">BTSSenctence</a> instances.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="btstextcontent">
 <h2>BTSTextContent</h2>
+<p>This type is a simple container for a list of <a class="reference internal" href="#btssenctence">BTSSenctence</a> objects. It is a very basic EObject.</p>
 </div>
 <div class="section" id="btstextcorpus">
 <h2>BTSTextCorpus</h2>
 </div>
 <div class="section" id="btstextitems">
 <h2>BTSTextItems</h2>
+<p>This is an interface meant to bundle a bunch of stuff that could theoretically be put into a text. It directly inherits
+from <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a> and thus only <em>nearly</em> is a <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
 </div>
 <div class="section" id="btstextsentenceitem">
 <h2>BTSTextSentenceItem</h2>
@@ -1750,6 +1879,38 @@ the database name inside every single object is of the highest priority for purp
 </div>
 <div class="section" id="btsword">
 <h2>BTSWord</h2>
+<p><a class="reference internal" href="#btsword">BTSWord</a> is a type describing a single transliteration of a single egyptian word.  It is a possible element in the
+<span class="docutils literal">sentenceItems</span> array of a <a class="reference internal" href="#btssenctence">BTSSenctence</a> or the <span class="docutils literal">scenario</span> array of a <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> (transliteration
+alternative), and it can be in <span class="docutils literal">words</span> of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> (dictionary entry).</p>
+<p><a class="reference internal" href="#btsword">BTSWord</a> is a subtype of <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a> and <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>. Despite this, <span class="docutils literal">name</span> or <span class="docutils literal">type</span> are
+never used with it.</p>
+<!-- TODO check the definition of this with Jakob and Simon -->
+<dl class="field-list">
+<dt><span class="docutils literal">lKey</span></dt>
+<dd><p>This field is only used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a>. If this <a class="reference internal" href="#btsword">BTSWord</a> is
+part of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>, this field is always null.</p>
+<p>This field contains the couchDB object <span class="docutils literal">_id</span> of the <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> this word can be found in. Note that
+<a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> object ids are human-readable short numbers (5-6 digit) that also serve as human-readable
+dictionary keys.</p>
+</dd>
+<dt><span class="docutils literal">flexCode</span></dt>
+<dd><p>This field is only used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a>. If this <a class="reference internal" href="#btsword">BTSWord</a> is
+part of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>, this field is always null.</p>
+</dd>
+</dl>
+<!-- TODO explain this, and where it comes from -->
+<dl class="field-list simple">
+<dt><span class="docutils literal">wChar</span></dt>
+<dd><p>This field contains this word's unicode transliteration, such as <span class="docutils literal"><span class="pre">&quot;pꜣy=j-nb-n-ꜥḏdjw&quot;</span></span>. The grammar of this is
+rather complex and differs depending on whether this is part of a text transliteration or a dictionary entry.</p>
+</dd>
+<dt><span class="docutils literal">translation</span></dt>
+<dd><p>This field contains a <a class="reference internal" href="#btstranslations">BTSTranslations</a> instance with all translations of this word.</p>
+</dd>
+<dt><span class="docutils literal">graphics</span></dt>
+<dd><p>This field contains a list <a class="reference internal" href="#btsgraphic">BTSGraphic</a> objects that when concatenated make up this word.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="section" id="config-graph">
