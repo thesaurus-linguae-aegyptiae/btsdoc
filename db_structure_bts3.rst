@@ -272,6 +272,8 @@ Graph`_ to see how this is actually used.
     ``value`` except that the contents of ``label`` are wrapped into an array of `BTSTranslation`_ objects. Because why
     not.
 
+.. _ownerReferencedTypesStringList:
+
 :``ownerReferencedTypesStringList``:
     This field is relevant only(?) for a `BTSConfigItem`_ describing a passport field. In this case, this field
     points at an enumeration of the allowed values for the described passport field. See `BTSPassportEditorConfig`_.
@@ -286,9 +288,12 @@ Graph`_ to see how this is actually used.
             ]
 
     This field contains a list of strings, each describing one pointer from one thing to several other things. The
-    format roughly is ``{source}>>{target}[,{target}...]``. with ``{source}`` generally being one of the strings
-    described in `BASIC_OBJECT_TYPES in BTSConstants.java`_ and each ``{target}`` pointing either at a `BTSConfig`_ subtree
-    with leaf nodes being possible values or pointing out specific values.
+    format roughly is ``{source}>>{target}[,{target}...]``. ``{source}`` generally is one of the strings described in
+    `BASIC_OBJECT_TYPES in BTSConstants.java`_ and describes which object types this entry applies to. This means if this ORTS list is set on a passport entry config and the corresponding input widget is loaded as part of a corpus object's passport editor the tarets given in this line will be applied.
+    
+    Each ``{target}`` entry points either at a `BTSConfig`_ subtree with leaf nodes being possible values or points at a
+    particular ``type`` of `BTSThsEntry`_ objects in the global thesaurus. The input fields use this type to filter the
+    `BTSThsEntry`_ instances they display in their browsers.
 
     In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
     proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
@@ -329,6 +334,11 @@ Graph`_ to see how this is actually used.
     This is the textual value of the config node. For top-level nodes this is generally the same as the Type, for
     lower-level nodes this contains e.g. the type names in an enumeration or the passport field names. This field's
     value is supposed to be used as an identifier, and thus generally ``looks_like_this``.
+
+    .. ATTENTION::
+        Please do not attempt to put anything but ``[a-zA-Z0-9_]`` in there as the whole
+        `ownerReferencedTypesStringList`_ logic would probably break as soon as there's dots or angle brackets or
+        commas anywhere.
 
 :``rules``:
     Unused.
@@ -741,13 +751,20 @@ This is a rather hairy one. An instance of this type describes
     :``Text``: is a single-line text field.
     :``Text Field``: is a multi-line text field
     :``Boolean Select``: is a simple checkbox
-    :``Select from Thesaurus``: This is a text field that can be used to enter a dictionary entry's ``_id`` or ``name``.
-        There is a keyboard shortcut on this that will trigger an extremely slow lookup of the object in the database and
-        present substring matches to choose for the current input. There is a button that opens a tree viewer for the
-        target objects instead.
+
+    .. _`Select from Thesaurus`:
+
+    :``Select from Thesaurus``: This results in a text field and a button. Usage is a bit different to regular text
+        fields. You can directly input an object's ID or name here, but you have to press a key combination to "resolve"
+        this into a proper reference to the object via the autocompletion. If this is not done, the input value is not
+        persisted.
+
+        Next to this weird text field is two buttons that are actually labels. One opens an object browser on the
+        currently referenced object. The other opens another object browser, but one that only displays objects matched
+        by `ownerReferencedTypesStringList`_.
     :``Select from Configuration``: This results in a drop-down list containing entries that are themselves read from
         "the configuration". The values this drop-down list allows are pointed at in the
-        ``ownerReferencedTypesStringList`` field of `BTSConfigItem`_.
+        `ownerReferencedTypesStringList`_ field of `BTSConfigItem`_.
 
     The ``null`` values are there since many `BTSConfigItem`_ instances that don't actually need a
     ``BTSPassportEditorConfig`` for some reason still have an empty one.
@@ -1495,19 +1512,33 @@ This is an interface combining `BTSTextItems`_ and `BTSSentenceItem`_, supposedl
 both. In practice it is not really used as all two usages also directly implement its super-interfaces. Following is a
 table of types and which of this group of interfaces they implement
 
-=============================== ======================== ===================== =========================== ===========================
-Type                            Is a `BTSSentenceItem`_? Is a `BTSTextItems`_? Is a `BTSTextSentenceItem`? Is a `BTSAmbivalenceItem`_?
-=============================== ======================== ===================== =========================== ===========================
-`BTSMarker`_                    ✔                        ✔                     ✔                           ✔
-`BTSAmbivalence`_               ✔                        ✔                     ✔                           ✘
-`BTSWord`_                      ✔                        ✘                     ✘                           ✔
-`BTSSenctence`_                 ✘                        ✔                     ✘                           ✘
-=============================== ======================== ===================== =========================== ===========================
+=============================== ======================== ===================== ============================ ===========================
+Type                            Is a `BTSSentenceItem`_? Is a `BTSTextItems`_? Is a `BTSTextSentenceItem`_? Is a `BTSAmbivalenceItem`_?
+=============================== ======================== ===================== ============================ ===========================
+`BTSMarker`_                    ✔                        ✔                     ✔                            ✔
+`BTSAmbivalence`_               ✔                        ✔                     ✔                            ✘
+`BTSWord`_                      ✔                        ✘                     ✘                            ✔
+`BTSSenctence`_                 ✘                        ✔                     ✘                            ✘
+=============================== ======================== ===================== ============================ ===========================
 
 BTSThsEntry
 ~~~~~~~~~~~
 
-.. TODO BTSThsEntry
+`BTSThsEntry`_ (Berlin Text System Thesaurus Entry) is a subtype of `BTSCorpusObject`_ not containing any fields of its
+own that describes a semantically sensible value that can be put into some particular passport field. See
+`ownerReferencedTypesStringList`_ in `BTSConfigItem`_ and `Select from Thesaurus`_ in `BTSPassportEditorConfig`_ for
+details on how the corpus side of things looks.
+
+In practice, all instances `BTSThsEntry`_ are organized into subtrees via `partOf`_ relations. All entries in one
+subtree share one ``type`` and describe all the possible values that a particular type of passport field may assume.
+Within subtrees the entries are organized into some semantically sensible hierarchy. For example, the ``findSpot``
+entries in ``3 = Fundstellen`` are organized according to their geographical hierarchy. ``3 = Funstellen`` contains
+``Wüste östlich des Niltals und Küste des Roten Meeres (Staatsgebiet Ägypten und Sudan)`` contains ``Routen zum Roten
+Meer`` contains ``Wadi Abbad``.
+
+.. WARNING::
+    There may be BTSThsEntry objects without parents. Also there might be some with several parents. Just keep that in
+    mind.
 
 BTSWord
 ~~~~~~~

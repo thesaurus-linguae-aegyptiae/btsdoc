@@ -436,7 +436,7 @@ Graph</a> to see how this is actually used.</p>
 <p>Note that despite what it might initially seem like, <span class="docutils literal">BTSConfigItem</span> does <em>not</em> inherit from either of
 <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>, <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a>, <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> or <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
 </div>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt><span class="docutils literal">abbreviation</span></dt>
 <dd><p>This field is only used with some objects with <span class="docutils literal">.type == 'objectType'</span> and contains a human-readable abbreviation
 of the described type.</p>
@@ -454,6 +454,8 @@ good measure, its contents are wrapped into an array of <a class="reference inte
 <span class="docutils literal">value</span> except that the contents of <span class="docutils literal">label</span> are wrapped into an array of <a class="reference internal" href="#btstranslation">BTSTranslation</a> objects. Because why
 not.</p>
 </dd>
+</dl>
+<dl class="field-list" id="ownerreferencedtypesstringlist">
 <dt><span class="docutils literal">ownerReferencedTypesStringList</span></dt>
 <dd><p>This field is relevant only(?) for a <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> describing a passport field. In this case, this field
 points at an enumeration of the allowed values for the described passport field. See <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a>.
@@ -464,9 +466,11 @@ Example:</p>
     &quot;objectTypes.Thesaurus Entry&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
 ]</code></pre>
 <p>This field contains a list of strings, each describing one pointer from one thing to several other things. The
-format roughly is <span class="docutils literal"><span class="pre">{source}&gt;&gt;{target}[,{target}...]</span></span>. with <span class="docutils literal">{source}</span> generally being one of the strings
-described in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/global-commons/src/org/bbaw/bts/commons/BTSConstants.java#L83-L97">BASIC_OBJECT_TYPES in BTSConstants.java</a> and each <span class="docutils literal">{target}</span> pointing either at a <a class="reference internal" href="#btsconfig">BTSConfig</a> subtree
-with leaf nodes being possible values or pointing out specific values.</p>
+format roughly is <span class="docutils literal"><span class="pre">{source}&gt;&gt;{target}[,{target}...]</span></span>. <span class="docutils literal">{source}</span> generally is one of the strings described in
+<a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/global-commons/src/org/bbaw/bts/commons/BTSConstants.java#L83-L97">BASIC_OBJECT_TYPES in BTSConstants.java</a> and describes which object types this entry applies to. This means if this ORTS list is set on a passport entry config and the corresponding input widget is loaded as part of a corpus object's passport editor the tarets given in this line will be applied.</p>
+<p>Each <span class="docutils literal">{target}</span> entry points either at a <a class="reference internal" href="#btsconfig">BTSConfig</a> subtree with leaf nodes being possible values or points at a
+particular <span class="docutils literal">type</span> of <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> objects in the global thesaurus. The input fields use this type to filter the
+<a class="reference internal" href="#btsthsentry">BTSThsEntry</a> instances they display in their browsers.</p>
 <p>In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
 proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
 inclined you may have look at all its nasty innards in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSConfigurationServiceImpl.java#L535">BTSConfigurationServiceImpl.java</a></p>
@@ -476,7 +480,7 @@ inclined you may have look at all its nasty innards in <a class="reference exter
 </div>
 </dd>
 </dl>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt><span class="docutils literal">passportEditorConfig</span></dt>
 <dd><p>This field is only used for config items describing the passport structure and points to a
 <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a> object describing the way the UI should behave for this field.</p>
@@ -504,6 +508,12 @@ anymore, are we? So, we end up with the following <span class="docutils literal"
 <dd><p>This is the textual value of the config node. For top-level nodes this is generally the same as the Type, for
 lower-level nodes this contains e.g. the type names in an enumeration or the passport field names. This field's
 value is supposed to be used as an identifier, and thus generally <span class="docutils literal">looks_like_this</span>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Please do not attempt to put anything but <span class="docutils literal"><span class="pre">[a-zA-Z0-9_]</span></span> in there as the whole
+<a class="reference internal" href="#ownerreferencedtypesstringlist">ownerReferencedTypesStringList</a> logic would probably break as soon as there's dots or angle brackets or
+commas anywhere.</p>
+</div>
 </dd>
 <dt><span class="docutils literal">rules</span></dt>
 <dd><p>Unused.</p>
@@ -1203,16 +1213,21 @@ modifications of this object's eclipsey properties.</p>
 <dt><span class="docutils literal">Boolean Select</span></dt>
 <dd><p>is a simple checkbox</p>
 </dd>
+</dl>
+<dl class="field-list" id="select-from-thesaurus">
 <dt><span class="docutils literal">Select from Thesaurus</span></dt>
-<dd><p>This is a text field that can be used to enter a dictionary entry's <span class="docutils literal">_id</span> or <span class="docutils literal">name</span>.
-There is a keyboard shortcut on this that will trigger an extremely slow lookup of the object in the database and
-present substring matches to choose for the current input. There is a button that opens a tree viewer for the
-target objects instead.</p>
+<dd><p>This results in a text field and a button. Usage is a bit different to regular text
+fields. You can directly input an object's ID or name here, but you have to press a key combination to &quot;resolve&quot;
+this into a proper reference to the object via the autocompletion. If this is not done, the input value is not
+persisted.</p>
+<p>Next to this weird text field is two buttons that are actually labels. One opens an object browser on the
+currently referenced object. The other opens another object browser, but one that only displays objects matched
+by <a class="reference internal" href="#ownerreferencedtypesstringlist">ownerReferencedTypesStringList</a>.</p>
 </dd>
 <dt><span class="docutils literal">Select from Configuration</span></dt>
 <dd><p>This results in a drop-down list containing entries that are themselves read from
 &quot;the configuration&quot;. The values this drop-down list allows are pointed at in the
-<span class="docutils literal">ownerReferencedTypesStringList</span> field of <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>.</p>
+<a class="reference internal" href="#ownerreferencedtypesstringlist">ownerReferencedTypesStringList</a> field of <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>.</p>
 </dd>
 </dl>
 <p>The <span class="docutils literal">null</span> values are there since many <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> instances that don't actually need a
@@ -2448,7 +2463,7 @@ table of types and which of this group of interfaces they implement</p>
 <tr><th class="head"><p>Type</p></th>
 <th class="head"><p>Is a <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a>?</p></th>
 <th class="head"><p>Is a <a class="reference internal" href="#btstextitems">BTSTextItems</a>?</p></th>
-<th class="head"><p>Is a <cite>BTSTextSentenceItem</cite>?</p></th>
+<th class="head"><p>Is a <a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a>?</p></th>
 <th class="head"><p>Is a <a class="reference internal" href="#btsambivalenceitem">BTSAmbivalenceItem</a>?</p></th>
 </tr>
 </thead>
@@ -2482,7 +2497,20 @@ table of types and which of this group of interfaces they implement</p>
 </div>
 <div class="section" id="btsthsentry">
 <h2>BTSThsEntry</h2>
-<!-- TODO BTSThsEntry -->
+<p><a class="reference internal" href="#btsthsentry">BTSThsEntry</a> (Berlin Text System Thesaurus Entry) is a subtype of <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> not containing any fields of its
+own that describes a semantically sensible value that can be put into some particular passport field. See
+<a class="reference internal" href="#ownerreferencedtypesstringlist">ownerReferencedTypesStringList</a> in <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> and <a class="reference internal" href="#select-from-thesaurus">Select from Thesaurus</a> in <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a> for
+details on how the corpus side of things looks.</p>
+<p>In practice, all instances <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> are organized into subtrees via <a class="reference internal" href="#partof">partOf</a> relations. All entries in one
+subtree share one <span class="docutils literal">type</span> and describe all the possible values that a particular type of passport field may assume.
+Within subtrees the entries are organized into some semantically sensible hierarchy. For example, the <span class="docutils literal">findSpot</span>
+entries in <span class="docutils literal">3 = Fundstellen</span> are organized according to their geographical hierarchy. <span class="docutils literal">3 = Funstellen</span> contains
+<span class="docutils literal">Wüste östlich des Niltals und Küste des Roten Meeres (Staatsgebiet Ägypten und Sudan)</span> contains <span class="docutils literal">Routen zum Roten Meer</span> contains <span class="docutils literal">Wadi Abbad</span>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There may be BTSThsEntry objects without parents. Also there might be some with several parents. Just keep that in
+mind.</p>
+</div>
 </div>
 <div class="section" id="btsword">
 <h2>BTSWord</h2>
