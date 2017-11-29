@@ -213,6 +213,9 @@ A ``BTSComment`` describes a human-language comment on some object or text secti
 the project's ``{project name}_admin`` database and link to their target object or text part by means of exactly one
 `partOf`_ `BTSRelation`_.
 
+.. ATTENTION::
+    Do not confuse this with `BTSAnnotation`_, which describes a highlighted part of a text.
+
 A ``BTSComment`` is a `BTSObject`_ and has the following fields:
 
 :``comment``:
@@ -1069,9 +1072,11 @@ transliterations of this part of the sentence.
 BTSAmbivalenceItem
 ~~~~~~~~~~~~~~~~~~
 
+
 .. ATTENTION::
     Despite the name suggesting that this is what is found in the ``cases`` field of a `BTSAmbivalence`_, this in fact
-    seems to be unused, `BTSLemmaCase`_ being used there instead.
+    seems to be unused, `BTSLemmaCase`_ being used there instead. For type information hava a look at the table under
+    `BTSTextSentenceItem`_.
 
 BTSAnnotation
 ~~~~~~~~~~~~~
@@ -1080,6 +1085,9 @@ BTSAnnotation
 inheriting a whole slew of miscellaneous fields. The usage of `BTSAnnotation`_ is a bit patchy.  Following is a list of
 all nontrivial fields that are used with `BTSAnnotation`_. The two semantically most relevant fields are ``type`` and
 ``name``, as well as the one `partOf`_ `BTSRelation`_.
+
+.. ATTENTION::
+    Do not confuse this with `BTSComment`_, which describes a human-readable comment on some object *or* part of text.
 
 Fields used with BTSAnnotation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1396,14 +1404,56 @@ translations into a number of languages. `BTSSenctence`_ is a subtype of `BTSTex
 BTSSentenceItem
 ~~~~~~~~~~~~~~~
 
-.. WARNING:: Despite the misspelling in the name of `BTSSenctence`_, `BTSSentenceItem`_ is not misspelled.
-
-.. TODO BTSSentenceItem
+This is an interface meant to bundle a bunch of stuff that could theoretically be put into a `BTSSenctence`_. It
+directly inherits from `BTSNamedTypedObject`_. For details see `BTSTextSentenceItem`_.
 
 BTSTCObject
 ~~~~~~~~~~~
 
-.. TODO BTSTCObject
+.. ATTENTION::
+    Try to not confuse this with `BTSTextCorpus`_, `BTSCorpusObject`_, `BTSTextContent`_ or `BTSObject`_.
+
+`BTSTCObject`_ ("Berlin Text System Text Corpus Object") is a `BTSCorpusObject`_ describing what is in effect a folder
+with other computer things. The general convention is that a `BTSTCObject`_ maps to some physical place or thing and its
+`BTSTCObject`_ descendants are parts of it. Example: ``〈Pyramidentexte〉`` contains ``Pyramide Pepis I.`` contains
+``〈Sargkammer〉`` contains ``〈"Wartesaal"/vestibule〉`` contains ``〈Westwand〉`` contains 26 `BTSText`_ instances. As
+you can see there is no particular schema to these names, and ever representing them in some sort of path language will
+be quite challenging due to their liberal use of weird characters.
+
+A `BTSTCObject`_ notably may possess a `BTSPassport`_ describing what effects to extended object metadata. It does not
+have any fields beyond what it inherits from `BTSCorpusObject`_.
+
+As usual, hierarchy is expressed using a `partOf`_ `BTSRelation`_. As follows there are rare cases of multiple ancestors
+that make this graph not be a tree.
+
+===================== ===== =========
+# of partOf Relations Count Frequency
+===================== ===== =========
+<total>               16008   100.00%
+1                     15988    99.88%
+2                        19     0.12%
+3                         1     0.01%
+===================== ===== =========
+
+Types values used with BTSTCObject
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+=========== ===== =========
+Type        Count Frequency
+=========== ===== =========
+<total>     16008
+TCObject     8239    51.47%
+ObjectPart   4175    26.08%
+Caption      1445     9.03%
+Scene        1281     8.00%
+Group         327     2.04%
+Arrangement   166     1.04%
+TCSuperText    34     0.21%
+<empty>         2     0.01%
+undefined       1     0.01%
+=========== ===== =========
+
+A `BTSTCObject`_'s type manifests itself in the icon displayed for this object in the tree viewer.
 
 BTSText
 ~~~~~~~
@@ -1435,12 +1485,24 @@ BTSTextItems
 ~~~~~~~~~~~~
 
 This is an interface meant to bundle a bunch of stuff that could theoretically be put into a text. It directly inherits
-from `AdministrativDataObject`_ and `BTSNamedTypedObject`_ and thus only *nearly* is a `BTSObject`_.
+from `AdministrativDataObject`_ and `BTSNamedTypedObject`_ and thus only *nearly* is a `BTSObject`_. For details see
+`BTSTextSentenceItem`_
 
 BTSTextSentenceItem
 ~~~~~~~~~~~~~~~~~~~
 
-This is an interface combining `BTSTextItems`_ and `BTSSentenceItem`_.
+This is an interface combining `BTSTextItems`_ and `BTSSentenceItem`_, supposedly meant to describe types implementing
+both. In practice it is not really used as all two usages also directly implement its super-interfaces. Following is a
+table of types and which of this group of interfaces they implement
+
+=============================== ======================== ===================== =========================== ===========================
+Type                            Is a `BTSSentenceItem`_? Is a `BTSTextItems`_? Is a `BTSTextSentenceItem`? Is a `BTSAmbivalenceItem`_?
+=============================== ======================== ===================== =========================== ===========================
+`BTSMarker`_                    ✔                        ✔                     ✔                           ✔
+`BTSAmbivalence`_               ✔                        ✔                     ✔                           ✘
+`BTSWord`_                      ✔                        ✘                     ✘                           ✔
+`BTSSenctence`_                 ✘                        ✔                     ✘                           ✘
+=============================== ======================== ===================== =========================== ===========================
 
 BTSThsEntry
 ~~~~~~~~~~~

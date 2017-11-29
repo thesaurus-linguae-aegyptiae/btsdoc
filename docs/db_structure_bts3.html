@@ -392,6 +392,10 @@ to be described in the <span class="docutils literal">Visibility</span> meta mod
 <p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored in
 the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of exactly one
 <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Do not confuse this with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>, which describes a highlighted part of a text.</p>
+</div>
 <p>A <span class="docutils literal">BTSComment</span> is a <a class="reference internal" href="#btsobject">BTSObject</a> and has the following fields:</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">comment</span></dt>
@@ -1693,7 +1697,8 @@ transliterations of this part of the sentence.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Despite the name suggesting that this is what is found in the <span class="docutils literal">cases</span> field of a <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>, this in fact
-seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> being used there instead.</p>
+seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> being used there instead. For type information hava a look at the table under
+<a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a>.</p>
 </div>
 </div>
 <div class="section" id="btsannotation">
@@ -1702,6 +1707,10 @@ seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaC
 inheriting a whole slew of miscellaneous fields. The usage of <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a bit patchy.  Following is a list of
 all nontrivial fields that are used with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>. The two semantically most relevant fields are <span class="docutils literal">type</span> and
 <span class="docutils literal">name</span>, as well as the one <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Do not confuse this with <a class="reference internal" href="#btscomment">BTSComment</a>, which describes a human-readable comment on some object <em>or</em> part of text.</p>
+</div>
 <div class="section" id="fields-used-with-btsannotation">
 <h3>Fields used with BTSAnnotation</h3>
 <table>
@@ -2282,15 +2291,115 @@ translations into a number of languages. <a class="reference internal" href="#bt
 </div>
 <div class="section" id="btssentenceitem">
 <h2>BTSSentenceItem</h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Despite the misspelling in the name of <a class="reference internal" href="#btssenctence">BTSSenctence</a>, <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a> is not misspelled.</p>
-</div>
-<!-- TODO BTSSentenceItem -->
+<p>This is an interface meant to bundle a bunch of stuff that could theoretically be put into a <a class="reference internal" href="#btssenctence">BTSSenctence</a>. It
+directly inherits from <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>. For details see <a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a>.</p>
 </div>
 <div class="section" id="btstcobject">
 <h2>BTSTCObject</h2>
-<!-- TODO BTSTCObject -->
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Try to not confuse this with <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a>, <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a>, <a class="reference internal" href="#btstextcontent">BTSTextContent</a> or <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+</div>
+<p><a class="reference internal" href="#btstcobject">BTSTCObject</a> (&quot;Berlin Text System Text Corpus Object&quot;) is a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> describing what is in effect a folder
+with other computer things. The general convention is that a <a class="reference internal" href="#btstcobject">BTSTCObject</a> maps to some physical place or thing and its
+<a class="reference internal" href="#btstcobject">BTSTCObject</a> descendants are parts of it. Example: <span class="docutils literal">〈Pyramidentexte〉</span> contains <span class="docutils literal">Pyramide Pepis I.</span> contains
+<span class="docutils literal">〈Sargkammer〉</span> contains <span class="docutils literal"><span class="pre">〈&quot;Wartesaal&quot;/vestibule〉</span></span> contains <span class="docutils literal">〈Westwand〉</span> contains 26 <a class="reference internal" href="#btstext">BTSText</a> instances. As
+you can see there is no particular schema to these names, and ever representing them in some sort of path language will
+be quite challenging due to their liberal use of weird characters.</p>
+<p>A <a class="reference internal" href="#btstcobject">BTSTCObject</a> notably may possess a <a class="reference internal" href="#btspassport">BTSPassport</a> describing what effects to extended object metadata. It does not
+have any fields beyond what it inherits from <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a>.</p>
+<p>As usual, hierarchy is expressed using a <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>. As follows there are rare cases of multiple ancestors
+that make this graph not be a tree.</p>
+<table>
+<colgroup>
+<col style="width: 60%" />
+<col style="width: 14%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p># of partOf Relations</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>&lt;total&gt;</p></td>
+<td><p>16008</p></td>
+<td><p>100.00%</p></td>
+</tr>
+<tr><td><p>1</p></td>
+<td><p>15988</p></td>
+<td><p>99.88%</p></td>
+</tr>
+<tr><td><p>2</p></td>
+<td><p>19</p></td>
+<td><p>0.12%</p></td>
+</tr>
+<tr><td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="types-values-used-with-btstcobject">
+<h3>Types values used with BTSTCObject</h3>
+<table>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 20%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>&lt;total&gt;</p></td>
+<td><p>16008</p></td>
+<td></td>
+</tr>
+<tr><td><p>TCObject</p></td>
+<td><p>8239</p></td>
+<td><p>51.47%</p></td>
+</tr>
+<tr><td><p>ObjectPart</p></td>
+<td><p>4175</p></td>
+<td><p>26.08%</p></td>
+</tr>
+<tr><td><p>Caption</p></td>
+<td><p>1445</p></td>
+<td><p>9.03%</p></td>
+</tr>
+<tr><td><p>Scene</p></td>
+<td><p>1281</p></td>
+<td><p>8.00%</p></td>
+</tr>
+<tr><td><p>Group</p></td>
+<td><p>327</p></td>
+<td><p>2.04%</p></td>
+</tr>
+<tr><td><p>Arrangement</p></td>
+<td><p>166</p></td>
+<td><p>1.04%</p></td>
+</tr>
+<tr><td><p>TCSuperText</p></td>
+<td><p>34</p></td>
+<td><p>0.21%</p></td>
+</tr>
+<tr><td><p>&lt;empty&gt;</p></td>
+<td><p>2</p></td>
+<td><p>0.01%</p></td>
+</tr>
+<tr><td><p>undefined</p></td>
+<td><p>1</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+<p>A <a class="reference internal" href="#btstcobject">BTSTCObject</a>'s type manifests itself in the icon displayed for this object in the tree viewer.</p>
+</div>
 </div>
 <div class="section" id="btstext">
 <h2>BTSText</h2>
@@ -2319,11 +2428,57 @@ exclusively <a class="reference internal" href="#btssenctence">BTSSenctence</a> 
 <div class="section" id="btstextitems">
 <h2>BTSTextItems</h2>
 <p>This is an interface meant to bundle a bunch of stuff that could theoretically be put into a text. It directly inherits
-from <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a> and thus only <em>nearly</em> is a <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+from <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a> and thus only <em>nearly</em> is a <a class="reference internal" href="#btsobject">BTSObject</a>. For details see
+<a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a></p>
 </div>
 <div class="section" id="btstextsentenceitem">
 <h2>BTSTextSentenceItem</h2>
-<p>This is an interface combining <a class="reference internal" href="#btstextitems">BTSTextItems</a> and <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a>.</p>
+<p>This is an interface combining <a class="reference internal" href="#btstextitems">BTSTextItems</a> and <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a>, supposedly meant to describe types implementing
+both. In practice it is not really used as all two usages also directly implement its super-interfaces. Following is a
+table of types and which of this group of interfaces they implement</p>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Is a <a class="reference internal" href="#btssentenceitem">BTSSentenceItem</a>?</p></th>
+<th class="head"><p>Is a <a class="reference internal" href="#btstextitems">BTSTextItems</a>?</p></th>
+<th class="head"><p>Is a <cite>BTSTextSentenceItem</cite>?</p></th>
+<th class="head"><p>Is a <a class="reference internal" href="#btsambivalenceitem">BTSAmbivalenceItem</a>?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p><a class="reference internal" href="#btsmarker">BTSMarker</a></p></td>
+<td><p>✔</p></td>
+<td><p>✔</p></td>
+<td><p>✔</p></td>
+<td><p>✔</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a></p></td>
+<td><p>✔</p></td>
+<td><p>✔</p></td>
+<td><p>✔</p></td>
+<td><p>✘</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btsword">BTSWord</a></p></td>
+<td><p>✔</p></td>
+<td><p>✘</p></td>
+<td><p>✘</p></td>
+<td><p>✔</p></td>
+</tr>
+<tr><td><p><a class="reference internal" href="#btssenctence">BTSSenctence</a></p></td>
+<td><p>✘</p></td>
+<td><p>✔</p></td>
+<td><p>✘</p></td>
+<td><p>✘</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="btsthsentry">
 <h2>BTSThsEntry</h2>
