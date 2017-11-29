@@ -391,7 +391,7 @@ to be described in the <span class="docutils literal">Visibility</span> meta mod
 <h2>BTSComment</h2>
 <p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored in
 the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of exactly one
-<span class="docutils literal">partOf</span> relation. For details, see <a class="reference internal" href="#partof-relations">PartOf relations</a>.</p>
+<a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
 <p>A <span class="docutils literal">BTSComment</span> is a <a class="reference internal" href="#btsobject">BTSObject</a> and has the following fields:</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">comment</span></dt>
@@ -1027,7 +1027,7 @@ the database. It is instead used as some kind of object-global variable.</p>
 <dt><span class="docutils literal">relations</span></dt>
 <dd><p>Array field of <span class="docutils literal">Relation</span> objects describing relations between the containing object and other objects. This is
 used to describe complex relations such as <span class="docutils literal">rootOf</span> or <span class="docutils literal">composedOf</span> for lemmata. <em>Everywhere</em> else it is only
-ever used with <span class="docutils literal">partOf</span> to express the hierarchical structure of the object tree. Below is an exhaustive table of
+ever used with <a class="reference internal" href="#partof">partOf</a> to express the hierarchical structure of the object tree. Below is an exhaustive table of
 occurences.</p>
 <table>
 <colgroup>
@@ -1304,10 +1304,10 @@ for details.</p>
 objects than by kludging an ersatz relational layer on it?</p>
 <p>A <span class="docutils literal">BTSRelation</span> represents a single item in a relation (and not as the name implies the relation itself). An
 implementation detail is that these relations are inherently directional, and the <span class="docutils literal">BTSRelation</span> object is always
-stored in the <em>head</em> object. So, a <span class="docutils literal">partOf</span> relation describing that object <span class="docutils literal">A</span> is a part of object <span class="docutils literal">B</span> would be
+stored in the <em>head</em> object. So, a <a class="reference internal" href="#partof">partOf</a> relation describing that object <span class="docutils literal">A</span> is a part of object <span class="docutils literal">B</span> would be
 stored in object <span class="docutils literal">A</span>. Read: <span class="docutils literal">A is partOf B</span>.</p>
 <p>Every relation contains the couchDB <span class="docutils literal">_id</span> of its target object in its <span class="docutils literal">objectId</span> field.</p>
-<p>Relations come in many flavors. The important one is <span class="docutils literal">partOf</span>, which is used to express hierarchical structure in the
+<p>Relations come in many flavors. The important one is <a class="reference internal" href="#partof">partOf</a>, which is used to express hierarchical structure in the
 object browser. It can be used on most anything. The other relation type flavors are only used on <span class="docutils literal">BTSLemmaEntry</span>
 objects. Below are some nice stats on these.</p>
 <p>Due to the inherently asymmetric nature of this representation, most &quot;relation types&quot; need a reciprocal type to be put
@@ -1315,7 +1315,7 @@ at the far end of the relation. Such pairs are e.g. <span class="docutils litera
 <span class="docutils literal">composedOf</span>. Note that these are sometimes not named very well.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
-<p><span class="docutils literal">partOf</span> relations do not have a reciprocal element.</p>
+<p><a class="reference internal" href="#partof">partOf</a> relations do not have a reciprocal element.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1416,8 +1416,8 @@ Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
            1 <font color="#cc6633">partOf</font>(<font color="#cc3366">CorpusModel:ThsEntry</font>)</pre>
 </div>
 <div class="section" id="partof-relations">
-<h3>PartOf relations</h3>
-<p>In certain cases such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a> a <span class="docutils literal">partOf</span> relation may contain <span class="docutils literal">parts</span>. Each &quot;part&quot; is a
+<span id="partof"></span><h3>PartOf relations</h3>
+<p>In certain cases such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a> a <a class="reference internal" href="#partof">partOf</a> relation may contain <span class="docutils literal">parts</span>. Each &quot;part&quot; is a
 <a class="reference internal" href="#btsintertextreference">BTSInterTextReference</a> pointing to part of some text. The statistics of the number of parts as extracted from a
 database backup are as follows.</p>
 <p><span class="docutils literal">jq <span class="pre">'.docs[].relations[]?.parts</span> | length' *.json | sort | uniq <span class="pre">-c</span> | sort <span class="pre">-bnk2</span></span></p>
@@ -1490,13 +1490,13 @@ database backup are as follows.</p>
 </table>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
-<p>Technically, the <span class="docutils literal">partOf</span> graph is only directed. In practice, it seems it is also acyclic and something would
+<p>Technically, the <a class="reference internal" href="#partof">partOf</a> graph is only directed. In practice, it seems it is also acyclic and something would
 probably crash if it wasn't. It is, however, <em>not</em> a vanilla tree as objects can have several parents.</p>
 </div>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
-<p>TODO: Right now I can't make any statements on the equivalency of two <span class="docutils literal">partOf</span> relations using the same target
-<span class="docutils literal">objectId</span> but each containing different <span class="docutils literal">parts</span> and only one <span class="docutils literal">partOf</span> relation using the same target
+<p>TODO: Right now I can't make any statements on the equivalency of two <a class="reference internal" href="#partof">partOf</a> relations using the same target
+<span class="docutils literal">objectId</span> but each containing different <span class="docutils literal">parts</span> and only one <a class="reference internal" href="#partof">partOf</a> relation using the same target
 <span class="docutils literal">objectId</span> but containing the union of both partses .</p>
 </div>
 </div>
@@ -1698,7 +1698,348 @@ seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaC
 </div>
 <div class="section" id="btsannotation">
 <h2>BTSAnnotation</h2>
-<!-- TODO BTSAnnotation -->
+<p><a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a type describing a highlighted part of a text. <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and as such
+inheriting a whole slew of miscellaneous fields. The usage of <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a bit patchy.  Following is a list of
+all nontrivial fields that are used with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>. The two semantically most relevant fields are <span class="docutils literal">type</span> and
+<span class="docutils literal">name</span>, as well as the one <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<div class="section" id="fields-used-with-btsannotation">
+<h3>Fields used with BTSAnnotation</h3>
+<table>
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 14%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Field</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>&lt;total&gt;</p></td>
+<td><p>13862</p></td>
+<td></td>
+</tr>
+<tr><td><p>state</p></td>
+<td><p>13862</p></td>
+<td><p>100.00%</p></td>
+</tr>
+<tr><td><p>type</p></td>
+<td><p>10090</p></td>
+<td><p>72.79%</p></td>
+</tr>
+<tr><td><p>name</p></td>
+<td><p>8016</p></td>
+<td><p>57.83%</p></td>
+</tr>
+<tr><td><p>corpusPrefix</p></td>
+<td><p>5148</p></td>
+<td><p>37.14%</p></td>
+</tr>
+<tr><td><p>passport</p></td>
+<td><p>696</p></td>
+<td><p>5.02%</p></td>
+</tr>
+<tr><td><p>subtype</p></td>
+<td><p>54</p></td>
+<td><p>0.39%</p></td>
+</tr>
+<tr><td><p>externalReferences[]</p></td>
+<td><p>3</p></td>
+<td><p>0.02%</p></td>
+</tr>
+<tr><td><p>sortKey</p></td>
+<td><p>2</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="type-values-used-with-btsannotation">
+<h3>Type values used with BTSAnnotation</h3>
+<table>
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 14%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>&lt;total&gt;</p></td>
+<td><p>13862</p></td>
+<td></td>
+</tr>
+<tr><td><p>rubrum</p></td>
+<td><p>9927</p></td>
+<td><p>71.61%</p></td>
+</tr>
+<tr><td><p>lexical</p></td>
+<td><p>48</p></td>
+<td><p>0.35%</p></td>
+</tr>
+<tr><td><p>textual</p></td>
+<td><p>30</p></td>
+<td><p>0.22%</p></td>
+</tr>
+<tr><td><p>conceptual</p></td>
+<td><p>29</p></td>
+<td><p>0.21%</p></td>
+</tr>
+<tr><td><p>Annotation-Leipzig</p></td>
+<td><p>20</p></td>
+<td><p>0.14%</p></td>
+</tr>
+<tr><td><p>undefined</p></td>
+<td><p>13</p></td>
+<td><p>0.09%</p></td>
+</tr>
+<tr><td><p>Layout</p></td>
+<td><p>8</p></td>
+<td><p>0.06%</p></td>
+</tr>
+<tr><td><p>&lt;empty&gt;</p></td>
+<td><p>7</p></td>
+<td><p>0.05%</p></td>
+</tr>
+<tr><td><p>ConceptualGroup2</p></td>
+<td><p>6</p></td>
+<td><p>0.04%</p></td>
+</tr>
+<tr><td><p>ConceptualGroup3</p></td>
+<td><p>2</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="type-values-used-with-named-btsannotations">
+<h3>Type values used with named BTSAnnotations</h3>
+<table>
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 14%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>rubrum</p></td>
+<td><p>4352</p></td>
+<td><p>54.3%</p></td>
+</tr>
+<tr><td><p>&lt;null&gt;</p></td>
+<td><p>3513</p></td>
+<td><p>43.8%</p></td>
+</tr>
+<tr><td><p>lexical</p></td>
+<td><p>44</p></td>
+<td><p>0.5%</p></td>
+</tr>
+<tr><td><p>textual</p></td>
+<td><p>28</p></td>
+<td><p>0.3%</p></td>
+</tr>
+<tr><td><p>conceptual</p></td>
+<td><p>25</p></td>
+<td><p>0.3%</p></td>
+</tr>
+<tr><td><p>Annotation-Leipzig</p></td>
+<td><p>19</p></td>
+<td><p>0.2%</p></td>
+</tr>
+<tr><td><p>undefined</p></td>
+<td><p>13</p></td>
+<td><p>0.2%</p></td>
+</tr>
+<tr><td><p>Layout</p></td>
+<td><p>8</p></td>
+<td><p>0.1%</p></td>
+</tr>
+<tr><td><p>ConceptualGroup2</p></td>
+<td><p>6</p></td>
+<td><p>0.1%</p></td>
+</tr>
+<tr><td><p>&lt;empty string&gt;</p></td>
+<td><p>6</p></td>
+<td><p>0.1%</p></td>
+</tr>
+<tr><td><p>ConceptualGroup3</p></td>
+<td><p>2</p></td>
+<td><p>0.0%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-most-common-names-of-btsannotations">
+<h3>The most common names of BTSAnnotations</h3>
+<p>The <span class="docutils literal">name</span> of a <a class="reference internal" href="#btsannotation">BTSAnnotation</a> by default contains <span class="docutils literal">&quot;Rubrum&quot;</span>. Otherwise, it is mostly a human-readable comment.
+Many a <a class="reference internal" href="#btsannotation">BTSAnnotation</a> does not have a name. Note that <span class="docutils literal">name</span> has a long-tail distribution with very many rarely used
+values.</p>
+<!-- To extract name statistics: jq -c '.docs[] | select(.eClass == "http://btsCorpusModel/1.0#//BTSAnnotation") | .name | select(. != null)' *.json|sort|uniq -c|sort -rn|head -n 20 -->
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 16%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr><th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>&lt;name not null&gt;</p></td>
+<td><p>8016</p></td>
+<td></td>
+</tr>
+<tr><td><p>&quot;Rubrum&quot;</p></td>
+<td><p>4348</p></td>
+<td><p>54.24%</p></td>
+</tr>
+<tr><td><p>&quot;supralinear&quot;</p></td>
+<td><p>177</p></td>
+<td><p>2.21%</p></td>
+</tr>
+<tr><td><p>&quot;Osiris&quot;</p></td>
+<td><p>177</p></td>
+<td><p>2.21%</p></td>
+</tr>
+<tr><td><p>&quot;Chiffrenschrift&quot;</p></td>
+<td><p>113</p></td>
+<td><p>1.41%</p></td>
+</tr>
+<tr><td><p>&quot;Ptol VIII&quot;</p></td>
+<td><p>104</p></td>
+<td><p>1.30%</p></td>
+</tr>
+<tr><td><p>&quot;Textfeld&quot;</p></td>
+<td><p>101</p></td>
+<td><p>1.26%</p></td>
+</tr>
+<tr><td><p>&quot;titre&quot;</p></td>
+<td><p>75</p></td>
+<td><p>0.94%</p></td>
+</tr>
+<tr><td><p>&quot;Bildfeld&quot;</p></td>
+<td><p>63</p></td>
+<td><p>0.79%</p></td>
+</tr>
+<tr><td><p>&quot;griechisch&quot;</p></td>
+<td><p>57</p></td>
+<td><p>0.71%</p></td>
+</tr>
+<tr><td><p>&quot;Pehou&quot;</p></td>
+<td><p>41</p></td>
+<td><p>0.51%</p></td>
+</tr>
+<tr><td><p>&quot;paroles Osiris&quot;</p></td>
+<td><p>39</p></td>
+<td><p>0.49%</p></td>
+</tr>
+<tr><td><p>&quot;Sekhet&quot;</p></td>
+<td><p>35</p></td>
+<td><p>0.44%</p></td>
+</tr>
+<tr><td><p>&quot;Kolophon&quot;</p></td>
+<td><p>34</p></td>
+<td><p>0.42%</p></td>
+</tr>
+<tr><td><p>&quot;lexical&quot;</p></td>
+<td><p>33</p></td>
+<td><p>0.41%</p></td>
+</tr>
+<tr><td><p>&quot;hieratisch&quot;</p></td>
+<td><p>31</p></td>
+<td><p>0.39%</p></td>
+</tr>
+<tr><td><p>&quot;Nil&quot;</p></td>
+<td><p>30</p></td>
+<td><p>0.37%</p></td>
+</tr>
+<tr><td><p>&quot;nome&quot;</p></td>
+<td><p>27</p></td>
+<td><p>0.34%</p></td>
+</tr>
+<tr><td><p>&quot;Isis&quot;</p></td>
+<td><p>24</p></td>
+<td><p>0.30%</p></td>
+</tr>
+<tr><td><p>&quot;textual&quot;</p></td>
+<td><p>23</p></td>
+<td><p>0.29%</p></td>
+</tr>
+<tr><td><p>&quot;Giebelfeld&quot;</p></td>
+<td><p>23</p></td>
+<td><p>0.29%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mapping-between-btsannotation-and-btstext-parts">
+<h3>Mapping between BTSAnnotation and BTSText parts</h3>
+<p>Almost always, a <a class="reference internal" href="#btsannotation">BTSAnnotation</a> has a single <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a> pointing at a <a class="reference internal" href="#btstext">BTSText</a>. There is only two
+exceptions in the entire database of which each has two <a class="reference internal" href="#partof">partOf</a> relations. See the following table for the frequency
+of <a class="reference internal" href="#btstext">BTSText</a> as a relation target compared to other types.</p>
+<!-- To count annotation relations with parts field: jq -c '.docs[] | select(.eClass == "http://btsCorpusModel/1.0#//BTSAnnotation") | .relations[0] | select(has("parts"))' *.json|wc -l -->
+<table>
+<colgroup>
+<col style="width: 71%" />
+<col style="width: 13%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Type</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>BTSText (total)</p></td>
+<td><p>13830</p></td>
+<td><p>99.77%</p></td>
+</tr>
+<tr><td><p>BTSText (Relation has <span class="docutils literal">parts</span> field)</p></td>
+<td><p>13796</p></td>
+<td><p>99.52%</p></td>
+</tr>
+<tr><td><p>&lt;unknown&gt;</p></td>
+<td><p>15</p></td>
+<td><p>0.10%</p></td>
+</tr>
+<tr><td><p>BTSLemmaEntry</p></td>
+<td><p>8</p></td>
+<td><p>0.06%</p></td>
+</tr>
+<tr><td><p>BTSTextCorpus</p></td>
+<td><p>5</p></td>
+<td><p>0.04%</p></td>
+</tr>
+<tr><td><p>BTSTCObject</p></td>
+<td><p>4</p></td>
+<td><p>0.03%</p></td>
+</tr>
+<tr><td><p>&lt;parts only&gt;</p></td>
+<td><p>1</p></td>
+<td><p>0.01%</p></td>
+</tr>
+<tr><td><p>BTSThsEntry</p></td>
+<td><p>1</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section" id="btscorpusheader">
 <h2>BTSCorpusHeader</h2>

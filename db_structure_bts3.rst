@@ -211,7 +211,7 @@ BTSComment
 
 A ``BTSComment`` describes a human-language comment on some object or text section. All comments on a project are stored in
 the project's ``{project name}_admin`` database and link to their target object or text part by means of exactly one
-``partOf`` relation. For details, see `PartOf relations`_.
+`partOf`_ `BTSRelation`_.
 
 A ``BTSComment`` is a `BTSObject`_ and has the following fields:
 
@@ -662,7 +662,7 @@ the database. It is instead used as some kind of object-global variable.
 :``relations``:
     Array field of ``Relation`` objects describing relations between the containing object and other objects. This is
     used to describe complex relations such as ``rootOf`` or ``composedOf`` for lemmata. *Everywhere* else it is only
-    ever used with ``partOf`` to express the hierarchical structure of the object tree. Below is an exhaustive table of
+    ever used with `partOf`_ to express the hierarchical structure of the object tree. Below is an exhaustive table of
     occurences.
 
     =================== ======= =========
@@ -829,12 +829,12 @@ objects than by kludging an ersatz relational layer on it?
 
 A ``BTSRelation`` represents a single item in a relation (and not as the name implies the relation itself). An
 implementation detail is that these relations are inherently directional, and the ``BTSRelation`` object is always
-stored in the *head* object. So, a ``partOf`` relation describing that object ``A`` is a part of object ``B`` would be
+stored in the *head* object. So, a `partOf`_ relation describing that object ``A`` is a part of object ``B`` would be
 stored in object ``A``. Read: ``A is partOf B``.
 
 Every relation contains the couchDB ``_id`` of its target object in its ``objectId`` field. 
 
-Relations come in many flavors. The important one is ``partOf``, which is used to express hierarchical structure in the
+Relations come in many flavors. The important one is `partOf`_, which is used to express hierarchical structure in the
 object browser. It can be used on most anything. The other relation type flavors are only used on ``BTSLemmaEntry``
 objects. Below are some nice stats on these.
 
@@ -842,7 +842,7 @@ Due to the inherently asymmetric nature of this representation, most "relation t
 at the far end of the relation. Such pairs are e.g. ``successor`` and ``predecessor`` or ``composes`` and
 ``composedOf``. Note that these are sometimes not named very well.
 
-.. ATTENTION:: ``partOf`` relations do not have a reciprocal element.
+.. ATTENTION:: `partOf`_ relations do not have a reciprocal element.
 
 .. WARNING:: reciprocal relations are maintained by hand, this does in practice lead to inconsistencies as are evident
     for example from the untyped relations shown in the data below.
@@ -859,10 +859,12 @@ Relation target type statistics
 .. raw:: html
     :file: relation_child_types.html
 
+.. _partOf:
+
 PartOf relations
 ^^^^^^^^^^^^^^^^
 
-In certain cases such as when used with a `BTSComment`_ a ``partOf`` relation may contain ``parts``. Each "part" is a
+In certain cases such as when used with a `BTSComment`_ a `partOf`_ relation may contain ``parts``. Each "part" is a
 `BTSInterTextReference`_ pointing to part of some text. The statistics of the number of parts as extracted from a
 database backup are as follows.
 
@@ -887,12 +889,12 @@ length  count   percentage
 ======= ======= ==========
 
 .. ATTENTION::
-    Technically, the ``partOf`` graph is only directed. In practice, it seems it is also acyclic and something would
+    Technically, the `partOf`_ graph is only directed. In practice, it seems it is also acyclic and something would
     probably crash if it wasn't. It is, however, *not* a vanilla tree as objects can have several parents.
 
 .. ATTENTION::
-    TODO: Right now I can't make any statements on the equivalency of two ``partOf`` relations using the same target
-    ``objectId`` but each containing different ``parts`` and only one ``partOf`` relation using the same target
+    TODO: Right now I can't make any statements on the equivalency of two `partOf`_ relations using the same target
+    ``objectId`` but each containing different ``parts`` and only one `partOf`_ relation using the same target
     ``objectId`` but containing the union of both partses .
 
 BTSRevision
@@ -1074,7 +1076,120 @@ BTSAmbivalenceItem
 BTSAnnotation
 ~~~~~~~~~~~~~
 
-.. TODO BTSAnnotation
+`BTSAnnotation`_ is a type describing a highlighted part of a text. `BTSAnnotation`_ is a `BTSCorpusObject`_ and as such
+inheriting a whole slew of miscellaneous fields. The usage of `BTSAnnotation`_ is a bit patchy.  Following is a list of
+all nontrivial fields that are used with `BTSAnnotation`_. The two semantically most relevant fields are ``type`` and
+``name``, as well as the one `partOf`_ `BTSRelation`_.
+
+Fields used with BTSAnnotation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+======================= ===== =========
+Field                   Count Frequency
+======================= ===== =========
+<total>                 13862
+state                   13862   100.00%
+type                    10090    72.79%
+name                     8016    57.83%
+corpusPrefix             5148    37.14%
+passport                  696     5.02%
+subtype                    54     0.39%
+externalReferences[]        3     0.02%
+sortKey                     2     0.01%
+======================= ===== =========
+
+Type values used with BTSAnnotation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+======================= ===== =========
+Type                    Count Frequency
+======================= ===== =========
+<total>                 13862
+rubrum                   9927  71.61%
+lexical                    48   0.35%
+textual                    30   0.22%
+conceptual                 29   0.21%
+Annotation-Leipzig         20   0.14%
+undefined                  13   0.09%
+Layout                      8   0.06%
+<empty>                     7   0.05%
+ConceptualGroup2            6   0.04%
+ConceptualGroup3            2   0.01%
+======================= ===== =========
+
+Type values used with named BTSAnnotations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+======================= ===== =========
+Type                    Count Frequency
+======================= ===== =========
+rubrum                   4352     54.3%
+<null>                   3513     43.8%
+lexical                    44      0.5%
+textual                    28      0.3%
+conceptual                 25      0.3%
+Annotation-Leipzig         19      0.2%
+undefined                  13      0.2%
+Layout                      8      0.1%
+ConceptualGroup2            6      0.1%
+<empty string>              6      0.1%
+ConceptualGroup3            2      0.0%
+======================= ===== =========
+
+The most common names of BTSAnnotations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``name`` of a `BTSAnnotation`_ by default contains ``"Rubrum"``. Otherwise, it is mostly a human-readable comment.
+Many a `BTSAnnotation`_ does not have a name. Note that ``name`` has a long-tail distribution with very many rarely used
+values.
+
+.. To extract name statistics: jq -c '.docs[] | select(.eClass == "http://btsCorpusModel/1.0#//BTSAnnotation") | .name | select(. != null)' *.json|sort|uniq -c|sort -rn|head -n 20
+
+================= ===== =========
+                  Count Frequency
+================= ===== =========
+<name not null>    8016
+"Rubrum"           4348    54.24%
+"supralinear"       177     2.21%
+"Osiris"            177     2.21%
+"Chiffrenschrift"   113     1.41%
+"Ptol VIII"         104     1.30%
+"Textfeld"          101     1.26%
+"titre"              75     0.94%
+"Bildfeld"           63     0.79%
+"griechisch"         57     0.71%
+"Pehou"              41     0.51%
+"paroles Osiris"     39     0.49%
+"Sekhet"             35     0.44%
+"Kolophon"           34     0.42%
+"lexical"            33     0.41%
+"hieratisch"         31     0.39%
+"Nil"                30     0.37%
+"nome"               27     0.34%
+"Isis"               24     0.30%
+"textual"            23     0.29%
+"Giebelfeld"         23     0.29%
+================= ===== =========
+
+Mapping between BTSAnnotation and BTSText parts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Almost always, a `BTSAnnotation`_ has a single `partOf`_ `BTSRelation`_ pointing at a `BTSText`_. There is only two
+exceptions in the entire database of which each has two `partOf`_ relations. See the following table for the frequency
+of `BTSText`_ as a relation target compared to other types.
+
+.. To count annotation relations with parts field: jq -c '.docs[] | select(.eClass == "http://btsCorpusModel/1.0#//BTSAnnotation") | .relations[0] | select(has("parts"))' *.json|wc -l
+
+======================================= ======= =========
+Type                                    Count   Frequency
+======================================= ======= =========
+BTSText (total)                         13830   99.77%
+BTSText (Relation has ``parts`` field)  13796   99.52%
+<unknown>                               15       0.10%
+BTSLemmaEntry                           8        0.06%
+BTSTextCorpus                           5        0.04%
+BTSTCObject                             4        0.03%
+<parts only>                            1        0.01%
+BTSThsEntry                             1        0.01% 
+======================================= ======= =========
+
 
 BTSCorpusHeader
 ~~~~~~~~~~~~~~~
