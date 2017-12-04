@@ -326,8 +326,81 @@ Eclipse-Interface.</p>
 </dl>
 </div>
 </div>
-<div class="section" id="objekttypen-des-basis-modells">
-<h1>Objekttypen des Basis-Modells</h1>
+<div class="section" id="database-types">
+<h1>Database types</h1>
+<p>There is several different databases that are used by the BTS.</p>
+<div class="section" id="global">
+<h2>Global</h2>
+<p>These global databases are present exactly once and are common to all projects and corpora.</p>
+<dl class="field-list simple" id="global-admin-database">
+<dt><span class="docutils literal">admin</span></dt>
+<dd><p>This database contains miscellaneous global data. It contains all <a class="reference internal" href="#btsproject">BTSProject</a> instances as well as the
+<a class="reference internal" href="#btsuser">BTSUser</a> and <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> instances used for access control.</p>
+</dd>
+</dl>
+<dl class="field-list simple" id="global-notification-database">
+<dt><span class="docutils literal">notification</span></dt>
+<dd><p>This database is used for a homebrewn locking scheme. See <a class="reference internal" href="#dblease">DBLease</a>.</p>
+</dd>
+<dt><span class="docutils literal">users</span></dt>
+<dd><p>This is a couchdb-internal database.</p>
+</dd>
+<dt><span class="docutils literal">replicator</span></dt>
+<dd><p>This is a couchdb-internal database.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="project">
+<h2>Project</h2>
+<p>The project databases exist up to once per project. Sometimes, a project does not have all possible project
+databases.</p>
+<dl class="field-list simple" id="project-corpus-index-database">
+<dt><span class="docutils literal">{project name}_corpus</span></dt>
+<dd><p>This database is basically an index of all corpora that are part of this project through their respective
+<a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> objects.</p>
+</dd>
+</dl>
+<dl class="field-list simple" id="project-admin-database">
+<dt><span class="docutils literal">{project name}_admin</span></dt>
+<dd><p>This database contains the project's configuration, as in <a class="reference internal" href="#btsconfig">BTSConfig</a>. For some reason, it also contains all
+<a class="reference internal" href="#btscomment">BTSComment</a> objects that belong to this project.</p>
+</dd>
+</dl>
+<dl class="field-list simple" id="project-word-list-database">
+<dt><span class="docutils literal">{project name}_wlist</span></dt>
+<dd><p>This is the project's word list. It contains all <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> objects of this project. The texts in the
+project have their words linked into this database. Objects are keyed by their ~6-digit decimal lemma keys.</p>
+</dd>
+</dl>
+<dl class="field-list simple" id="project-thesaurus-database">
+<dt><span class="docutils literal">{project name}_ths</span></dt>
+<dd><p>This is the project's thesaurus database. It contains all <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> objects belonging to this project.
+Basically you can consider this database a project-specific grand enum table.</p>
+</dd>
+</dl>
+<dl class="field-list simple" id="project-atext-database">
+<dt><span class="docutils literal">{project name}_atext</span></dt>
+<dd><p>This database type is almost entirely unused. This seems to be part of some unfinished feature.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="corpora">
+<h2>Corpora</h2>
+<p>The private corpus database exists once per corpus. These contain the bulk of the data in the BTS.</p>
+<dl class="field-list simple" id="private-corpus-database">
+<dt><span class="docutils literal">{project name}_corpus_{corpus name}</span></dt>
+<dd><p>This database contains all <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> instances that belong to this project. This is mostly
+<a class="reference internal" href="#btstcobject">BTSTCObject</a> and <a class="reference internal" href="#btstext">BTSText</a> instances.</p>
+</dd>
+</dl>
+<!-- to generate data type-database statistics:
+for infix in corpus.; begin echo $infix; jq -c '.docs[].eClass' *$infix*json | sort | uniq -c | sort -h; echo; end | tee typestats; end
+for infix in admin.json; begin echo $infix; jq -c '.docs[].eClass' admin.json | sort | uniq -c | sort -h; echo; end | tee -a typestats; end
+for infix in users replicator notification _admin wlist ths corpus_ atext; begin echo $infix; jq -c '.docs[].eClass' *$infix*.json | sort | uniq -c | sort -h; echo; end | tee -a typestats; end -->
+</div>
+</div>
+<div class="section" id="object-types-of-the-base-model">
+<h1>Object types of the base model</h1>
 <div class="section" id="administrativdataobject">
 <h2>AdministrativDataObject</h2>
 <p>AdministrativDataObject is a base class of BTSObject meant to bring in object versioning functionality. Its fields are
@@ -392,6 +465,10 @@ to be described in the <span class="docutils literal">Visibility</span> meta mod
 <p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored in
 the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of exactly one
 <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btscomment">BTSComment</a> instances are stored in the <a class="reference internal" href="#project-admin-database">project admin database</a>.</p>
+</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Do not confuse this with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>, which describes a highlighted part of a text.</p>
@@ -530,6 +607,10 @@ commas anywhere.</p>
 kitchen sink, from UI defaults through the ACL to the database schema.  The top-level <span class="docutils literal">BTSConfiguration</span> object is the
 root of the config tree. Its descendants are all <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a>. They are stored in the <span class="docutils literal">children</span> attribute
 inherited from <a class="reference internal" href="#btsconfig">BTSConfig</a>. Have a look at the <a class="reference internal" href="#config-graph">Config Graph</a> to see how this is actually used.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsconfiguration">BTSConfiguration</a> instances are stored in the <a class="reference internal" href="#project-admin-database">project admin database</a>.</p>
+</div>
 <dl class="field-list">
 <dt><span class="docutils literal">provider</span></dt>
 <dd><p>A symbolic name of the config. This is only used to find the configuration object specified in the application
@@ -597,7 +678,7 @@ name as part of a <span class="docutils literal">groupIds</span> array in their 
 <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/dao-couch/src/org/bbaw/bts/dao/couchDB/CouchDBDao.java#L590">CouchDBDao.java</a> with the ids of conflicting revisions of the document containing the field as couchDB sees them.</p>
 </dd>
 </dl>
-<dl class="field-list simple">
+<dl class="field-list simple" id="dbcollectionkey">
 <dt><span class="docutils literal">DBCollectionKey</span></dt>
 <dd><p>Not written to db. This field is populated in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/dao-couch/src/org/bbaw/bts/dao/couchDB/CouchDBDao.java">CouchDBDao.java</a> and caches the name of the local elasticsearch
 index that contains the object this field belongs to.</p>
@@ -776,6 +857,10 @@ fixed number of reservations in cache. If the application can't find a reservati
 totally different format (mangled UUID) instead.</p>
 <p>Since in different places different ID formats are used (see <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>), <span class="docutils literal">BTSIDReservationObject</span> allows
 prefixes. There is no further scoping or proper namespacing.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsidreservationobject">BTSIDReservationObject</a> instances are stored in the <a class="reference internal" href="#project-word-list-database">project word list database</a>.</p>
+</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>The details of the reservation logic are controlled by the <span class="docutils literal">propertyStrings</span> field on the
@@ -1265,6 +1350,10 @@ in <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> poi
 looking into this is <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L691-L704">getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java</a>.</p>
 <p>The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
 one can select one or multiple projects to download.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsproject">BTSProject</a> instances are stored in the <a class="reference internal" href="#global-admin-database">global admin database</a>.</p>
+</div>
 <dl class="field-list simple">
 <dt><span class="docutils literal">prefix</span></dt>
 <dd><p>&quot;key&quot; of this project, such as <span class="docutils literal">&quot;aaew&quot;</span> in case of the Altägyptisches Wörterbuch. Among others, this is used in
@@ -1568,6 +1657,10 @@ string in a set of translations.</p>
 <p>In addition to the specific fields below, some <a class="reference internal" href="#btsuser">BTSUser</a> objects have their inherited <span class="docutils literal">externalReferences</span> field set
 to a list containing one <a class="reference internal" href="#btsexternalreference">BTSExternalReference</a> of type <span class="docutils literal">aaew_1</span> with a string-formatted small number that apparently
 is this user's ID in a previous incarnation of the BTS.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsuser">BTSUser</a> instances are stored in the <a class="reference internal" href="#global-admin-database">global admin database</a>.</p>
+</div>
 <dl class="field-list simple">
 <dt><span class="docutils literal">comment</span></dt>
 <dd><p>Not used.</p>
@@ -1617,6 +1710,10 @@ is this user's ID in a previous incarnation of the BTS.</p>
 <h2>BTSUserGroup</h2>
 <p>This type describes a group of users. The group membership is managed in the individual <a class="reference internal" href="#btsuser">BTSUser</a> objects via their
 <span class="docutils literal">groupIds</span> field. <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> is a subtype of <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> instances are stored in the <a class="reference internal" href="#global-admin-database">global admin database</a>.</p>
+</div>
 <dl class="field-list simple">
 <dt><span class="docutils literal">name</span></dt>
 <dd><p>This field contains the human-readable long-form name of this group, such as <span class="docutils literal"><span class="pre">&quot;Totenbuch-Projekt,</span> Ägyptologisches Seminar der Universität Bonn&quot;</span>.
@@ -1649,6 +1746,10 @@ created for every object that is opened in the BTS. This is done via the selecti
 <p>The logic behind lock creation (e.g. <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSEvaluationServiceImpl.java#L416-L468">acquireLockOptimistic in BTSEvaluationServiceImpl.java</a>) is very racy. Also,
 there is no good guarantee that things that are locked are also unlocked in time. And locks expire at some point, and
 AFAICT there is noone actively checking when exactly that happens.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#dblease">DBLease</a> instances are stored in the <a class="reference internal" href="#global-notification-database">global notification database</a>.</p>
+</div>
 </div>
 <div class="section" id="useractioncounter">
 <h2>UserActionCounter</h2>
@@ -1722,6 +1823,13 @@ seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaC
 inheriting a whole slew of miscellaneous fields. The usage of <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a bit patchy.  Following is a list of
 all nontrivial fields that are used with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>. The two semantically most relevant fields are <span class="docutils literal">type</span> and
 <span class="docutils literal">name</span>, as well as the one <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <a class="reference internal" href="#btsannotation">BTSAnnotation</a> on some object is stored in the same database as the target object. This means an annotation
+on e.g. a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> will be stored in the corpuses <a class="reference internal" href="#private-corpus-database">private corpus database</a> while an annotation on a
+<a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> will be stored in the project's <cite>project word list database</cite>.</p>
+</div>
+<!-- TODO verify this storage association -->
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Do not confuse this with <a class="reference internal" href="#btscomment">BTSComment</a>, which describes a human-readable comment on some object <em>or</em> part of text.</p>
@@ -2077,6 +2185,10 @@ of <a class="reference internal" href="#btstext">BTSText</a> as a relation targe
 <p>This is the base class for objects that can be shown in one of the tree viewers. This is a subtype of BTSObject, and as
 such also includes everything of <a class="reference internal" href="#btsnamedtypedobject">BTSNamedTypedObject</a>, <a class="reference internal" href="#administrativdataobject">AdministrativDataObject</a> and <a class="reference internal" href="#btsidentifiableitem">BTSIdentifiableItem</a>:</p>
 <pre class="code literal-block"><code>_id, name, type, subtype, sortKey, code, relations, externalReferences, revisions, state, revisionState, visibility</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All instances of <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> is stored in the <a class="reference internal" href="#private-corpus-database">private corpus database</a>.</p>
+</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Do not confuse this with the similarly named <span class="docutils literal">BTSTCObject</span> (from &quot;Text Corpus Object&quot;) or <span class="docutils literal">BTSTextCorpus</span>. Both
@@ -2120,10 +2232,13 @@ implementation the BTS grammar is more lenient than the one of <a class="referen
 <dd><p>This is an integer field that in rare cases is used to reorder <span class="docutils literal">graphics</span> within a word. When the sentence is
 translated into <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> for display, each word's <span class="docutils literal">graphics</span> are passed through a stable sort keyed on
 <span class="docutils literal">innerSentenceOrder</span>. This results in the intermediate <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> representation of the word passed to <a class="reference external" href="https://jsesh.qenherkhopeshef.org/">JSesh</a> being
-in a different order.</p>
+in a different order. The reason for this is that there are cases of words which are written in hieroglyphs in a
+different order than they are pronounced. In the BTS, the oder of words in the database always follows the
+pronunciation and transliteration. To allow for the hieroglyph rendering assuming a different order,
+<span class="docutils literal">innerSentenceOrder</span> may be set.</p>
 </dd>
 </dl>
-<!-- TODO exactly explain what ``innerSentenceOrder`` does. -->
+<!-- TODO Add an example to ``innerSentenceOrder`` -->
 </div>
 <div class="section" id="btsimage">
 <h2>BTSImage</h2>
@@ -2158,11 +2273,230 @@ contain other <a class="reference internal" href="#btsambivalence">BTSAmbivalenc
 </div>
 <div class="section" id="btslemmaentry">
 <h2>BTSLemmaEntry</h2>
+<p>This type describes a single lemma in the project's dictionary. It is a direct subtype of <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and as
+such uses many of its fields including the passport.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> instances are stored in the <a class="reference internal" href="#project-word-list-database">project word list database</a>.</p>
+</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Do not confuse this with <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a>. These two a totally diferrent. <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> describes a single
 dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> one of several alternative transliterations in a <a class="reference internal" href="#btssenctence">BTSSenctence</a> via
 <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a>.</p>
+</div>
+<div class="section" id="notable-inherited-fields">
+<h3>Notable inherited fields</h3>
+<dl class="field-list">
+<dt><span class="docutils literal">type</span></dt>
+<dd><p></p></dd>
+<dt><span class="docutils literal">subtype</span></dt>
+<dd><p>These are used to express the word type of this entry such as <span class="docutils literal">substantive</span> or <span class="docutils literal">aadjective</span> for <span class="docutils literal">type</span> and
+<span class="docutils literal"><span class="pre">verb_4-inf</span></span> or <span class="docutils literal">kings_name</span> for <span class="docutils literal">subtype</span>.  Possible values are enumerated in the <a class="reference internal" href="#btsconfig">BTSConfig</a> under
+<span class="docutils literal">√.objectTypes.Lemma</span>.</p>
+</dd>
+<dt><span class="docutils literal">name</span></dt>
+<dd><p>This field contains the unicode transliteration of the lemma's egyptian pronunciation.</p>
+</dd>
+<dt><span class="docutils literal">revisionState</span></dt>
+<dd><p>This field contains a lifecycle state for this entry.</p>
+<table>
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 12%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr><th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>null</p></td>
+<td><p>10</p></td>
+<td><p>0.02%</p></td>
+</tr>
+<tr><td><p>&quot;new&quot;</p></td>
+<td><p>12</p></td>
+<td><p>0.02%</p></td>
+</tr>
+<tr><td><p>&quot;obsolete&quot;</p></td>
+<td><p>752</p></td>
+<td><p>1.44%</p></td>
+</tr>
+<tr><td><p>&quot;published-obsolete&quot;</p></td>
+<td><p>3723</p></td>
+<td><p>7.13%</p></td>
+</tr>
+<tr><td><p>&quot;published-awaiting-review&quot;</p></td>
+<td><p>14250</p></td>
+<td><p>27.30%</p></td>
+</tr>
+<tr><td><p>&quot;published&quot;</p></td>
+<td><p>33451</p></td>
+<td><p>64.08%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><span class="docutils literal">relations</span></dt>
+<dd><p>While the rest of the BTS exclusively uses <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">relations</a>, lemmata heavily use all sorts of relations. Below is
+a list detailing how many <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> there are with a given number of <a class="reference internal" href="#btsrelation">relations</a>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 18%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p># of relations</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>0</p></td>
+<td><p>47070</p></td>
+<td><p>69.97%</p></td>
+</tr>
+<tr><td><p>1</p></td>
+<td><p>12498</p></td>
+<td><p>18.58%</p></td>
+</tr>
+<tr><td><p>2</p></td>
+<td><p>4221</p></td>
+<td><p>6.27%</p></td>
+</tr>
+<tr><td><p>3</p></td>
+<td><p>1379</p></td>
+<td><p>2.05%</p></td>
+</tr>
+<tr><td><p>4</p></td>
+<td><p>704</p></td>
+<td><p>1.05%</p></td>
+</tr>
+<tr><td><p>5</p></td>
+<td><p>369</p></td>
+<td><p>0.55%</p></td>
+</tr>
+<tr><td><p>6</p></td>
+<td><p>240</p></td>
+<td><p>0.36%</p></td>
+</tr>
+<tr><td><p>7</p></td>
+<td><p>137</p></td>
+<td><p>0.20%</p></td>
+</tr>
+<tr><td><p>8</p></td>
+<td><p>129</p></td>
+<td><p>0.19%</p></td>
+</tr>
+<tr><td><p>9</p></td>
+<td><p>69</p></td>
+<td><p>0.10%</p></td>
+</tr>
+<tr><td><p>...</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr><td><p>71</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>73</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>75</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>77</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+<tr><td><p>91</p></td>
+<td><p>1</p></td>
+<td><p>0.00%</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</div>
+<div class="section" id="specific-fields">
+<h3>Specific fields</h3>
+<dl class="field-list">
+<dt><span class="docutils literal">translations</span></dt>
+<dd><p>This field contains a <a class="reference internal" href="#btstranslations">BTSTranslations</a> object containing all the translations of this entry into several languages.</p>
+</dd>
+<dt><span class="docutils literal">words</span></dt>
+<dd><p>This field contains the words of this entry. A <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> of a compound word should ideally consist of several
+words, however there is no mechanism that guarantees this.</p>
+<p>In many cases, the latter entries of <span class="docutils literal">words</span> have their <span class="docutils literal">wChar</span> field surrounded by parentheses as in <span class="docutils literal">(foo)</span>.
+This is to mark collocations in specializations of a verb. That is, a verb <span class="docutils literal">have</span> that has a broad meaning is
+present in the word list with one generic entry for the verb and with a number of specialized entries, one for each
+collocation and meaning <span class="docutils literal">have (kittens)</span>. These cases are also expressed through <a class="reference internal" href="#partof">partOf</a> and <span class="docutils literal">contains</span>
+<a class="reference internal" href="#btsrelation">relations</a>.</p>
+<p>Below is a table of how many entries there are with a given length of <span class="docutils literal">words</span>.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 25%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr><th class="head"><p>Length</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>1</p></td>
+<td><p>50689</p></td>
+<td><p>97.11%</p></td>
+</tr>
+<tr><td><p>2</p></td>
+<td><p>1223</p></td>
+<td><p>2.34%</p></td>
+</tr>
+<tr><td><p>3</p></td>
+<td><p>185</p></td>
+<td><p>0.35%</p></td>
+</tr>
+<tr><td><p>4</p></td>
+<td><p>45</p></td>
+<td><p>0.09%</p></td>
+</tr>
+<tr><td><p>0</p></td>
+<td><p>24</p></td>
+<td><p>0.05%</p></td>
+</tr>
+<tr><td><p>5</p></td>
+<td><p>19</p></td>
+<td><p>0.04%</p></td>
+</tr>
+<tr><td><p>6</p></td>
+<td><p>7</p></td>
+<td><p>0.01%</p></td>
+</tr>
+<tr><td><p>7</p></td>
+<td><p>6</p></td>
+<td><p>0.01%</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>Note that there are many cases of entries that have several words where all hieroglyphs are bunched into the
+first word, and the later words only contain <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a>. This is an artifact of the initial data import.</p>
+</div>
+</dd>
+<dt><span class="docutils literal">ignore</span></dt>
+<dd><p>This field is unused.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="section" id="btsmarker">
@@ -2438,7 +2772,18 @@ exclusively <a class="reference internal" href="#btssenctence">BTSSenctence</a> 
 </div>
 <div class="section" id="btstextcorpus">
 <h2>BTSTextCorpus</h2>
-<!-- TODO BTSTextCorpus -->
+<p>A <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> is sort of a top-level folder for <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> instances. A <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> belongs to exactly
+one <a class="reference internal" href="#btsproject">BTSProject</a>. It is a basic <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> with two quirks: It may contain a <a class="reference internal" href="#btscorpusheader">BTSCorpusHeader</a> (which in
+practice it never does) and it has a flag <span class="docutils literal">active</span> that is not persisted in the database. The list of active corpora
+is stored in the app's preferences.</p>
+<p>Each <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> has its own CouchDB database (i.e. database within the same CouchDB instance). The association
+between a <a class="reference internal" href="#btsproject">BTSProject</a> and its corpora is done via the names of these databases. The format is <span class="docutils literal">{project name}_corpus_{corpus name}</span>, e.g. <span class="docutils literal">aaew_corpus_bbawgrabinschriften</span>. When anything is loaded from a corpuses
+database, the non-persisted <a class="reference internal" href="#dbcollectionkey">DBCollectionKey</a> field inherited from <a class="reference internal" href="#btsdbbaseobject">BTSDBBaseObject</a> is set to the database name. The
+content of this field is later used to access the project.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A corpuses <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> instance is stored in the <a class="reference internal" href="#project-corpus-index-database">project corpus index database</a>.</p>
+</div>
 </div>
 <div class="section" id="btstextitems">
 <h2>BTSTextItems</h2>
@@ -2510,6 +2855,10 @@ entries in <span class="docutils literal">3 = Fundstellen</span> are organized a
 <p class="admonition-title">Warning</p>
 <p>There may be BTSThsEntry objects without parents. Also there might be some with several parents. Just keep that in
 mind.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> instances are stored in the <a class="reference internal" href="#project-thesaurus-database">project thesaurus database</a>.</p>
 </div>
 </div>
 <div class="section" id="btsword">

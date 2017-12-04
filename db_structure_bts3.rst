@@ -489,6 +489,8 @@ Fields for local caching of values
 
 __ https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/dao-couch/src/org/bbaw/bts/dao/couchDB/CouchDBDao.java#L590
     
+.. _`DBCollectionKey`:
+
 :``DBCollectionKey``:
     Not written to db. This field is populated in `CouchDBDao.java`__ and caches the name of the local elasticsearch
     index that contains the object this field belongs to.
@@ -1379,9 +1381,12 @@ implementation the BTS grammar is more lenient than the one of `JSesh`_. A good 
     This is an integer field that in rare cases is used to reorder ``graphics`` within a word. When the sentence is
     translated into `MdC`_ for display, each word's ``graphics`` are passed through a stable sort keyed on
     ``innerSentenceOrder``. This results in the intermediate `MdC`_ representation of the word passed to `JSesh`_ being
-    in a different order.
+    in a different order. The reason for this is that there are cases of words which are written in hieroglyphs in a
+    different order than they are pronounced. In the BTS, the oder of words in the database always follows the
+    pronunciation and transliteration. To allow for the hieroglyph rendering assuming a different order,
+    ``innerSentenceOrder`` may be set.
 
-.. TODO exactly explain what ``innerSentenceOrder`` does.
+.. TODO Add an example to ``innerSentenceOrder``
 
 .. _`MdC`: https://en.wikipedia.org/wiki/Manuel_de_Codage
 .. _`cartouche`: https://en.wikipedia.org/wiki/Cartouche
@@ -1418,10 +1423,107 @@ and thus also a `BTSIdentifiableItem`_.
 BTSLemmaEntry
 ~~~~~~~~~~~~~
 
+This type describes a single lemma in the project's dictionary. It is a direct subtype of `BTSCorpusObject`_ and as
+such uses many of its fields including the passport.
+
+.. NOTE::
+    All `BTSLemmaEntry`_ instances are stored in the `project word list database`_.
+
 .. ATTENTION::
     Do not confuse this with `BTSLemmaCase`_. These two a totally diferrent. `BTSLemmaEntry`_ describes a single
     dictionary entry. `BTSLemmaCase`_ one of several alternative transliterations in a `BTSSenctence`_ via
     `BTSAmbivalence`_.
+
+Notable inherited fields
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+:``type``:
+:``subtype``:
+    These are used to express the word type of this entry such as ``substantive`` or ``aadjective`` for ``type`` and
+    ``verb_4-inf`` or ``kings_name`` for ``subtype``.  Possible values are enumerated in the `BTSConfig`_ under
+    ``√.objectTypes.Lemma``.
+
+:``name``:
+    This field contains the unicode transliteration of the lemma's egyptian pronunciation.
+
+:``revisionState``:
+    This field contains a lifecycle state for this entry.
+
+    =========================== ===== =========
+                                Count Frequency
+    =========================== ===== =========
+    null                           10     0.02%
+    "new"                          12     0.02%
+    "obsolete"                    752     1.44%
+    "published-obsolete"         3723     7.13%
+    "published-awaiting-review" 14250    27.30%
+    "published"                 33451    64.08%
+    =========================== ===== =========
+
+:``relations``:
+    While the rest of the BTS exclusively uses partOf_ relations_, lemmata heavily use all sorts of relations. Below is
+    a list detailing how many BTSLemmaEntry_ there are with a given number of relations_.
+
+    ============== ===== =========
+    # of relations Count Frequency
+    ============== ===== =========
+    0              47070    69.97%
+    1              12498    18.58%
+    2               4221     6.27%
+    3               1379     2.05%
+    4                704     1.05%
+    5                369     0.55%
+    6                240     0.36%
+    7                137     0.20%
+    8                129     0.19%
+    9                 69     0.10%
+    ...
+    71                 1     0.00%
+    73                 1     0.00%
+    75                 1     0.00%
+    77                 1     0.00%
+    91                 1     0.00%
+    ============== ===== =========
+
+.. _relations: BTSRelation_
+
+Specific fields
+^^^^^^^^^^^^^^^
+
+:``translations``:
+    This field contains a BTSTranslations_ object containing all the translations of this entry into several languages.
+
+:``words``:
+    This field contains the words of this entry. A BTSLemmaEntry_ of a compound word should ideally consist of several
+    words, however there is no mechanism that guarantees this.
+    
+    In many cases, the latter entries of ``words`` have their ``wChar`` field surrounded by parentheses as in ``(foo)``.
+    This is to mark collocations in specializations of a verb. That is, a verb ``have`` that has a broad meaning is
+    present in the word list with one generic entry for the verb and with a number of specialized entries, one for each
+    collocation and meaning ``have (kittens)``. These cases are also expressed through partOf_ and ``contains``
+    relations_.
+
+    Below is a table of how many entries there are with a given length of ``words``.
+
+    ====== ===== =========
+    Length Count Frequency
+    ====== ===== =========
+    1      50689    97.11%
+    2       1223     2.34%
+    3        185     0.35%
+    4         45     0.09%
+    0         24     0.05%
+    5         19     0.04%
+    6          7     0.01%
+    7          6     0.01%
+    ====== ===== =========
+
+    .. ATTENTION::
+        Note that there are many cases of entries that have several words where all hieroglyphs are bunched into the
+        first word, and the later words only contain MdC_. This is an artifact of the initial data import.
+
+:``ignore``:
+    This field is unused.
 
 BTSMarker
 ~~~~~~~~~
@@ -1604,7 +1706,19 @@ This type is a simple container for a list of `BTSSenctence`_ objects. It is a v
 BTSTextCorpus
 ~~~~~~~~~~~~~
 
-.. TODO BTSTextCorpus
+A `BTSTextCorpus`_ is sort of a top-level folder for `BTSCorpusObject`_ instances. A `BTSTextCorpus`_ belongs to exactly
+one `BTSProject`_. It is a basic `BTSCorpusObject`_ with two quirks: It may contain a `BTSCorpusHeader`_ (which in
+practice it never does) and it has a flag ``active`` that is not persisted in the database. The list of active corpora
+is stored in the app's preferences.
+
+Each `BTSTextCorpus`_ has its own CouchDB database (i.e. database within the same CouchDB instance). The association
+between a `BTSProject`_ and its corpora is done via the names of these databases. The format is ``{project
+name}_corpus_{corpus name}``, e.g. ``aaew_corpus_bbawgrabinschriften``. When anything is loaded from a corpuses
+database, the non-persisted `DBCollectionKey`_ field inherited from `BTSDBBaseObject`_ is set to the database name. The
+content of this field is later used to access the project.
+
+.. NOTE::
+    A corpuses `BTSTextCorpus`_ instance is stored in the `project corpus index database`_.
 
 BTSTextItems
 ~~~~~~~~~~~~
