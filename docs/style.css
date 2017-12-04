@@ -59,6 +59,12 @@ th {
     border-color: #faebcc;
 }
 
+.note { 
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
 .admonition-title {
     font-weight: 700;
 }

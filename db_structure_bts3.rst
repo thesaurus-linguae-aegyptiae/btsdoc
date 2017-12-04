@@ -125,8 +125,85 @@ Definierte eClasses des Corpus-Modells
 .. [#implonly] Es ist kein separates Interface vorhanden. Die zugehörige Impl-Klasse benutzt ein generisches
     Eclipse-Interface.
 
-Objekttypen des Basis-Modells
------------------------------
+Database types
+--------------
+
+There is several different databases that are used by the BTS.
+
+Global
+~~~~~~
+
+These global databases are present exactly once and are common to all projects and corpora.
+
+.. _`Global admin database`:
+
+:``admin``:
+    This database contains miscellaneous global data. It contains all `BTSProject`_ instances as well as the
+    `BTSUser`_ and `BTSUserGroup`_ instances used for access control.
+
+.. _`Global notification database`:
+
+:``notification``:
+    This database is used for a homebrewn locking scheme. See `DBLease`_.
+:``users``:
+    This is a couchdb-internal database.
+:``replicator``:
+    This is a couchdb-internal database.
+
+Project
+~~~~~~~
+
+The project databases exist up to once per project. Sometimes, a project does not have all possible project
+databases.
+
+.. _`project corpus index database`:
+
+:``{project name}_corpus``:
+    This database is basically an index of all corpora that are part of this project through their respective
+    `BTSTextCorpus`_ objects.
+
+.. _`project admin database`:
+
+:``{project name}_admin``:
+    This database contains the project's configuration, as in `BTSConfig`_. For some reason, it also contains all
+    `BTSComment`_ objects that belong to this project.
+
+.. _`project word list database`:
+
+:``{project name}_wlist``:
+    This is the project's word list. It contains all `BTSLemmaEntry`_ objects of this project. The texts in the
+    project have their words linked into this database. Objects are keyed by their ~6-digit decimal lemma keys.
+
+.. _`project thesaurus database`:
+
+:``{project name}_ths``:
+    This is the project's thesaurus database. It contains all `BTSThsEntry`_ objects belonging to this project.
+    Basically you can consider this database a project-specific grand enum table.
+
+.. _`project atext database`:
+
+:``{project name}_atext``:
+    This database type is almost entirely unused. This seems to be part of some unfinished feature.
+
+Corpora
+~~~~~~~
+
+The private corpus database exists once per corpus. These contain the bulk of the data in the BTS.
+
+.. _`private corpus database`:
+
+:``{project name}_corpus_{corpus name}``:
+    This database contains all `BTSCorpusObject`_ instances that belong to this project. This is mostly
+    `BTSTCObject`_ and `BTSText`_ instances.
+
+.. to generate data type-database statistics:
+    for infix in corpus.; begin echo $infix; jq -c '.docs[].eClass' *$infix*json | sort | uniq -c | sort -h; echo; end | tee typestats; end
+    for infix in admin.json; begin echo $infix; jq -c '.docs[].eClass' admin.json | sort | uniq -c | sort -h; echo; end | tee -a typestats; end
+    for infix in users replicator notification _admin wlist ths corpus_ atext; begin echo $infix; jq -c '.docs[].eClass' *$infix*.json | sort | uniq -c | sort -h; echo; end | tee -a typestats; end
+
+
+Object types of the base model
+------------------------------
 
 AdministrativDataObject
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,6 +289,9 @@ BTSComment
 A ``BTSComment`` describes a human-language comment on some object or text section. All comments on a project are stored in
 the project's ``{project name}_admin`` database and link to their target object or text part by means of exactly one
 `partOf`_ `BTSRelation`_.
+
+.. NOTE::
+    All `BTSComment`_ instances are stored in the `project admin database`_.
 
 .. ATTENTION::
     Do not confuse this with `BTSAnnotation`_, which describes a highlighted part of a text.
@@ -354,6 +434,9 @@ Every project has exactly one ``BTSConfiguration`` stored in its ``{project name
 kitchen sink, from UI defaults through the ACL to the database schema.  The top-level ``BTSConfiguration`` object is the
 root of the config tree. Its descendants are all `BTSConfigItem`_. They are stored in the ``children`` attribute
 inherited from `BTSConfig`_. Have a look at the `Config Graph`_ to see how this is actually used.
+
+.. NOTE::
+    All `BTSConfiguration`_ instances are stored in the `project admin database`_.
 
 :``provider``:
     A symbolic name of the config. This is only used to find the configuration object specified in the application
@@ -515,6 +598,9 @@ totally different format (mangled UUID) instead.
 
 Since in different places different ID formats are used (see `BTSIdentifiableItem`_), ``BTSIDReservationObject`` allows
 prefixes. There is no further scoping or proper namespacing.
+
+.. NOTE::
+    All `BTSIDReservationObject`_ instances are stored in the `project word list database`_.
 
 .. ATTENTION:: The details of the reservation logic are controlled by the ``propertyStrings`` field on the
     `BTSProjectDBCollection`_ belonging to the active (dictionary) object.
@@ -798,6 +884,9 @@ looking into this is `getDBCollection in PermissionsAndExpressionsEvaluationCont
 The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
 one can select one or multiple projects to download.
 
+.. NOTE::
+    All `BTSProject`_ instances are stored in the `global admin database`_.
+
 :``prefix``:
     "key" of this project, such as ``"aaew"`` in case of the Altägyptisches Wörterbuch. Among others, this is used in
     the database name of this project's personal database.
@@ -967,6 +1056,9 @@ In addition to the specific fields below, some `BTSUser`_ objects have their inh
 to a list containing one `BTSExternalReference`_ of type ``aaew_1`` with a string-formatted small number that apparently
 is this user's ID in a previous incarnation of the BTS.
 
+.. NOTE::
+    All `BTSUser`_ instances are stored in the `global admin database`_.
+
 :``comment``:
     Not used.
 :``dbAdmin``:
@@ -1002,6 +1094,9 @@ BTSUserGroup
 This type describes a group of users. The group membership is managed in the individual `BTSUser`_ objects via their
 ``groupIds`` field. `BTSUserGroup`_ is a subtype of `BTSObject`_.
 
+.. NOTE::
+    All `BTSUserGroup`_ instances are stored in the `global admin database`_.
+
 :``name``:
     This field contains the human-readable long-form name of this group, such as ``"Totenbuch-Projekt, Ägyptologisches Seminar der Universität Bonn"``.
     This field is not present in ``terminated`` groups.
@@ -1030,6 +1125,9 @@ created for every object that is opened in the BTS. This is done via the selecti
 The logic behind lock creation (e.g. `acquireLockOptimistic in BTSEvaluationServiceImpl.java`_) is very racy. Also,
 there is no good guarantee that things that are locked are also unlocked in time. And locks expire at some point, and
 AFAICT there is noone actively checking when exactly that happens.
+
+.. NOTE::
+    All `DBLease`_ instances are stored in the `global notification database`_.
 
 .. _`setSelection in PermissionsAndExpressionsEvaluationController.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L150-L198
 .. _`acquireLockOptimistic in BTSEvaluationServiceImpl.java`: https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSEvaluationServiceImpl.java#L416-L468
@@ -1102,6 +1200,13 @@ BTSAnnotation
 inheriting a whole slew of miscellaneous fields. The usage of `BTSAnnotation`_ is a bit patchy.  Following is a list of
 all nontrivial fields that are used with `BTSAnnotation`_. The two semantically most relevant fields are ``type`` and
 ``name``, as well as the one `partOf`_ `BTSRelation`_.
+
+.. NOTE::
+    A `BTSAnnotation`_ on some object is stored in the same database as the target object. This means an annotation
+    on e.g. a `BTSCorpusObject`_ will be stored in the corpuses `private corpus database`_ while an annotation on a
+    `BTSLemmaEntry`_ will be stored in the project's `project word list database`.
+
+.. TODO verify this storage association
 
 .. ATTENTION::
     Do not confuse this with `BTSComment`_, which describes a human-readable comment on some object *or* part of text.
@@ -1231,6 +1336,9 @@ such also includes everything of `BTSNamedTypedObject`_, `AdministrativDataObjec
 .. code::
 
     _id, name, type, subtype, sortKey, code, relations, externalReferences, revisions, state, revisionState, visibility
+
+.. NOTE::
+    All instances of `BTSCorpusObject`_ is stored in the `private corpus database`_.
 
 .. ATTENTION::
     Do not confuse this with the similarly named ``BTSTCObject`` (from "Text Corpus Object") or ``BTSTextCorpus``. Both
@@ -1539,6 +1647,9 @@ Meer`` contains ``Wadi Abbad``.
 .. WARNING::
     There may be BTSThsEntry objects without parents. Also there might be some with several parents. Just keep that in
     mind.
+
+.. NOTE::
+    All `BTSThsEntry`_ instances are stored in the `project thesaurus database`_.
 
 BTSWord
 ~~~~~~~
