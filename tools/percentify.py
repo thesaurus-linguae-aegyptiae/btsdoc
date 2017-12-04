@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--field', default=0, type=int, help='Field to use. 0-based index.')
     parser.add_argument('-o', '--original', action='store_true', help='Output original lines instead of counts along with percentages')
     parser.add_argument('-t', '--table', action='store_true', help='Output rst table')
+    parser.add_argument('-n', '--name', type=str, default='Content', help='Name of content column')
     parser.add_argument('input', type=argparse.FileType('r'), nargs='?', default=sys.stdin, help='Input file')
     args = parser.parse_args()
 
@@ -17,14 +18,14 @@ if __name__ == '__main__':
     digits = int(math.log10(max(nums)))+1
     total = sum(nums) if args.sum else max(nums)
 
-    maxlen = max(len(l) for l in lines)
+    maxlen = max(len(args.name), max(len(l) for l in lines))
     if args.table:
         digits = max(len('Count'), digits)
         strip_field = lambda arr, idx: arr[:idx] + arr[idx+1:]
         lines = [ ' '.join(strip_field(line.strip().split(), args.field)) for line in lines ]
-        maxlen = max(len(l) for l in lines)
+        maxlen = max(len(args.name), max(len(l) for l in lines))
         print('='*maxlen, '='*digits, '=========')
-        print(' '*maxlen, 'Count'.ljust(digits), 'Frequency')
+        print(args.name.ljust(maxlen), 'Count'.ljust(digits), 'Frequency')
         print('='*maxlen, '='*digits, '=========')
     for line, num in zip(lines, nums):
         if args.table:
