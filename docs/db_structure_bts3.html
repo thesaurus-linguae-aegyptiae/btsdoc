@@ -2874,8 +2874,9 @@ never used with it.</p>
 <!-- TODO check the definition of this with Jakob and Simon -->
 <dl class="field-list">
 <dt><span class="docutils literal">lKey</span></dt>
-<dd><p>This field is only used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a>. If this <a class="reference internal" href="#btsword">BTSWord</a> is
-part of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>, this field is always null.</p>
+<dd><p>This field is mostly used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a>. If this <a class="reference internal" href="#btsword">BTSWord</a> is
+part of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>, this field is null most of the time but may point to other entries in case of a compound
+word.</p>
 <p>This field contains the couchDB object <span class="docutils literal">_id</span> of the <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> this word can be found in. Note that
 <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> object ids are human-readable short numbers (5-6 digit) that also serve as human-readable
 dictionary keys.</p>

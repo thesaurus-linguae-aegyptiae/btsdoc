@@ -1782,8 +1782,9 @@ never used with it.
 .. TODO check the definition of this with Jakob and Simon
 
 :``lKey``:
-    This field is only used when this `BTSWord`_ is part of a transliteration in a `BTSText`_. If this `BTSWord`_ is
-    part of a `BTSLemmaEntry`_, this field is always null.
+    This field is mostly used when this `BTSWord`_ is part of a transliteration in a `BTSText`_. If this `BTSWord`_ is
+    part of a BTSLemmaEntry_, this field is null most of the time but may point to other entries in case of a compound
+    word.
 
     This field contains the couchDB object ``_id`` of the `BTSLemmaEntry`_ this word can be found in. Note that
     `BTSLemmaEntry`_ object ids are human-readable short numbers (5-6 digit) that also serve as human-readable
