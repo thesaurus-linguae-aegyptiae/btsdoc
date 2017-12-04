@@ -3,34 +3,34 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
-<title>Datenbankstruktur des BTS Version 3</title>
+<title>Database Structure of the BTSv3</title>
 <link rel="stylesheet" href="bootstrap.css" type="text/css" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
-<div class="document" id="datenbankstruktur-des-bts-version-3">
-<h1 class="title">Datenbankstruktur des BTS Version 3</h1>
+<div class="document" id="database-structure-of-the-btsv3">
+<h1 class="title">Database Structure of the BTSv3</h1>
 
-<div class="section" id="einleitung">
-<h1>Einleitung</h1>
-<p>Das BTS3 läuft auf einer CouchDB. Es gibt eine zentrale Instanz sowie als Teil jeder BTS3-Installation eine lokale
-Instanz. Die lokale Instanz wird über die CouchDB-eigene Synchronisationsfunktion bidirektional mit der zentralen
-Instanz synchronisiert. Lokal redet der BTS3-Java-Prozess über HTTP an localhost mit der lokalen CouchDB. Im
-BTS3-Java-prozess läuft eingebettet eine Elasticsearch-Instanz, die mit Daten aus der lokalen CouchDB gefüttert wird.
-Deshalb ist die auch ständig nicht mehr synchron und muss ständig von Hand über den BTS3-Datenbankmanager neu
-synchronisiert werden.</p>
+<div class="section" id="introduction">
+<h1>Introduction</h1>
+<p>BTS version 3 is running on a CouchDB. There is a single central instance as well as one local instance per BTS3
+installation. The local instances are kept in sync with the central instance using the synchronization feature built
+into CouchDB. The java process of a BTS3 instance talks to its local CouchDB instance using HTTP against localhost.
+Embedded into the BTS3 java process is an Elasticsearch instance that is fed from the local couchdb. This
+synchronization being only half working is the reason one frequently must manually kick of &quot;indexing&quot; actions from a
+complaining BTS3 dialog.</p>
 <p>This document starts out with an overview of all object types defined in the source, not their manifestation in the
 database. Thus it includes super-types that are not directly present in the database.</p>
 </div>
-<div class="section" id="allgemeines-objektlayout-in-der-datenbank">
-<h1>Allgemeines Objektlayout in der Datenbank</h1>
-<p>Alle hier aufgelisteten Objekte bilden 1:1 auf Java-Klassen ab. All diese Klassen sind Teil des Eclipse eObject-Systems.
-Jedes Objekt enthält ein Attribut <span class="docutils literal">eClass</span>, das eine Pseudo-URL enthält, die den Typen dieses Objektes eindeutig
-identifiziert. Diese URL folgt immer dem Schema <span class="docutils literal"><span class="pre">http://{&quot;btsmodel&quot;</span> oder <span class="pre">&quot;btsCorpusModel&quot;}/1.0#//{Name</span> der eClass}</span>.
-Es gibt zwei Gruppen von eClass-Definitionen, oder <em>Modelle</em>: Das <span class="docutils literal">btsmodel</span> sowie das <span class="docutils literal">btsCorpusModel</span> (sic!).
-Ersteres enthält hauptsächlich interne Verwaltungsklassen, letzteres die Klassen für die eigentlichen Nutzdaten. Im
-folgenden eine Auflistung aller definierten <span class="docutils literal">eClass</span>-Pseudo-URLs mit der Angabe, ob diese auch tatsächlich irgendwo in
-der Datenbank zu finden sind.</p>
+<div class="section" id="general-object-layout-inside-the-database">
+<h1>General Object Layout inside the Database</h1>
+<p>All object types listed here map 1:1 to Java classes. Each of these classes is mapped to Eclipse's eObject system. Every
+object in the database contains an attribute <span class="docutils literal">eClass</span> that uniquely identifies the type of this object. This attribute
+looks like a HTTP URL but isn't: <span class="docutils literal"><span class="pre">http://{&quot;btsmodel&quot;</span> or <span class="pre">&quot;btsCorpusModel&quot;}/1.0#//{eClass</span> name}</span>.  There is two groups
+of eClass definitions, called models: The <span class="docutils literal">btsmodel</span> or base model and the <span class="docutils literal">btsCorpusModel</span> (sic!) or corpus model.
+The base model mainly contains internal management types. The corpus model contains types for the actual payload of the
+BTS.</p>
+<p>Following are two graphs that describe the relationship between all types, one for each model.</p>
 <div class="figure">
 <a class="reference external image-reference" href="graphs/basemodel_interface_graph.pdf"><img alt="graphs/basemodel_interface_graph.png" src="graphs/basemodel_interface_graph.png" style="width: 100%;" /></a>
 <p class="caption">Graph of all interfaces of the base model. For one including the impls, see <a class="reference external" href="graphs/basemodel_type_graph.pdf">basemodel_type_graph.pdf</a>.</p>
@@ -39,8 +39,10 @@ der Datenbank zu finden sind.</p>
 <a class="reference external image-reference" href="graphs/corpusmodel_interface_graph.pdf"><img alt="graphs/corpusmodel_interface_graph.png" src="graphs/corpusmodel_interface_graph.png" style="width: 100%;" /></a>
 <p class="caption">Graph of all interfaces of the corpus model. For one including the impls, see <a class="reference external" href="graphs/corpusmodel_type_graph.pdf">corpusmodel_type_graph.pdf</a>.</p>
 </div>
-<div class="section" id="definierte-eclasses-des-basis-modells">
-<h2>Definierte eClasses des Basis-Modells</h2>
+<div class="section" id="tables-of-defined-eclass-values">
+<h2>Tables of Defined eClass Values</h2>
+<p>Following is a table per model of all defined eClasses including information on whether they are to be found in the
+database.</p>
 <table>
 <colgroup>
 <col style="width: 63%" />
@@ -49,8 +51,8 @@ der Datenbank zu finden sind.</p>
 </colgroup>
 <thead>
 <tr><th class="head"><p>eClass</p></th>
-<th class="head"><p>In Datenbank <a class="footnote-reference brackets" href="#db" id="id1">1</a></p></th>
-<th class="head"><p>Anmerkungen</p></th>
+<th class="head"><p>In database <a class="footnote-reference brackets" href="#db" id="id1">1</a></p></th>
+<th class="head"><p>Notes</p></th>
 </tr>
 </thead>
 <tbody>
@@ -192,9 +194,6 @@ der Datenbank zu finden sind.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="definierte-eclasses-des-corpus-modells">
-<h2>Definierte eClasses des Corpus-Modells</h2>
 <table>
 <colgroup>
 <col style="width: 63%" />
@@ -203,8 +202,8 @@ der Datenbank zu finden sind.</p>
 </colgroup>
 <thead>
 <tr><th class="head"><p>eClass</p></th>
-<th class="head"><p>In Datenbank <a class="footnote-reference brackets" href="#db" id="id4">1</a></p></th>
-<th class="head"><p>Anmerkungen</p></th>
+<th class="head"><p>In database <a class="footnote-reference brackets" href="#db" id="id4">1</a></p></th>
+<th class="head"><p>Notes</p></th>
 </tr>
 </thead>
 <tbody>
@@ -316,19 +315,23 @@ der Datenbank zu finden sind.</p>
 </table>
 <dl class="footnote brackets">
 <dt class="label" id="db"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>)</span></dt>
-<dd><p>Ist die jeweilige eClass zwar im Modell vorhanden, aber nirgendwo in der Datenbank zu finden? Das ist z.B. bei
-rein abstrakten Basisklassen der Fall.</p>
+<dd><p>This eClass is present only in the model, not in the database. This is the case e.g. for abstract base types.</p>
 </dd>
 <dt class="label" id="implonly"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
-<dd><p>Es ist kein separates Interface vorhanden. Die zugehörige Impl-Klasse benutzt ein generisches
-Eclipse-Interface.</p>
+<dd><p>There is no custom implementation of this eClass. The corresponding interface uses a generic
+implementation from eclipse.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="section" id="database-types">
 <h1>Database types</h1>
-<p>There is several different databases that are used by the BTS.</p>
+<p>There are several different database types that are used by the BTS.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A single CouchDB instance may contain several &quot;databases&quot;, each of which may contain a whole bunch of disparate
+&quot;documents&quot;.</p>
+</div>
 <div class="section" id="global">
 <h2>Global</h2>
 <p>These global databases are present exactly once and are common to all projects and corpora.</p>

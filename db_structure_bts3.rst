@@ -1,29 +1,30 @@
-Datenbankstruktur des BTS Version 3
-===================================
+Database Structure of the BTSv3
+===============================
 
-Einleitung
-----------
+Introduction
+------------
 
-Das BTS3 läuft auf einer CouchDB. Es gibt eine zentrale Instanz sowie als Teil jeder BTS3-Installation eine lokale
-Instanz. Die lokale Instanz wird über die CouchDB-eigene Synchronisationsfunktion bidirektional mit der zentralen
-Instanz synchronisiert. Lokal redet der BTS3-Java-Prozess über HTTP an localhost mit der lokalen CouchDB. Im
-BTS3-Java-prozess läuft eingebettet eine Elasticsearch-Instanz, die mit Daten aus der lokalen CouchDB gefüttert wird.
-Deshalb ist die auch ständig nicht mehr synchron und muss ständig von Hand über den BTS3-Datenbankmanager neu
-synchronisiert werden.
+BTS version 3 is running on a CouchDB. There is a single central instance as well as one local instance per BTS3
+installation. The local instances are kept in sync with the central instance using the synchronization feature built
+into CouchDB. The java process of a BTS3 instance talks to its local CouchDB instance using HTTP against localhost.
+Embedded into the BTS3 java process is an Elasticsearch instance that is fed from the local couchdb. This
+synchronization being only half working is the reason one frequently must manually kick of "indexing" actions from a
+complaining BTS3 dialog.
 
 This document starts out with an overview of all object types defined in the source, not their manifestation in the
 database. Thus it includes super-types that are not directly present in the database.
 
-Allgemeines Objektlayout in der Datenbank
+General Object Layout inside the Database
 -----------------------------------------
 
-Alle hier aufgelisteten Objekte bilden 1:1 auf Java-Klassen ab. All diese Klassen sind Teil des Eclipse eObject-Systems.
-Jedes Objekt enthält ein Attribut ``eClass``, das eine Pseudo-URL enthält, die den Typen dieses Objektes eindeutig
-identifiziert. Diese URL folgt immer dem Schema ``http://{"btsmodel" oder "btsCorpusModel"}/1.0#//{Name der eClass}``.
-Es gibt zwei Gruppen von eClass-Definitionen, oder *Modelle*: Das ``btsmodel`` sowie das ``btsCorpusModel`` (sic!).
-Ersteres enthält hauptsächlich interne Verwaltungsklassen, letzteres die Klassen für die eigentlichen Nutzdaten. Im
-folgenden eine Auflistung aller definierten ``eClass``-Pseudo-URLs mit der Angabe, ob diese auch tatsächlich irgendwo in
-der Datenbank zu finden sind.
+All object types listed here map 1:1 to Java classes. Each of these classes is mapped to Eclipse's eObject system. Every
+object in the database contains an attribute ``eClass`` that uniquely identifies the type of this object. This attribute
+looks like a HTTP URL but isn't: ``http://{"btsmodel" or "btsCorpusModel"}/1.0#//{eClass name}``.  There is two groups
+of eClass definitions, called models: The ``btsmodel`` or base model and the ``btsCorpusModel`` (sic!) or corpus model.
+The base model mainly contains internal management types. The corpus model contains types for the actual payload of the
+BTS.
+
+Following are two graphs that describe the relationship between all types, one for each model.
 
 .. figure:: graphs/basemodel_interface_graph.png
     :width: 100%
@@ -40,13 +41,16 @@ der Datenbank zu finden sind.
 .. _`basemodel_type_graph.pdf`: graphs/basemodel_type_graph.pdf
 .. _`corpusmodel_type_graph.pdf`: graphs/corpusmodel_type_graph.pdf
 
-Definierte eClasses des Basis-Modells
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tables of Defined eClass Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Following is a table per model of all defined eClasses including information on whether they are to be found in the
+database.
 
 .. table::
 
     ======================================================= =================== =============
-    eClass                                                  In Datenbank [#db]_ Anmerkungen
+    eClass                                                  In database [#db]_  Notes
     ======================================================= =================== =============
     ``http://btsmodel/1.0#//AdministrativDataObject``       ✘
     ``http://btsmodel/1.0#//BTSComment``                    ✔
@@ -84,13 +88,10 @@ Definierte eClasses des Basis-Modells
     ``http://btsmodel/1.0#//StringToStringMap``             ✘                   [#implonly]_
     ======================================================= =================== =============
 
-Definierte eClasses des Corpus-Modells
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. table::
 
     ======================================================= =================== =============
-    eClass                                                  In Datenbank [#db]_ Anmerkungen
+    eClass                                                  In database [#db]_  Notes
     ======================================================= =================== =============
     ``http://btsCorpusModel/1.0#//BTSAbstractParagraph``    ✘
     ``http://btsCorpusModel/1.0#//BTSAbstractText``         ✘
@@ -120,15 +121,18 @@ Definierte eClasses des Corpus-Modells
     ``http://btsCorpusModel/1.0#//BTSWord``                 ✔
     ======================================================= =================== =============
 
-.. [#db] Ist die jeweilige eClass zwar im Modell vorhanden, aber nirgendwo in der Datenbank zu finden? Das ist z.B. bei
-    rein abstrakten Basisklassen der Fall.
-.. [#implonly] Es ist kein separates Interface vorhanden. Die zugehörige Impl-Klasse benutzt ein generisches
-    Eclipse-Interface.
+.. [#db] This eClass is present only in the model, not in the database. This is the case e.g. for abstract base types.
+.. [#implonly] There is no custom implementation of this eClass. The corresponding interface uses a generic
+    implementation from eclipse.
 
 Database types
 --------------
 
-There is several different databases that are used by the BTS.
+There are several different database types that are used by the BTS.
+
+.. NOTE::
+    A single CouchDB instance may contain several "databases", each of which may contain a whole bunch of disparate
+    "documents".
 
 Global
 ~~~~~~
