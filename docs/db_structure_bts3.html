@@ -180,10 +180,6 @@ database.</p>
 <td><p>✔</p></td>
 <td></td>
 </tr>
-<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//UserActionCounter</span></span></p></td>
-<td><p>✘</p></td>
-<td></td>
-</tr>
 <tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//StringToStringListMap</span></span></p></td>
 <td><p>✘</p></td>
 <td><p><a class="footnote-reference brackets" href="#implonly" id="id2">2</a></p></td>
@@ -191,6 +187,10 @@ database.</p>
 <tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//StringToStringMap</span></span></p></td>
 <td><p>✘</p></td>
 <td><p><a class="footnote-reference brackets" href="#implonly" id="id3">2</a></p></td>
+</tr>
+<tr><td><p><span class="docutils literal"><span class="pre">http://btsmodel/1.0#//UserActionCounter</span></span></p></td>
+<td><p>✘</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -416,12 +416,14 @@ like this:</p>
   &quot;1&#64;2015-06-26T16:18:09&#64;74cb6b70ab6b58566bfadc664b00282d&quot;,
   &quot;2&#64;2015-08-06T10:56:12&#64;IHYWLODR3RDGHIAJRRNREH7MIQ&quot; ]</code></pre>
 <p>The first element is an incrementing revision number, the second one is a timestamp in some random timezone and the
-third one is the couchdb object id of the user to blame. As usual, don't expect these to <em>always</em> actually follow
-that format as <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BtsmodelFactoryImpl.java#L491">the parsing code in BtsmodelFactoryImpl.java</a> made to fail silently.</p>
+third one is the couchdb object id of the user to blame. Don't expect these to <em>always</em> actually follow that format
+as <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/db/model/src/org/bbaw/bts/btsmodel/impl/BtsmodelFactoryImpl.java#L491">the parsing code in BtsmodelFactoryImpl.java</a> made to fail silently. There don't seem to be any inconsistencies
+so far but I would not rely on that.</p>
 <p>In the java domain these revisions are represented by eclipsey <a class="reference internal" href="#btsrevision">BTSRevision</a> objects.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
-<p>The CouchDB user ID in some cases is some random-looking string, but in some cases it is the user's login name.</p>
+<p>For accounts migrated from an older version of the BTS, the CouchDB user ID is a random string. For new accounts
+it is the user's login name.</p>
 </div>
 <!-- ATTENTION:
 
@@ -437,7 +439,7 @@ any way. Just have a look at `addRevisionStatementInternal in GenericObjectServi
 Absence of this field seems to be considered equivalent with its value being <span class="docutils literal">active</span>.</p>
 <p>The semantics of this are similar to a &quot;is_deleted&quot; field. To &quot;delete&quot; an object, you set its <span class="docutils literal">state</span> from
 <span class="docutils literal">active</span> to <span class="docutils literal">terminated</span>, but leave the object in the database. This means you never delete an object's history
-and an user can't mess up <em>too</em> bad.</p>
+and an user can't mess up <em>too</em> badly.</p>
 <p>This field seems to be only ever checked in a smattering of UI classes, namely <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/corpus/src/org/bbaw/bts/ui/corpus/parts/CorpusNavigatorPart.java#L434">CorpusNavigatorPart.java</a>, <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/corpus/src/org/bbaw/bts/ui/corpus/parts/AnnotationsPart.java#L809">AnnotationsPart.java</a>, <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/egy/src/org/bbaw/bts/ui/egy/textSign/SignTextComposite.java#L1776">SignTextComposite.java</a> and <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/ui/egy/src/org/bbaw/bts/ui/egy/parts/EgyTextEditorPart.java#L2135">EgyTextEditorPart.java</a>.</p>
 </dd>
 </dl>
@@ -447,9 +449,9 @@ and an user can't mess up <em>too</em> bad.</p>
 under the <span class="docutils literal"><span class="pre">Revision-Status</span></span> meta model entry.  There is a convoluted system in place to restrict which states can
 be applied to which object types, however in practice luckily this remains mostly unused.</p>
 <p>The meaning of this field is something along the lines of &quot;has this object been reviewed for publication?&quot;</p>
-<p>This field is used in the code in a somewhat inconsistent manner. Most object types do not have any code referring
-to it even though all objects carry it. It seems the only place it <em>is</em> in fact used is with lemmata, and there <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-services-impl/src/org/bbaw/bts/core/services/corpus/impl/services/BTSLemmaEntryServiceImpl.java#L244">the
-code</a> looks like this:</p>
+<p>This field is used in the java code in a somewhat inconsistent manner. Most object types do not have any code
+referring to it even though all objects carry it. It seems the only place it <em>is</em> in fact used is with lemmata, and
+there <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/corpus-services-impl/src/org/bbaw/bts/core/services/corpus/impl/services/BTSLemmaEntryServiceImpl.java#L244">the code</a> looks like this:</p>
 <pre class="code literal-block"><code>entry.getRevisionState().contains(&quot;obsolete&quot;)</code></pre>
 </dd>
 </dl>
@@ -465,9 +467,9 @@ to be described in the <span class="docutils literal">Visibility</span> meta mod
 </div>
 <div class="section" id="btscomment">
 <h2>BTSComment</h2>
-<p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored in
-the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of exactly one
-<a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<p>A <span class="docutils literal">BTSComment</span> describes a human-language comment on some object or text section. All comments on a project are stored
+in the project's <span class="docutils literal">{project name}_admin</span> database and link to their target object or text part by means of one or more
+<a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a> objects.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>All <a class="reference internal" href="#btscomment">BTSComment</a> instances are stored in the <a class="reference internal" href="#project-admin-database">project admin database</a>.</p>
@@ -537,8 +539,8 @@ not.</p>
 </dl>
 <dl class="field-list" id="ownerreferencedtypesstringlist">
 <dt><span class="docutils literal">ownerReferencedTypesStringList</span></dt>
-<dd><p>This field is relevant only(?) for a <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> describing a passport field. In this case, this field
-points at an enumeration of the allowed values for the described passport field. See <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a>.
+<dd><p>This field is relevant only for a <a class="reference internal" href="#btsconfigitem">BTSConfigItem</a> describing a passport field. In this case, this field points at
+an enumeration of the allowed values for the described passport field. See <a class="reference internal" href="#btspassporteditorconfig">BTSPassportEditorConfig</a>.
 Example:</p>
 <pre class="code literal-block"><code>[
     &quot;objectTypes.CorpusObject&gt;&gt;74cb6b70ab6b58566bfadc664b001f0c.Custom-Entries.language,&quot;,
@@ -551,7 +553,7 @@ format roughly is <span class="docutils literal"><span class="pre">{source}&gt;&
 <p>Each <span class="docutils literal">{target}</span> entry points either at a <a class="reference internal" href="#btsconfig">BTSConfig</a> subtree with leaf nodes being possible values or points at a
 particular <span class="docutils literal">type</span> of <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> objects in the global thesaurus. The input fields use this type to filter the
 <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> instances they display in their browsers.</p>
-<p>In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
+<p>In fact this field contains its own little borked DSL, but considering overall there are only 393 instances of it a
 proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
 inclined you may have look at all its nasty innards in <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/core-services-impl/src/org/bbaw/bts/core/services/impl/services/BTSConfigurationServiceImpl.java#L535">BTSConfigurationServiceImpl.java</a></p>
 <div class="admonition attention">
@@ -661,8 +663,8 @@ hex-encoded random value to distinguish concurrent revisions.</p>
 <h3>Access control fields</h3>
 <p>These fields are part of a half-finished implementation of a limited form of <a class="reference external" href="https://en.wikipedia.org/wiki/Access_control_list">ACLs</a>. The idea is that on a per-object
 basis, a list of users or groups with read permission and a list of users or groups with update permission may be added.
-There does not seem to be any code to propagate permissions from parent to child objects and in the database most
-objects do not seem to contain sensible ACLs.</p>
+There is no code to propagate permissions from parent to child objects and in the database most objects do not seem to
+contain sensible ACLs.</p>
 <dl class="field-list simple">
 <dt><span class="docutils literal">updaters</span></dt>
 <dd><p></p></dd>
@@ -706,8 +708,13 @@ a particular obejct.  Has no functional value.</p>
 </div>
 <div class="section" id="btsdbcollectionroledesc">
 <h2>BTSDBCollectionRoleDesc</h2>
-<p>This type describes a per-project &quot;role&quot;. A role seems to be just a set of permissions such as &quot;r&quot; for a &quot;reader&quot; or
-&quot;rw&quot; for an updater.</p>
+<p>This type describes a per-project &quot;role&quot;. A role is a set of permissions such as &quot;r&quot; for a &quot;reader&quot; or &quot;rw&quot; for an
+updater.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>There are two ways a user may become owner of a role. One is through <span class="docutils literal">userNames</span>, the other is through a group via
+the misnamed <span class="docutils literal">userRoles</span>.</p>
+</div>
 <dl class="field-list simple">
 <dt><span class="docutils literal">roleName</span></dt>
 <dd><p>This field contains the name of the role, such as <span class="docutils literal">&quot;guests&quot;</span> or <span class="docutils literal">&quot;editors&quot;</span>.</p>
@@ -716,8 +723,8 @@ a particular obejct.  Has no functional value.</p>
 <dd><p>This field is a list of (human-readable) user names that have this role.</p>
 </dd>
 <dt><span class="docutils literal">userRoles</span></dt>
-<dd><p>Contrary to its name, this field contains a list of couchDB ids of <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> objects. I'm not sure what the
-meaning of this is, but I suppose that all members of these groups kinda also get to have this role??</p>
+<dd><p>Contrary to its name, this field contains a list of couchDB ids of <a class="reference internal" href="#btsusergroup">BTSUserGroup</a> objects. All members of one of
+these groups is also an owner of this role.</p>
 </dd>
 </dl>
 </div>
@@ -746,7 +753,9 @@ three fields to it of which only <span class="docutils literal">masterServer</sp
 </div>
 <div class="section" id="btsexternalreference">
 <h2>BTSExternalReference</h2>
-<p>Below is a table of which types use <span class="docutils literal">BTSExternalReference</span> objects in their <span class="docutils literal">externalReferences</span> fields.</p>
+<p>A <a class="reference internal" href="#btsexternalreference">BTSExternalReference</a> describes an internal reference from one BTS object to another BTS object. This system exists
+in addition to the <a class="reference internal" href="#btsrelation">BTSRelation</a> logic. Below is a table of which types use <span class="docutils literal">BTSExternalReference</span> objects in their
+<span class="docutils literal">externalReferences</span> fields.</p>
 <table>
 <colgroup>
 <col style="width: 53%" />
@@ -845,9 +854,12 @@ version of the AÄW. Note that anything besides these two is perfectly irrelevan
 </table>
 </dd>
 <dt><span class="docutils literal">reference</span></dt>
-<dd><p></p></dd>
+<dd><p>This is the actual text of the reference. Generally, this is the target object's database ID.</p>
+</dd>
 <dt><span class="docutils literal">provider</span></dt>
-<dd><p></p></dd>
+<dd><p>This is redundant to <span class="docutils literal">type</span> to describe what kind of thing this reference describes. The valid values of the field
+are enumerated in the meta model.</p>
+</dd>
 </dl>
 </div>
 <div class="section" id="btsidreservationobject">
@@ -898,9 +910,9 @@ document). Its sole field is:</p>
 <dt><span class="docutils literal">_id</span></dt>
 <dd><p>The raw couchdb object ID. Do not make any assumptions about the contents of this field. Treat it as couchdb treats
 it: As an arbitrary string. Fun fact: There is both an object with the <span class="docutils literal">_id</span> <span class="docutils literal"><span class="pre">-1</span></span> and one with the <span class="docutils literal">_id</span>
-<span class="docutils literal"><span class="pre">-2</span></span>.</p>
+<span class="docutils literal"><span class="pre">-2</span></span>, among other oddities.</p>
 <p>Using the following code we can get some statistics about these ids.</p>
-<pre class="code literal-block"><code>set count (wc -l ids|cut -d' ' -f1); for re in '^&quot;[0-9]+&quot;$' '^&quot;[0-9a-f]{32}&quot;$' '^&quot;[a-zA-Z0-9]{27}&quot;$' '^&quot;[A-Z0-9]{26}&quot;$' '^&quot;dm[0-9]*&quot;$'; set num (egrep $re ids|wc -l); echo $re $num (echo $num/$count|bc -l); end</code></pre>
+<pre class="code literal-block"><code>set count (wc -l ids|cut -d' ' -f1); for re in '^&quot;[0-9]+&quot;$' '^&quot;[0-9a-f]{32}&quot;$' '^&quot;[a-zA-Z0-9]{27}&quot;$' '^&quot;[A-Z0-9]{26}&quot;$' '^&quot;dm?[0-9]*&quot;$'; set num (egrep $re ids|wc -l); echo $re $num (echo $num/$count|bc -l); end</code></pre>
 <p>The total number of objects is slightly over 4.4 million.</p>
 <table>
 <colgroup>
@@ -928,16 +940,16 @@ it: As an arbitrary string. Fun fact: There is both an object with the <span cla
 <td><p>1.18%</p></td>
 </tr>
 <tr><td><p><span class="docutils literal"><span class="pre">dm[0-9]*</span></span></p></td>
-<td><p>7971</p></td>
-<td><p>0.18%</p></td>
+<td><p>15070</p></td>
+<td><p>0.34%</p></td>
 </tr>
 <tr><td><p><span class="docutils literal"><span class="pre">[0-9a-f]{32}</span></span></p></td>
 <td><p>3</p></td>
 <td><p>0.00%</p></td>
 </tr>
 <tr><td><p>other</p></td>
-<td><p>7932</p></td>
-<td><p>0.18%</p></td>
+<td><p>833</p></td>
+<td><p>0.02%</p></td>
 </tr>
 </tbody>
 </table>
@@ -1345,12 +1357,16 @@ this regex before submitting changes.</p>
 <div class="section" id="btsproject">
 <h2>BTSProject</h2>
 <p>A &quot;Project&quot; is a single administrative entity. It has its own database configuration, access control rules and set of
-corpora. <span class="docutils literal">BTSProject</span> is a subtype of <a class="reference internal" href="#btsobject">BTSObject</a>. As in any good data model, there is no direct link between a
-<span class="docutils literal">BTSProject</span> and its constituent <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> instances. Both are only linked through the <span class="docutils literal">corpusPrefix</span> field
-in <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> pointing at one of the <a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a> instances of the <a class="reference internal" href="#btsproject">BTSProject</a>. Every time the
-<span class="docutils literal">BTSProject</span> side of the database has to be accessed from the <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> side, the
-<a class="reference internal" href="#btsproject">BTSProject</a>/<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a>/whatever is simply looked up by <span class="docutils literal">corpusPrefix</span>. A good starting point for
-looking into this is <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L691-L704">getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java</a>.</p>
+corpora. <span class="docutils literal">BTSProject</span> is a subtype of <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention!</p>
+<p>There is no direct link between a <span class="docutils literal">BTSProject</span> and its constituent <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a> instances.</p>
+<p>Both are only linked through the <span class="docutils literal">corpusPrefix</span> field in <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> pointing at one of the
+<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a> instances of the <a class="reference internal" href="#btsproject">BTSProject</a>. Every time the <span class="docutils literal">BTSProject</span> side of the database has to
+be accessed from the <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> side, the <a class="reference internal" href="#btsproject">BTSProject</a>/<a class="reference internal" href="#btsprojectdbcollection">BTSProjectDBCollection</a>/whatever is simply looked
+up by <span class="docutils literal">corpusPrefix</span>. A good starting point for looking into this is <a class="reference external" href="https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/core/controller-impl/src/org/bbaw/bts/core/controller/impl/generalController/PermissionsAndExpressionsEvaluationControllerImpl.java#L691-L704">getDBCollection in
+PermissionsAndExpressionsEvaluationControllerImpl.java</a>.</p>
+</div>
 <p>The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
 one can select one or multiple projects to download.</p>
 <div class="admonition note">
@@ -1411,8 +1427,9 @@ for details.</p>
 </div>
 <div class="section" id="btsrelation">
 <h2>BTSRelation</h2>
-<p>Since CouchDB is a document oriented database what more natural way is there to describe the tree-like hierarchy of
-objects than by kludging an ersatz relational layer on it?</p>
+<p>Though CouchDB is a document-oriented database and lends itself quite well to tree- or graph-structured data, this is
+not how it is used in BTS. Instead, the tree-like structure of objects is represented with an ersatz relational layer
+made up of <a class="reference internal" href="#btsrelation">BTSRelation</a> objects.</p>
 <p>A <span class="docutils literal">BTSRelation</span> represents a single item in a relation (and not as the name implies the relation itself). An
 implementation detail is that these relations are inherently directional, and the <span class="docutils literal">BTSRelation</span> object is always
 stored in the <em>head</em> object. So, a <a class="reference internal" href="#partof">partOf</a> relation describing that object <span class="docutils literal">A</span> is a part of object <span class="docutils literal">B</span> would be
@@ -1529,8 +1546,8 @@ Type <font color="#3399cc">CorpusModel:LemmaEntry</font>
 <div class="section" id="partof-relations">
 <span id="partof"></span><h3>PartOf relations</h3>
 <p>In certain cases such as when used with a <a class="reference internal" href="#btscomment">BTSComment</a> a <a class="reference internal" href="#partof">partOf</a> relation may contain <span class="docutils literal">parts</span>. Each &quot;part&quot; is a
-<a class="reference internal" href="#btsintertextreference">BTSInterTextReference</a> pointing to part of some text. The statistics of the number of parts as extracted from a
-database backup are as follows.</p>
+<a class="reference internal" href="#btsintertextreference">BTSInterTextReference</a> pointing to part of some text. The statistics of the number of parts of a single relation as
+extracted from a database backup are as follows.</p>
 <p><span class="docutils literal">jq <span class="pre">'.docs[].relations[]?.parts</span> | length' *.json | sort | uniq <span class="pre">-c</span> | sort <span class="pre">-bnk2</span></span></p>
 <table>
 <colgroup>
@@ -1797,9 +1814,9 @@ edit in the UI.</p>
 </div>
 <div class="section" id="btsambivalence">
 <h2>BTSAmbivalence</h2>
-<p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> may be part of a <a class="reference internal" href="#btssenctence">BTSSenctence</a> and describes the case when a transliteration is ambiguous. It
-contains nothing but an array of <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> objects in its <span class="docutils literal">cases</span> attribute, each being one of the possible
-transliterations of this part of the sentence.</p>
+<p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> may be part of a <a class="reference internal" href="#btssenctence">BTSSenctence</a> and describes the case when a text passage is ambiguous, such as
+when there are different ways to transliterate or lemmatize or infer flection from it. It contains nothing but an array
+of <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> objects in its <span class="docutils literal">cases</span> attribute, each being one of the possibilities of this part of the sentence.</p>
 <p><a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> is a subtype of <a class="reference internal" href="#btstextsentenceitem">BTSTextSentenceItem</a>.</p>
 <dl class="field-list">
 <dt><span class="docutils literal">cases</span></dt>
@@ -1822,17 +1839,20 @@ seems to be unused, <a class="reference internal" href="#btslemmacase">BTSLemmaC
 </div>
 <div class="section" id="btsannotation">
 <h2>BTSAnnotation</h2>
-<p><a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a type describing a highlighted part of a text. <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and as such
-inheriting a whole slew of miscellaneous fields. The usage of <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a bit patchy.  Following is a list of
-all nontrivial fields that are used with <a class="reference internal" href="#btsannotation">BTSAnnotation</a>. The two semantically most relevant fields are <span class="docutils literal">type</span> and
-<span class="docutils literal">name</span>, as well as the one <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
+<p><a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a type describing things such as part of a text or a LemmaEntry. <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a
+<a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> and as such inheriting a whole slew of miscellaneous fields. A <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is put on some object
+with a <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>, possibly containing a <span class="docutils literal">parts</span> field.</p>
+<p>The usage of <a class="reference internal" href="#btsannotation">BTSAnnotation</a> is a bit patchy.  Following is a list of all nontrivial fields that are used with
+<a class="reference internal" href="#btsannotation">BTSAnnotation</a>. The two semantically most relevant fields are <span class="docutils literal">type</span> and <span class="docutils literal">name</span>, as well as the one <a class="reference internal" href="#partof">partOf</a>
+<a class="reference internal" href="#btsrelation">BTSRelation</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A <a class="reference internal" href="#btsannotation">BTSAnnotation</a> on some object is stored in the same database as the target object. This means an annotation
-on e.g. a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> will be stored in the corpuses <a class="reference internal" href="#private-corpus-database">private corpus database</a> while an annotation on a
-<a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> will be stored in the project's <cite>project word list database</cite>.</p>
+<p>A <a class="reference internal" href="#btsannotation">BTSAnnotation</a> on some object is generally stored in the same database as the target object. This means an
+annotation on e.g. a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> will be stored in the corpuses <a class="reference internal" href="#private-corpus-database">private corpus database</a> while an
+annotation on a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> will be stored in the project's <cite>project word list database</cite>.</p>
+<p>There are exceptions to this (such as the Goettingen's metaphor project) that are caused by the inadequate access
+control necessitating separate databases.</p>
 </div>
-<!-- TODO verify this storage association -->
 <div class="admonition attention">
 <p class="admonition-title">Attention!</p>
 <p>Do not confuse this with <a class="reference internal" href="#btscomment">BTSComment</a>, which describes a human-readable comment on some object <em>or</em> part of text.</p>
@@ -2230,7 +2250,8 @@ implementation the BTS grammar is more lenient than the one of <a class="referen
 <dd><p>This hieroglyph's <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> string.</p>
 </dd>
 <dt><span class="docutils literal">ignored</span></dt>
-<dd><p></p></dd>
+<dd><!-- TODO this -->
+</dd>
 <dt><span class="docutils literal">innerSentenceOrder</span></dt>
 <dd><p>This is an integer field that in rare cases is used to reorder <span class="docutils literal">graphics</span> within a word. When the sentence is
 translated into <a class="reference external" href="https://en.wikipedia.org/wiki/Manuel_de_Codage">MdC</a> for display, each word's <span class="docutils literal">graphics</span> are passed through a stable sort keyed on
@@ -2263,9 +2284,8 @@ dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCas
 <dl class="field-list simple">
 <dt><span class="docutils literal">name</span></dt>
 <dd><p>This field contains a string with a number identifying this alternative transliteration, e.g. <span class="docutils literal">&quot;1&quot;</span> or <span class="docutils literal">&quot;2&quot;</span>.
-This string is entered by a human. There is some inconsistencies, but almost always this string is equal to the
-index (starting from 1) of this <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a> instance in the containing <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> instance's <span class="docutils literal">cases</span>
-array.</p>
+This string is entered by a human. This string is equal to the index (starting from 1) of this <a class="reference internal" href="#btslemmacase">BTSLemmaCase</a>
+instance in the containing <a class="reference internal" href="#btsambivalence">BTSAmbivalence</a> instance's <span class="docutils literal">cases</span> array.</p>
 </dd>
 <dt><span class="docutils literal">scenario</span></dt>
 <dd><p>This field contains the actual transliteration content of this alternative. This field behaves just like
@@ -2294,7 +2314,7 @@ dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCas
 <dt><span class="docutils literal">type</span></dt>
 <dd><p></p></dd>
 <dt><span class="docutils literal">subtype</span></dt>
-<dd><p>These are used to express the word type of this entry such as <span class="docutils literal">substantive</span> or <span class="docutils literal">aadjective</span> for <span class="docutils literal">type</span> and
+<dd><p>These are used to express the word type of this entry such as <span class="docutils literal">substantive</span> or <span class="docutils literal">adjective</span> for <span class="docutils literal">type</span> and
 <span class="docutils literal"><span class="pre">verb_4-inf</span></span> or <span class="docutils literal">kings_name</span> for <span class="docutils literal">subtype</span>.  Possible values are enumerated in the <a class="reference internal" href="#btsconfig">BTSConfig</a> under
 <span class="docutils literal">√.objectTypes.Lemma</span>.</p>
 </dd>
@@ -2305,40 +2325,40 @@ dictionary entry. <a class="reference internal" href="#btslemmacase">BTSLemmaCas
 <dd><p>This field contains a lifecycle state for this entry.</p>
 <table>
 <colgroup>
-<col style="width: 66%" />
-<col style="width: 12%" />
-<col style="width: 22%" />
+<col style="width: 64%" />
+<col style="width: 13%" />
+<col style="width: 23%" />
 </colgroup>
 <thead>
-<tr><th class="head"></th>
-<th class="head"></th>
-<th class="head"></th>
+<tr><th class="head"><p>revisionState</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Frequency</p></th>
 </tr>
 </thead>
 <tbody>
-<tr><td><p>null</p></td>
-<td><p>10</p></td>
-<td><p>0.02%</p></td>
+<tr><td><p>published</p></td>
+<td><p>44082</p></td>
+<td><p>100.00%</p></td>
 </tr>
-<tr><td><p>&quot;new&quot;</p></td>
-<td><p>12</p></td>
-<td><p>0.02%</p></td>
+<tr><td><p>published-awaiting-review</p></td>
+<td><p>16440</p></td>
+<td><p>37.29%</p></td>
 </tr>
-<tr><td><p>&quot;obsolete&quot;</p></td>
-<td><p>752</p></td>
-<td><p>1.44%</p></td>
+<tr><td><p>published-obsolete</p></td>
+<td><p>7052</p></td>
+<td><p>16.00%</p></td>
 </tr>
-<tr><td><p>&quot;published-obsolete&quot;</p></td>
-<td><p>3723</p></td>
-<td><p>7.13%</p></td>
+<tr><td><p>obsolete</p></td>
+<td><p>753</p></td>
+<td><p>1.71%</p></td>
 </tr>
-<tr><td><p>&quot;published-awaiting-review&quot;</p></td>
-<td><p>14250</p></td>
-<td><p>27.30%</p></td>
+<tr><td><p>awaiting-review</p></td>
+<td><p>16</p></td>
+<td><p>0.04%</p></td>
 </tr>
-<tr><td><p>&quot;published&quot;</p></td>
-<td><p>33451</p></td>
-<td><p>64.08%</p></td>
+<tr><td><p>new</p></td>
+<td><p>6</p></td>
+<td><p>0.01%</p></td>
 </tr>
 </tbody>
 </table>
@@ -2575,6 +2595,7 @@ which groups they may occur) is described in the <a class="reference internal" h
 </table>
 <div class="section" id="passport-key-graph">
 <h3>Passport Key Graph</h3>
+<!-- TODO fix this graph. It seems it is not displayed correctly in the rendered HTML. -->
 <div class="figure">
 <a class="reference external image-reference" href="graphs/passport_graph_mapped.pdf"><img alt="graphs/passport_graph_mapped.png" src="graphs/passport_graph_mapped.png" style="width: 100%;" /></a>
 <p class="caption">A Graph of passport attribute paths found in actual live data.</p>
@@ -2652,12 +2673,12 @@ directly inherits from <a class="reference internal" href="#btsnamedtypedobject"
 <p class="admonition-title">Attention!</p>
 <p>Try to not confuse this with <a class="reference internal" href="#btstextcorpus">BTSTextCorpus</a>, <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a>, <a class="reference internal" href="#btstextcontent">BTSTextContent</a> or <a class="reference internal" href="#btsobject">BTSObject</a>.</p>
 </div>
-<p><a class="reference internal" href="#btstcobject">BTSTCObject</a> (&quot;Berlin Text System Text Corpus Object&quot;) is a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> describing what is in effect a folder
-with other computer things. The general convention is that a <a class="reference internal" href="#btstcobject">BTSTCObject</a> maps to some physical place or thing and its
-<a class="reference internal" href="#btstcobject">BTSTCObject</a> descendants are parts of it. Example: <span class="docutils literal">〈Pyramidentexte〉</span> contains <span class="docutils literal">Pyramide Pepis I.</span> contains
-<span class="docutils literal">〈Sargkammer〉</span> contains <span class="docutils literal"><span class="pre">〈&quot;Wartesaal&quot;/vestibule〉</span></span> contains <span class="docutils literal">〈Westwand〉</span> contains 26 <a class="reference internal" href="#btstext">BTSText</a> instances. As
-you can see there is no particular schema to these names, and ever representing them in some sort of path language will
-be quite challenging due to their liberal use of weird characters.</p>
+<p><a class="reference internal" href="#btstcobject">BTSTCObject</a> (&quot;Berlin Text System Text Corpus Object&quot;) is a <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a> describing what is logically very
+similar to a folder with other computer things. Semantically, in general a <a class="reference internal" href="#btstcobject">BTSTCObject</a> maps to some physical place or
+thing and its <a class="reference internal" href="#btstcobject">BTSTCObject</a> descendants are parts of it. Example: <span class="docutils literal">〈Pyramidentexte〉</span> contains <span class="docutils literal">Pyramide Pepis I.</span>
+contains <span class="docutils literal">〈Sargkammer〉</span> contains <span class="docutils literal"><span class="pre">〈&quot;Wartesaal&quot;/vestibule〉</span></span> contains <span class="docutils literal">〈Westwand〉</span> contains 26 <a class="reference internal" href="#btstext">BTSText</a>
+instances. As you can see there is no particular schema to these names, and ever representing them in some sort of path
+language will be quite challenging due to their liberal use of weird characters.</p>
 <p>A <a class="reference internal" href="#btstcobject">BTSTCObject</a> notably may possess a <a class="reference internal" href="#btspassport">BTSPassport</a> describing what effects to extended object metadata. It does not
 have any fields beyond what it inherits from <a class="reference internal" href="#btscorpusobject">BTSCorpusObject</a>.</p>
 <p>As usual, hierarchy is expressed using a <a class="reference internal" href="#partof">partOf</a> <a class="reference internal" href="#btsrelation">BTSRelation</a>. As follows there are rare cases of multiple ancestors
@@ -2852,7 +2873,7 @@ details on how the corpus side of things looks.</p>
 <p>In practice, all instances <a class="reference internal" href="#btsthsentry">BTSThsEntry</a> are organized into subtrees via <a class="reference internal" href="#partof">partOf</a> relations. All entries in one
 subtree share one <span class="docutils literal">type</span> and describe all the possible values that a particular type of passport field may assume.
 Within subtrees the entries are organized into some semantically sensible hierarchy. For example, the <span class="docutils literal">findSpot</span>
-entries in <span class="docutils literal">3 = Fundstellen</span> are organized according to their geographical hierarchy. <span class="docutils literal">3 = Funstellen</span> contains
+entries in <span class="docutils literal">3 = Fundstellen</span> are organized according to their geographical hierarchy. <span class="docutils literal">3 = Fundstellen</span> contains
 <span class="docutils literal">Wüste östlich des Niltals und Küste des Roten Meeres (Staatsgebiet Ägypten und Sudan)</span> contains <span class="docutils literal">Routen zum Roten Meer</span> contains <span class="docutils literal">Wadi Abbad</span>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -2882,8 +2903,8 @@ word.</p>
 dictionary keys.</p>
 </dd>
 <dt><span class="docutils literal">flexCode</span></dt>
-<dd><p>This field is only used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a>. If this <a class="reference internal" href="#btsword">BTSWord</a> is
-part of a <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>, this field is always null.</p>
+<dd><p>This field may be used when this <a class="reference internal" href="#btsword">BTSWord</a> is part of a transliteration in a <a class="reference internal" href="#btstext">BTSText</a> or in a composite
+<a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a>. In most <a class="reference internal" href="#btslemmaentry">BTSLemmaEntry</a> objects, this field null.</p>
 </dd>
 </dl>
 <!-- TODO explain this, and where it comes from -->

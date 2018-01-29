@@ -83,9 +83,9 @@ database.
     ``http://btsmodel/1.0#//BTSWorkflowRule``               ✘
     ``http://btsmodel/1.0#//BTSWorkflowRuleItem``           ✘
     ``http://btsmodel/1.0#//DBLease``                       ✔
-    ``http://btsmodel/1.0#//UserActionCounter``             ✘
     ``http://btsmodel/1.0#//StringToStringListMap``         ✘                   [#implonly]_
     ``http://btsmodel/1.0#//StringToStringMap``             ✘                   [#implonly]_
+    ``http://btsmodel/1.0#//UserActionCounter``             ✘
     ======================================================= =================== =============
 
 .. table::
@@ -225,14 +225,16 @@ the following.
           "2@2015-08-06T10:56:12@IHYWLODR3RDGHIAJRRNREH7MIQ" ]
 
     The first element is an incrementing revision number, the second one is a timestamp in some random timezone and the
-    third one is the couchdb object id of the user to blame. As usual, don't expect these to *always* actually follow
-    that format as `the parsing code in BtsmodelFactoryImpl.java`_ made to fail silently.
+    third one is the couchdb object id of the user to blame. Don't expect these to *always* actually follow that format
+    as `the parsing code in BtsmodelFactoryImpl.java`_ made to fail silently. There don't seem to be any inconsistencies
+    so far but I would not rely on that.
 
     In the java domain these revisions are represented by eclipsey `BTSRevision`_ objects.
 
     .. ATTENTION::
 
-        The CouchDB user ID in some cases is some random-looking string, but in some cases it is the user's login name.
+        For accounts migrated from an older version of the BTS, the CouchDB user ID is a random string. For new accounts
+        it is the user's login name.
 
     .. ATTENTION:
         
@@ -250,7 +252,7 @@ the following.
 
     The semantics of this are similar to a "is_deleted" field. To "delete" an object, you set its ``state`` from
     ``active`` to ``terminated``, but leave the object in the database. This means you never delete an object's history
-    and an user can't mess up *too* bad.
+    and an user can't mess up *too* badly.
 
     This field seems to be only ever checked in a smattering of UI classes, namely `CorpusNavigatorPart.java`_, `AnnotationsPart.java`_, `SignTextComposite.java`_ and `EgyTextEditorPart.java`_.
 
@@ -266,9 +268,9 @@ the following.
 
     The meaning of this field is something along the lines of "has this object been reviewed for publication?"
 
-    This field is used in the code in a somewhat inconsistent manner. Most object types do not have any code referring
-    to it even though all objects carry it. It seems the only place it *is* in fact used is with lemmata, and there `the
-    code`_ looks like this:
+    This field is used in the java code in a somewhat inconsistent manner. Most object types do not have any code
+    referring to it even though all objects carry it. It seems the only place it *is* in fact used is with lemmata, and
+    there `the code`_ looks like this:
 
     .. code::
 
@@ -290,9 +292,9 @@ the following.
 BTSComment
 ~~~~~~~~~~
 
-A ``BTSComment`` describes a human-language comment on some object or text section. All comments on a project are stored in
-the project's ``{project name}_admin`` database and link to their target object or text part by means of exactly one
-`partOf`_ `BTSRelation`_.
+A ``BTSComment`` describes a human-language comment on some object or text section. All comments on a project are stored
+in the project's ``{project name}_admin`` database and link to their target object or text part by means of one or more
+`partOf`_ `BTSRelation`_ objects.
 
 .. NOTE::
     All `BTSComment`_ instances are stored in the `project admin database`_.
@@ -315,6 +317,7 @@ BTSConfig
 
 Config Graph
 ^^^^^^^^^^^^
+
 .. figure:: graphs/config_graph_hybrid.png
     :width: 100%
     :target: graphs/config_graph_hybrid.pdf
@@ -359,8 +362,8 @@ Graph`_ to see how this is actually used.
 .. _ownerReferencedTypesStringList:
 
 :``ownerReferencedTypesStringList``:
-    This field is relevant only(?) for a `BTSConfigItem`_ describing a passport field. In this case, this field
-    points at an enumeration of the allowed values for the described passport field. See `BTSPassportEditorConfig`_.
+    This field is relevant only for a `BTSConfigItem`_ describing a passport field. In this case, this field points at
+    an enumeration of the allowed values for the described passport field. See `BTSPassportEditorConfig`_.
     Example:
     
     .. code::
@@ -379,7 +382,7 @@ Graph`_ to see how this is actually used.
     particular ``type`` of `BTSThsEntry`_ objects in the global thesaurus. The input fields use this type to filter the
     `BTSThsEntry`_ instances they display in their browsers.
 
-    In fact this filed contains its own little borked DSL, but considering overall there are only 393 instances of it a
+    In fact this field contains its own little borked DSL, but considering overall there are only 393 instances of it a
     proper specification is hardly worth the effort. The intention can be accurately guessed in all instances. If you are so
     inclined you may have look at all its nasty innards in `BTSConfigurationServiceImpl.java`_
 
@@ -473,8 +476,8 @@ Access control fields
 
 These fields are part of a half-finished implementation of a limited form of `ACLs`_. The idea is that on a per-object
 basis, a list of users or groups with read permission and a list of users or groups with update permission may be added.
-There does not seem to be any code to propagate permissions from parent to child objects and in the database most
-objects do not seem to contain sensible ACLs.
+There is no code to propagate permissions from parent to child objects and in the database most objects do not seem to
+contain sensible ACLs.
 
 :``updaters``:
 :``readers``:
@@ -517,8 +520,12 @@ __ https://github.com/telota/bts/blob/7f7933ae338cbb22553156658823f42e3464dac5/d
 BTSDBCollectionRoleDesc
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This type describes a per-project "role". A role seems to be just a set of permissions such as "r" for a "reader" or
-"rw" for an updater.
+This type describes a per-project "role". A role is a set of permissions such as "r" for a "reader" or "rw" for an
+updater.
+
+.. ATTENTION::
+    There are two ways a user may become owner of a role. One is through ``userNames``, the other is through a group via
+    the misnamed ``userRoles``.
 
 :``roleName``:
     This field contains the name of the role, such as ``"guests"`` or ``"editors"``.
@@ -527,8 +534,8 @@ This type describes a per-project "role". A role seems to be just a set of permi
     This field is a list of (human-readable) user names that have this role.
 
 :``userRoles``:
-    Contrary to its name, this field contains a list of couchDB ids of `BTSUserGroup`_ objects. I'm not sure what the
-    meaning of this is, but I suppose that all members of these groups kinda also get to have this role??
+    Contrary to its name, this field contains a list of couchDB ids of `BTSUserGroup`_ objects. All members of one of
+    these groups is also an owner of this role.
 
 BTSDBConnection
 ~~~~~~~~~~~~~~~
@@ -554,7 +561,9 @@ BTSDate
 BTSExternalReference
 ~~~~~~~~~~~~~~~~~~~~
 
-Below is a table of which types use ``BTSExternalReference`` objects in their ``externalReferences`` fields.
+A `BTSExternalReference`_ describes an internal reference from one BTS object to another BTS object. This system exists
+in addition to the `BTSRelation`_ logic. Below is a table of which types use ``BTSExternalReference`` objects in their
+``externalReferences`` fields.
 
 ================ ===== =========
 Type             count frequency
@@ -588,8 +597,11 @@ Type             count frequency
     ======== ===== =========
 
 :``reference``:
+    This is the actual text of the reference. Generally, this is the target object's database ID.
 
 :``provider``:
+    This is redundant to ``type`` to describe what kind of thing this reference describes. The valid values of the field
+    are enumerated in the meta model.
 
 BTSIDReservationObject
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -641,13 +653,13 @@ document). Its sole field is:
 :``_id``:
     The raw couchdb object ID. Do not make any assumptions about the contents of this field. Treat it as couchdb treats
     it: As an arbitrary string. Fun fact: There is both an object with the ``_id`` ``-1`` and one with the ``_id``
-    ``-2``. 
+    ``-2``, among other oddities. 
 
     Using the following code we can get some statistics about these ids.
 
     .. code::
 
-        set count (wc -l ids|cut -d' ' -f1); for re in '^"[0-9]+"$' '^"[0-9a-f]{32}"$' '^"[a-zA-Z0-9]{27}"$' '^"[A-Z0-9]{26}"$' '^"dm[0-9]*"$'; set num (egrep $re ids|wc -l); echo $re $num (echo $num/$count|bc -l); end
+        set count (wc -l ids|cut -d' ' -f1); for re in '^"[0-9]+"$' '^"[0-9a-f]{32}"$' '^"[a-zA-Z0-9]{27}"$' '^"[A-Z0-9]{26}"$' '^"dm?[0-9]*"$'; set num (egrep $re ids|wc -l); echo $re $num (echo $num/$count|bc -l); end
 
     The total number of objects is slightly over 4.4 million.
 
@@ -659,9 +671,9 @@ document). Its sole field is:
         ``[a-zA-Z0-9]{27}`` 4282726 96.86%
         ``[A-Z0-9]{26}``    70761    1.60%
         ``[0-9]+``          52185    1.18%
-        ``dm[0-9]*``        7971     0.18%
+        ``dm[0-9]*``        15070    0.34%
         ``[0-9a-f]{32}``    3        0.00%
-        other               7932     0.18%
+        other               833      0.02%
         =================== ======= ==========
         
     For some database objects inherited from previous BTS versions, short numeric strings such as ``100120`` are used.
@@ -880,12 +892,15 @@ BTSProject
 ~~~~~~~~~~
 
 A "Project" is a single administrative entity. It has its own database configuration, access control rules and set of
-corpora. ``BTSProject`` is a subtype of `BTSObject`_. As in any good data model, there is no direct link between a
-``BTSProject`` and its constituent `BTSTextCorpus`_ instances. Both are only linked through the ``corpusPrefix`` field
-in `BTSCorpusObject`_ pointing at one of the `BTSProjectDBCollection`_ instances of the `BTSProject`_. Every time the
-``BTSProject`` side of the database has to be accessed from the `BTSCorpusObject`_ side, the
-`BTSProject`_/`BTSProjectDBCollection`_/whatever is simply looked up by ``corpusPrefix``. A good starting point for
-looking into this is `getDBCollection in PermissionsAndExpressionsEvaluationControllerImpl.java`_.
+corpora. ``BTSProject`` is a subtype of `BTSObject`_.
+
+.. ATTENTION:: There is no direct link between a ``BTSProject`` and its constituent `BTSTextCorpus`_ instances.
+    
+    Both are only linked through the ``corpusPrefix`` field in `BTSCorpusObject`_ pointing at one of the
+    `BTSProjectDBCollection`_ instances of the `BTSProject`_. Every time the ``BTSProject`` side of the database has to
+    be accessed from the `BTSCorpusObject`_ side, the `BTSProject`_/`BTSProjectDBCollection`_/whatever is simply looked
+    up by ``corpusPrefix``. A good starting point for looking into this is `getDBCollection in
+    PermissionsAndExpressionsEvaluationControllerImpl.java`_.
 
 The BTSProject is not exposed much in the user interface. The main contact area with this type is the installer, where
 one can select one or multiple projects to download.
@@ -939,8 +954,9 @@ BTSReferencableItem
 BTSRelation
 ~~~~~~~~~~~
 
-Since CouchDB is a document oriented database what more natural way is there to describe the tree-like hierarchy of
-objects than by kludging an ersatz relational layer on it?
+Though CouchDB is a document-oriented database and lends itself quite well to tree- or graph-structured data, this is
+not how it is used in BTS. Instead, the tree-like structure of objects is represented with an ersatz relational layer
+made up of `BTSRelation`_ objects.
 
 A ``BTSRelation`` represents a single item in a relation (and not as the name implies the relation itself). An
 implementation detail is that these relations are inherently directional, and the ``BTSRelation`` object is always
@@ -980,8 +996,8 @@ PartOf relations
 ^^^^^^^^^^^^^^^^
 
 In certain cases such as when used with a `BTSComment`_ a `partOf`_ relation may contain ``parts``. Each "part" is a
-`BTSInterTextReference`_ pointing to part of some text. The statistics of the number of parts as extracted from a
-database backup are as follows.
+`BTSInterTextReference`_ pointing to part of some text. The statistics of the number of parts of a single relation as
+extracted from a database backup are as follows.
 
 ``jq '.docs[].relations[]?.parts | length' *.json | sort | uniq -c | sort -bnk2``
 
@@ -1178,9 +1194,9 @@ BTSAbstractText
 BTSAmbivalence
 ~~~~~~~~~~~~~~
 
-`BTSAmbivalence`_ may be part of a `BTSSenctence`_ and describes the case when a transliteration is ambiguous. It
-contains nothing but an array of `BTSLemmaCase`_ objects in its ``cases`` attribute, each being one of the possible
-transliterations of this part of the sentence.
+`BTSAmbivalence`_ may be part of a `BTSSenctence`_ and describes the case when a text passage is ambiguous, such as
+when there are different ways to transliterate or lemmatize or infer flection from it. It contains nothing but an array
+of `BTSLemmaCase`_ objects in its ``cases`` attribute, each being one of the possibilities of this part of the sentence.
 
 `BTSAmbivalence`_ is a subtype of `BTSTextSentenceItem`_.
 
@@ -1202,17 +1218,21 @@ BTSAmbivalenceItem
 BTSAnnotation
 ~~~~~~~~~~~~~
 
-`BTSAnnotation`_ is a type describing a highlighted part of a text. `BTSAnnotation`_ is a `BTSCorpusObject`_ and as such
-inheriting a whole slew of miscellaneous fields. The usage of `BTSAnnotation`_ is a bit patchy.  Following is a list of
-all nontrivial fields that are used with `BTSAnnotation`_. The two semantically most relevant fields are ``type`` and
-``name``, as well as the one `partOf`_ `BTSRelation`_.
+`BTSAnnotation`_ is a type describing things such as part of a text or a LemmaEntry. `BTSAnnotation`_ is a
+`BTSCorpusObject`_ and as such inheriting a whole slew of miscellaneous fields. A `BTSAnnotation`_ is put on some object
+with a `partOf`_ `BTSRelation`_, possibly containing a ``parts`` field.
+
+The usage of `BTSAnnotation`_ is a bit patchy.  Following is a list of all nontrivial fields that are used with
+`BTSAnnotation`_. The two semantically most relevant fields are ``type`` and ``name``, as well as the one `partOf`_
+`BTSRelation`_.
 
 .. NOTE::
-    A `BTSAnnotation`_ on some object is stored in the same database as the target object. This means an annotation
-    on e.g. a `BTSCorpusObject`_ will be stored in the corpuses `private corpus database`_ while an annotation on a
-    `BTSLemmaEntry`_ will be stored in the project's `project word list database`.
+    A `BTSAnnotation`_ on some object is generally stored in the same database as the target object. This means an
+    annotation on e.g. a `BTSCorpusObject`_ will be stored in the corpuses `private corpus database`_ while an
+    annotation on a `BTSLemmaEntry`_ will be stored in the project's `project word list database`.
 
-.. TODO verify this storage association
+    There are exceptions to this (such as the Goettingen's metaphor project) that are caused by the inadequate access
+    control necessitating separate databases.
 
 .. ATTENTION::
     Do not confuse this with `BTSComment`_, which describes a human-readable comment on some object *or* part of text.
@@ -1381,6 +1401,7 @@ implementation the BTS grammar is more lenient than the one of `JSesh`_. A good 
 :``code``:
     This hieroglyph's `MdC`_ string.
 :``ignored``:
+    .. TODO this
 :``innerSentenceOrder``:
     This is an integer field that in rare cases is used to reorder ``graphics`` within a word. When the sentence is
     translated into `MdC`_ for display, each word's ``graphics`` are passed through a stable sort keyed on
@@ -1416,9 +1437,8 @@ and thus also a `BTSIdentifiableItem`_.
 
 :``name``:
     This field contains a string with a number identifying this alternative transliteration, e.g. ``"1"`` or ``"2"``.
-    This string is entered by a human. There is some inconsistencies, but almost always this string is equal to the
-    index (starting from 1) of this `BTSLemmaCase`_ instance in the containing `BTSAmbivalence`_ instance's ``cases``
-    array.
+    This string is entered by a human. This string is equal to the index (starting from 1) of this `BTSLemmaCase`_
+    instance in the containing `BTSAmbivalence`_ instance's ``cases`` array.
 :``scenario``:
     This field contains the actual transliteration content of this alternative. This field behaves just like
     ``sentenceItems`` in `BTSSenctence`_ with the exception that in practice, a `BTSAmbivalence`_ instance does not
@@ -1443,7 +1463,7 @@ Notable inherited fields
 
 :``type``:
 :``subtype``:
-    These are used to express the word type of this entry such as ``substantive`` or ``aadjective`` for ``type`` and
+    These are used to express the word type of this entry such as ``substantive`` or ``adjective`` for ``type`` and
     ``verb_4-inf`` or ``kings_name`` for ``subtype``.  Possible values are enumerated in the `BTSConfig`_ under
     ``√.objectTypes.Lemma``.
 
@@ -1453,16 +1473,16 @@ Notable inherited fields
 :``revisionState``:
     This field contains a lifecycle state for this entry.
 
-    =========================== ===== =========
-                                Count Frequency
-    =========================== ===== =========
-    null                           10     0.02%
-    "new"                          12     0.02%
-    "obsolete"                    752     1.44%
-    "published-obsolete"         3723     7.13%
-    "published-awaiting-review" 14250    27.30%
-    "published"                 33451    64.08%
-    =========================== ===== =========
+    ========================= ===== =========
+    revisionState             Count Frequency
+    ========================= ===== =========
+    published                 44082   100.00%
+    published-awaiting-review 16440    37.29%
+    published-obsolete         7052    16.00%
+    obsolete                    753     1.71%
+    awaiting-review              16     0.04%
+    new                           6     0.01%
+    ========================= ===== =========
 
 :``relations``:
     While the rest of the BTS exclusively uses partOf_ relations_, lemmata heavily use all sorts of relations. Below is
@@ -1570,6 +1590,9 @@ Attribute path                              count   percentage
 
 Passport Key Graph
 ^^^^^^^^^^^^^^^^^^
+
+.. TODO fix this graph. It seems it is not displayed correctly in the rendered HTML.
+
 .. figure:: graphs/passport_graph_mapped.png
     :width: 100%
     :target: graphs/passport_graph_mapped.pdf
@@ -1644,12 +1667,12 @@ BTSTCObject
 .. ATTENTION::
     Try to not confuse this with `BTSTextCorpus`_, `BTSCorpusObject`_, `BTSTextContent`_ or `BTSObject`_.
 
-`BTSTCObject`_ ("Berlin Text System Text Corpus Object") is a `BTSCorpusObject`_ describing what is in effect a folder
-with other computer things. The general convention is that a `BTSTCObject`_ maps to some physical place or thing and its
-`BTSTCObject`_ descendants are parts of it. Example: ``〈Pyramidentexte〉`` contains ``Pyramide Pepis I.`` contains
-``〈Sargkammer〉`` contains ``〈"Wartesaal"/vestibule〉`` contains ``〈Westwand〉`` contains 26 `BTSText`_ instances. As
-you can see there is no particular schema to these names, and ever representing them in some sort of path language will
-be quite challenging due to their liberal use of weird characters.
+`BTSTCObject`_ ("Berlin Text System Text Corpus Object") is a `BTSCorpusObject`_ describing what is logically very
+similar to a folder with other computer things. Semantically, in general a `BTSTCObject`_ maps to some physical place or
+thing and its `BTSTCObject`_ descendants are parts of it. Example: ``〈Pyramidentexte〉`` contains ``Pyramide Pepis I.``
+contains ``〈Sargkammer〉`` contains ``〈"Wartesaal"/vestibule〉`` contains ``〈Westwand〉`` contains 26 `BTSText`_
+instances. As you can see there is no particular schema to these names, and ever representing them in some sort of path
+language will be quite challenging due to their liberal use of weird characters.
 
 A `BTSTCObject`_ notably may possess a `BTSPassport`_ describing what effects to extended object metadata. It does not
 have any fields beyond what it inherits from `BTSCorpusObject`_.
@@ -1758,7 +1781,7 @@ details on how the corpus side of things looks.
 In practice, all instances `BTSThsEntry`_ are organized into subtrees via `partOf`_ relations. All entries in one
 subtree share one ``type`` and describe all the possible values that a particular type of passport field may assume.
 Within subtrees the entries are organized into some semantically sensible hierarchy. For example, the ``findSpot``
-entries in ``3 = Fundstellen`` are organized according to their geographical hierarchy. ``3 = Funstellen`` contains
+entries in ``3 = Fundstellen`` are organized according to their geographical hierarchy. ``3 = Fundstellen`` contains
 ``Wüste östlich des Niltals und Küste des Roten Meeres (Staatsgebiet Ägypten und Sudan)`` contains ``Routen zum Roten
 Meer`` contains ``Wadi Abbad``.
 
@@ -1791,8 +1814,8 @@ never used with it.
     dictionary keys.
 
 :``flexCode``:
-    This field is only used when this `BTSWord`_ is part of a transliteration in a `BTSText`_. If this `BTSWord`_ is
-    part of a `BTSLemmaEntry`_, this field is always null.
+    This field may be used when this `BTSWord`_ is part of a transliteration in a `BTSText`_ or in a composite
+    `BTSLemmaEntry`_. In most `BTSLemmaEntry`_ objects, this field null.
 
 .. TODO explain this, and where it comes from
 
